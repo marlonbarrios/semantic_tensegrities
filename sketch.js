@@ -41,12 +41,11 @@ var animationStartFrame = 0;
 
 const sketch = p => {
   // Function to create heartbeat sound
-  function createHeartbeatSound() {
+  async function createHeartbeatSound() {
     try {
-      // Initialize audio context
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
+      // Ensure audio context is ready (required for mobile)
+      const ready = await ensureAudioContextReady();
+      if (!ready) return;
       
       // Create gain node for volume control
       if (!heartbeatGainNode) {
@@ -90,31 +89,15 @@ const sketch = p => {
         oscillator2.stop(now + 0.45);
       }
       
-      // Resume audio context if suspended (browsers require user interaction)
-      if (audioContext.state === 'suspended') {
-        audioContext.resume().then(() => {
-          console.log('Heartbeat audio started');
-          // Start playing after resume
+      // Audio context should already be ready from ensureAudioContextReady
+      // Play heartbeat immediately, then repeat every second (60 BPM)
+      playHeartbeat();
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
+      heartbeatInterval = setInterval(() => {
+        if (audioContext && audioContext.state === 'running') {
           playHeartbeat();
-          if (heartbeatInterval) clearInterval(heartbeatInterval);
-          heartbeatInterval = setInterval(() => {
-            if (audioContext && audioContext.state === 'running') {
-              playHeartbeat();
-            }
-          }, 1000);
-        }).catch(err => {
-          console.warn('Could not resume audio context:', err);
-        });
-      } else {
-        // Play heartbeat immediately, then repeat every second (60 BPM)
-        playHeartbeat();
-        if (heartbeatInterval) clearInterval(heartbeatInterval);
-        heartbeatInterval = setInterval(() => {
-          if (audioContext && audioContext.state === 'running') {
-            playHeartbeat();
-          }
-        }, 1000);
-      }
+        }
+      }, 1000);
       
     } catch (err) {
       console.warn('Could not initialize heartbeat sound:', err);
@@ -141,16 +124,30 @@ const sketch = p => {
     }
   }
 
+  // Helper function to ensure audio context is ready (required for mobile)
+  async function ensureAudioContextReady() {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    // On mobile, audio context must be resumed after user interaction
+    if (audioContext.state === 'suspended' || audioContext.state !== 'running') {
+      try {
+        await audioContext.resume();
+      } catch (err) {
+        console.warn('Could not resume audio context:', err);
+        return false;
+      }
+    }
+    return true;
+  }
+  
   // Function to create a bouncing sound when network appears
-  function playBouncingSound() {
+  async function playBouncingSound() {
     try {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
+      // Ensure audio context is ready before playing sound
+      const ready = await ensureAudioContextReady();
+      if (!ready) return;
       
       // Create a bouncing "boing" sound with frequency sweep
       const oscillator = audioContext.createOscillator();
@@ -178,15 +175,11 @@ const sketch = p => {
   }
 
   // Function to create a collapse sound when word is clicked
-  function playCollapseSound() {
+  async function playCollapseSound() {
     try {
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      }
-      
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
+      // Ensure audio context is ready before playing sound
+      const ready = await ensureAudioContextReady();
+      if (!ready) return;
       
       // Create a collapse "whoosh" sound with frequency sweep down
       const oscillator = audioContext.createOscillator();
@@ -3043,9 +3036,23 @@ const sketch = p => {
   };
 
   // Function to trigger text generation
-  function triggerTextGeneration() {
+  async function triggerTextGeneration() {
     if (!isLoading) {
       isLoading = true;
+      
+      // Initialize audio context on first user interaction (required for mobile)
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      // Resume audio context if suspended (required for mobile browsers)
+      if (audioContext.state === 'suspended' || audioContext.state !== 'running') {
+        try {
+          await audioContext.resume();
+        } catch (err) {
+          console.warn('Could not resume audio context:', err);
+        }
+      }
       
       // Get prompts in the current language
       const prompts = getGenerationPrompts();
@@ -3057,8 +3064,22 @@ const sketch = p => {
   }
 
   // Function to trigger text generation based on a clicked word
-  function triggerTextGenerationWithWord(word) {
+  async function triggerTextGenerationWithWord(word) {
     if (!isLoading && word) {
+      // Initialize audio context on user interaction (required for mobile)
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      // Resume audio context if suspended (required for mobile browsers)
+      if (audioContext.state === 'suspended' || audioContext.state !== 'running') {
+        try {
+          await audioContext.resume();
+        } catch (err) {
+          console.warn('Could not resume audio context:', err);
+        }
+      }
+      
       // Disable auto-generation
       autoGenerationEnabled = false; // Disable automatic generation cycle
       
@@ -3078,7 +3099,7 @@ const sketch = p => {
         isCollapsing = true;
         collapseTarget = { x: targetNode.position.x, y: targetNode.position.y };
         collapseProgress = 0;
-        playCollapseSound(); // Play collapse sound
+        await playCollapseSound(); // Play collapse sound
         
         // Start generation immediately - don't wait for collapse
         // Create a prompt that incorporates the clicked word in the current language
