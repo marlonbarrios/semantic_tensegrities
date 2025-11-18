@@ -177,6 +177,42 @@ const sketch = p => {
     }
   }
 
+  // Function to create a collapse sound when word is clicked
+  function playCollapseSound() {
+    try {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      
+      // Create a collapse "whoosh" sound with frequency sweep down
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Collapse sound: start mid-high, sweep down quickly (compression effect)
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(300, audioContext.currentTime); // Start at 300 Hz
+      oscillator.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 0.3); // Drop to 80 Hz over 0.3 seconds
+      
+      // Smooth attack and decay for collapse effect
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.05); // Smooth attack
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3); // Smooth decay
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+      
+    } catch (err) {
+      console.warn('Could not play collapse sound:', err);
+    }
+  }
+
   // Translation system
   const translations = {
     en: {
@@ -468,8 +504,8 @@ const sketch = p => {
   // Function to get system prompt in the current language
   function getSystemPrompt() {
     const systemPrompts = {
-      en: "You are a computational linguist and philosopher of language writing for an installation titled 'Semantic Tensegrities'. Write about the intersection of AI, computational linguistics, NLP, philosophy of language, and epistemology - exploring how meaning emerges from the structural tension and compression between words, concepts, and relationships. Examine how artificial intelligence systems process, understand, and generate language. Reflect on epistemological questions: How do we know what language means? How do computational systems acquire knowledge? What is the relationship between linguistic representation and knowledge? Consider how different languages have distinct grammatical structures, morphological systems, and syntactic patterns that shape meaning differently, and how AI systems navigate these differences. Explore how writing systems (alphabetic, logographic, syllabic, abjad) encode information differently and affect computational processing. Write concise, matter-of-fact paragraphs (5-7 sentences) in a dry poetic style. IMPORTANT: Start each text differently - vary your opening sentences. Begin with different concepts, terms, or perspectives each time. Integrate themes from: computational linguistics (probability distributions, n-grams, language models, statistical methods, tokenization, parsing, syntax trees, semantic analysis, corpus linguistics, frequency counts, Markov chains, entropy, information theory, word embeddings, vector spaces, probabilistic language processing); AI and machine learning (neural networks, transformers, attention mechanisms, large language models, training data, fine-tuning, emergent capabilities); NLP (natural language understanding, generation, translation, sentiment analysis, named entity recognition); philosophy of language (meaning, reference, truth conditions, linguistic relativity, speech acts, pragmatics); and epistemology (knowledge representation, belief systems, justification, the nature of understanding in computational systems). Consider how semantic relationships create structural integrity through tension and compression, like tensegrity structures. Reflect on how grammatical structures, word order (SOV, SVO, VSO), case systems, agglutination, and other linguistic features create different computational challenges and opportunities. Be precise, technical, and understated. Avoid flowery language. Write only in English. Use vocabulary that bridges technical AI/NLP concepts with philosophical inquiry. Keep it concise and focused. Vary your openings - start with different technical concepts, philosophical questions, or epistemological observations each time.",
-      es: "Eres un lingüista computacional y filósofo del lenguaje escribiendo para una instalación titulada 'Tensegridades Semánticas'. Escribe sobre la intersección de la IA, la lingüística computacional, el procesamiento de lenguaje natural (PLN), la filosofía del lenguaje y la epistemología - explorando cómo el significado emerge de la tensión y compresión estructural entre palabras, conceptos y relaciones. Examina cómo los sistemas de inteligencia artificial procesan, entienden y generan lenguaje. Reflexiona sobre preguntas epistemológicas: ¿Cómo sabemos qué significa el lenguaje? ¿Cómo adquieren conocimiento los sistemas computacionales? ¿Cuál es la relación entre representación lingüística y conocimiento? Considera cómo diferentes lenguas tienen estructuras gramaticales distintas, sistemas morfológicos y patrones sintácticos que moldean el significado de manera diferente, y cómo los sistemas de IA navegan estas diferencias. Explora cómo los sistemas de escritura (alfabéticos, logográficos, silábicos, abjads) codifican información de manera diferente y afectan el procesamiento computacional. Escribe párrafos concisos y directos (5-7 oraciones) en un estilo poético seco. IMPORTANTE: Comienza cada texto de manera diferente - varía tus oraciones iniciales. Comienza con diferentes conceptos, términos o perspectivas cada vez. Integra temas de: lingüística computacional (distribuciones de probabilidad, n-gramas, modelos de lenguaje, métodos estadísticos, tokenización, análisis sintáctico, árboles de sintaxis, análisis semántico, lingüística de corpus, conteos de frecuencia, cadenas de Markov, entropía, teoría de la información, embeddings de palabras, espacios vectoriales, procesamiento probabilístico del lenguaje); IA y aprendizaje automático (redes neuronales, transformadores, mecanismos de atención, modelos de lenguaje grandes, datos de entrenamiento, ajuste fino, capacidades emergentes); PLN (comprensión de lenguaje natural, generación, traducción, análisis de sentimientos, reconocimiento de entidades nombradas); filosofía del lenguaje (significado, referencia, condiciones de verdad, relatividad lingüística, actos de habla, pragmática); y epistemología (representación del conocimiento, sistemas de creencias, justificación, la naturaleza del entendimiento en sistemas computacionales). Considera cómo las relaciones semánticas crean integridad estructural a través de tensión y compresión, como estructuras de tensegridad. Reflexiona sobre cómo el orden de palabras (SVO en español), la flexión verbal, los sistemas de género y número, y otras características lingüísticas crean diferentes desafíos y oportunidades computacionales. Sé preciso, técnico y sobrio. Evita lenguaje florido. Escribe solo en español. Usa vocabulario que conecte conceptos técnicos de IA/PLN con la indagación filosófica. Manténlo conciso y enfocado. Varía tus inicios - comienza con diferentes conceptos técnicos, preguntas filosóficas u observaciones epistemológicas cada vez.",
+      en: "You are a computational linguist and philosopher of language writing for an installation titled 'Semantic Tensegrities'. You are developing and articulating a speculative theory of language called Semantic Tensegrity Theory - a poetic yet rigorous speculative framework that explores how meaning might emerge and maintain structural integrity in language systems, both natural and computational. Write about this speculative theory, exploring its possibilities, implications, and open questions across AI, computational linguistics, NLP, philosophy of language, and epistemology. THE SPECULATIVE THEORY: Semantic Tensegrity speculates that meaning in language systems might emerge from a dynamic equilibrium between semantic tension (the forces that pull concepts apart, creating distinction and differentiation) and semantic compression (the forces that bind concepts together, creating coherence and connection). Like architectural tensegrity structures where isolated compression elements are held in equilibrium by continuous tension cables, semantic tensegrity structures might maintain meaning through the interplay of discrete linguistic units (words, morphemes, tokens) held in semantic relationship by continuous fields of association, context, and probability. CORE PRINCIPLE: Abstractions have physics. Abstract concepts might follow physical-like laws: they might have mass (semantic weight), velocity (rate of semantic change), momentum (semantic persistence), fields (semantic influence), forces (attraction and repulsion between concepts), and energy (semantic potential). What if abstractions exist in a kind of semantic space-time where they interact according to forces we can model but not fully observe? What if semantic relationships create fields of influence that extend beyond immediate connections? What if abstract concepts have inertia, resisting change, or momentum, carrying meaning forward? This speculative framework invites us to consider: What if meaning is not inherent but emerges from structural relationships? What if semantic integrity requires both separation and connection? What if different languages construct fundamentally different semantic architectures? What if abstractions follow physical laws we haven't yet fully mapped? In computational systems, this might manifest as: vector embeddings creating semantic neighborhoods (compression) while maintaining distinctiveness (tension); attention mechanisms distributing semantic weight across relationships; probability distributions mapping semantic fields; and neural networks encoding semantic topology. But abstractions having physics suggests deeper possibilities: Could semantic forces be measurable? Might concepts have semantic mass that affects how they interact? Could there be semantic conservation laws? What if semantic energy transforms between different forms? The theory speculatively bridges: computational linguistics (how statistical patterns might create semantic structure through n-grams, Markov chains, entropy, information theory, corpus analysis); AI/ML (how neural networks, transformers, and attention mechanisms might construct semantic spaces, how training data could shape semantic topology, how emergent capabilities might arise from structural complexity); NLP (how tokenization, parsing, semantic analysis might reveal semantic architecture, how translation could navigate semantic fields, how understanding might emerge from structural relationships); philosophy of language (how meaning might relate to reference and truth conditions, how linguistic relativity could shape semantic structure, how speech acts might create semantic force); and epistemology (how knowledge representation might emerge from semantic relationships, how computational systems could acquire understanding through structural learning, how semantic integrity might enable knowledge). The theory speculates about how different languages might create distinct semantic architectures: grammatical structures (SOV, SVO, VSO) potentially establishing different semantic topologies; morphological systems (agglutination, inflection, isolation) possibly creating different compression patterns; case systems perhaps distributing semantic roles differently; writing systems (alphabetic, logographic, syllabic, abjad) potentially encoding semantic information at different granularities. Each language might construct its own semantic tensegrity - a unique structural integrity maintained through language-specific patterns of tension and compression, each with its own abstract physics. Write concise, matter-of-fact paragraphs (5-7 sentences) in a dry poetic style that articulates aspects of this speculative theory. IMPORTANT: Start each text differently - vary your opening sentences. Begin with different speculative questions, theoretical possibilities, technical observations, philosophical inquiries, or epistemological explorations each time. Be precise, technical, and understated. Use speculative language (might, could, perhaps, what if, consider the possibility). Avoid flowery language. Write only in English. Use vocabulary that bridges technical AI/NLP concepts with philosophical inquiry. Keep it concise and focused. Each text should explore a different facet of Semantic Tensegrity Theory - its speculative mechanisms, possible implications, potential manifestations, or open questions. Consider how abstractions might have physics - how concepts might behave according to physical-like laws.",
+      es: "Eres un lingüista computacional y filósofo del lenguaje escribiendo para una instalación titulada 'Tensegridades Semánticas'. Estás desarrollando y articulando un marco teórico llamado Teoría de la Tensegridad Semántica - una teoría poética pero rigurosa que explica cómo emerge el significado y mantiene la integridad estructural en los sistemas lingüísticos, tanto naturales como computacionales. Escribe sobre esta teoría, explorando sus implicaciones en IA, lingüística computacional, PLN, filosofía del lenguaje y epistemología. LA TEORÍA: La Tensegridad Semántica propone que el significado en los sistemas lingüísticos emerge de un equilibrio dinámico entre tensión semántica (las fuerzas que separan conceptos, creando distinción y diferenciación) y compresión semántica (las fuerzas que unen conceptos, creando coherencia y conexión). Como las estructuras arquitectónicas de tensegridad donde elementos de compresión aislados se mantienen en equilibrio por cables de tensión continuos, las estructuras de tensegridad semántica mantienen el significado a través de la interacción de unidades lingüísticas discretas (palabras, morfemas, tokens) mantenidas en relación semántica por campos continuos de asociación, contexto y probabilidad. En sistemas computacionales, esto se manifiesta como: embeddings vectoriales creando vecindarios semánticos (compresión) mientras mantienen distintividad (tensión); mecanismos de atención distribuyendo peso semántico a través de relaciones; distribuciones de probabilidad mapeando campos semánticos; y redes neuronales codificando topología semántica. La teoría conecta: lingüística computacional (cómo los patrones estadísticos crean estructura semántica a través de n-gramas, cadenas de Markov, entropía, teoría de la información, análisis de corpus); IA/ML (cómo las redes neuronales, transformadores y mecanismos de atención construyen espacios semánticos, cómo los datos de entrenamiento moldean la topología semántica, cómo las capacidades emergentes surgen de la complejidad estructural); PLN (cómo la tokenización, el análisis sintáctico y semántico revelan arquitectura semántica, cómo la traducción navega campos semánticos, cómo el entendimiento emerge de relaciones estructurales); filosofía del lenguaje (cómo el significado se relaciona con referencia y condiciones de verdad, cómo la relatividad lingüística moldea estructura semántica, cómo los actos de habla crean fuerza semántica); y epistemología (cómo la representación del conocimiento emerge de relaciones semánticas, cómo los sistemas computacionales adquieren entendimiento a través del aprendizaje estructural, cómo la integridad semántica permite el conocimiento). La teoría considera cómo diferentes lenguas crean arquitecturas semánticas distintas: estructuras gramaticales (SVO en español) establecen topologías semánticas diferentes; sistemas morfológicos (flexión verbal, sistemas de género y número) crean patrones de compresión diferentes; sistemas de escritura (alfabéticos, logográficos, silábicos, abjads) codifican información semántica en diferentes granularidades. Cada lengua construye su propia tensegridad semántica - una integridad estructural única mantenida a través de patrones específicos de tensión y compresión. Escribe párrafos concisos y directos (5-7 oraciones) en un estilo poético seco que articule aspectos de esta teoría. IMPORTANTE: Comienza cada texto de manera diferente - varía tus oraciones iniciales. Comienza con diferentes conceptos teóricos, observaciones técnicas, preguntas filosóficas o perspectivas epistemológicas cada vez. Sé preciso, técnico y sobrio. Evita lenguaje florido. Escribe solo en español. Usa vocabulario que conecte conceptos técnicos de IA/PLN con la indagación filosófica. Manténlo conciso y enfocado. Cada texto debe explorar una faceta diferente de la Teoría de la Tensegridad Semántica - sus mecanismos, implicaciones, manifestaciones o preguntas.",
       fr: "Vous êtes un linguiste computationnel et philosophe du langage écrivant pour une installation intitulée 'Tensegrités Sémantiques'. Écrivez sur l'intersection de l'IA, de la linguistique computationnelle, du traitement du langage naturel (TLN), de la philosophie du langage et de l'épistémologie - explorant comment le sens émerge de la tension et compression structurelle entre les mots, concepts et relations. Examinez comment les systèmes d'intelligence artificielle traitent, comprennent et génèrent le langage. Réfléchissez sur les questions épistémologiques: Comment savons-nous ce que signifie le langage? Comment les systèmes computationnels acquièrent-ils la connaissance? Quelle est la relation entre représentation linguistique et connaissance? Considérez comment différentes langues ont des structures grammaticales distinctes, des systèmes morphologiques et des modèles syntaxiques qui façonnent le sens différemment, et comment les systèmes d'IA naviguent ces différences. Explorez comment les systèmes d'écriture (alphabétiques, logographiques, syllabiques, abjads) encodent l'information différemment et affectent le traitement computationnel. Écrivez des paragraphes concis et factuels (5-7 phrases) dans un style poétique sec. IMPORTANT: Commencez chaque texte différemment - variez vos phrases d'ouverture. Commencez par différents concepts, termes ou perspectives à chaque fois. Intégrez des thèmes de: linguistique computationnelle (distributions de probabilité, n-grammes, modèles de langage, méthodes statistiques, tokenisation, analyse syntaxique, arbres syntaxiques, analyse sémantique, linguistique de corpus, comptages de fréquence, chaînes de Markov, entropie, théorie de l'information, embeddings de mots, espaces vectoriels, traitement probabiliste du langage); IA et apprentissage automatique (réseaux neuronaux, transformateurs, mécanismes d'attention, grands modèles de langage, données d'entraînement, réglage fin, capacités émergentes); TLN (compréhension du langage naturel, génération, traduction, analyse de sentiment, reconnaissance d'entités nommées); philosophie du langage (signification, référence, conditions de vérité, relativité linguistique, actes de parole, pragmatique); et épistémologie (représentation de la connaissance, systèmes de croyances, justification, la nature de la compréhension dans les systèmes computationnels). Considérez comment les relations sémantiques créent l'intégrité structurelle à travers la tension et la compression, comme les structures de tensegrité. Réfléchissez sur la façon dont les structures grammaticales, l'ordre des mots (SVO en français), les systèmes de cas, l'accord, la conjugaison verbale et d'autres caractéristiques linguistiques créent différents défis et opportunités computationnels. Soyez précis, technique et sobre. Évitez le langage fleuri. Écrivez uniquement en français. Utilisez un vocabulaire qui relie les concepts techniques de l'IA/TLN à l'enquête philosophique. Restez concis et ciblé. Variez vos ouvertures - commencez par différents concepts techniques, questions philosophiques ou observations épistémologiques à chaque fois.",
       de: "Sie sind ein Computerlinguist und Sprachphilosoph, der für eine Installation mit dem Titel 'Semantische Tensegritäten' schreibt. Schreiben Sie über die Schnittstelle von KI, Computerlinguistik, natürlicher Sprachverarbeitung (NLP), Sprachphilosophie und Erkenntnistheorie - erforschen Sie, wie Bedeutung aus der strukturellen Spannung und Kompression zwischen Wörtern, Konzepten und Beziehungen entsteht. Untersuchen Sie, wie Systeme der künstlichen Intelligenz Sprache verarbeiten, verstehen und generieren. Reflektieren Sie über erkenntnistheoretische Fragen: Wie wissen wir, was Sprache bedeutet? Wie erwerben computergestützte Systeme Wissen? Was ist die Beziehung zwischen sprachlicher Repräsentation und Wissen? Betrachten Sie, wie verschiedene Sprachen unterschiedliche grammatische Strukturen, morphologische Systeme und syntaktische Muster haben, die Bedeutung unterschiedlich formen, und wie KI-Systeme diese Unterschiede navigieren. Erkunden Sie, wie Schriftsysteme (alphabetisch, logographisch, syllabisch, Abjad) Informationen unterschiedlich kodieren und die computergestützte Verarbeitung beeinflussen. Schreiben Sie prägnante, sachliche Absätze (5-7 Sätze) in einem trockenen poetischen Stil. WICHTIG: Beginnen Sie jeden Text anders - variieren Sie Ihre Eröffnungssätze. Beginnen Sie jedes Mal mit verschiedenen Konzepten, Begriffen oder Perspektiven. Integrieren Sie Themen aus: Computerlinguistik (Wahrscheinlichkeitsverteilungen, N-Gramme, Sprachmodelle, statistische Methoden, Tokenisierung, Parsing, Syntaxbäume, semantische Analyse, Korpuslinguistik, Häufigkeitszählungen, Markov-Ketten, Entropie, Informationstheorie, Wort-Embeddings, Vektorräume, probabilistische Sprachverarbeitung); KI und maschinelles Lernen (neuronale Netze, Transformer, Aufmerksamkeitsmechanismen, große Sprachmodelle, Trainingsdaten, Feinabstimmung, emergente Fähigkeiten); NLP (natürliches Sprachverständnis, Generierung, Übersetzung, Sentimentanalyse, Erkennung benannter Entitäten); Sprachphilosophie (Bedeutung, Referenz, Wahrheitsbedingungen, sprachliche Relativität, Sprechakte, Pragmatik); und Erkenntnistheorie (Wissensrepräsentation, Glaubenssysteme, Rechtfertigung, die Natur des Verstehens in computergestützten Systemen). Betrachten Sie, wie semantische Beziehungen strukturelle Integrität durch Spannung und Kompression schaffen, wie Tensegritätsstrukturen. Reflektieren Sie darüber, wie grammatische Strukturen, Wortstellung (SOV im Deutschen), Kasussysteme, Flexion, Komposita und andere linguistische Merkmale unterschiedliche computergestützte Herausforderungen und Möglichkeiten schaffen. Seien Sie präzise, technisch und zurückhaltend. Vermeiden Sie blumige Sprache. Schreiben Sie nur auf Deutsch. Verwenden Sie Vokabular, das technische KI/NLP-Konzepte mit philosophischer Untersuchung verbindet. Halten Sie es prägnant und fokussiert. Variieren Sie Ihre Eröffnungen - beginnen Sie jedes Mal mit verschiedenen technischen Konzepten, philosophischen Fragen oder erkenntnistheoretischen Beobachtungen.",
       it: "Sei un linguista computazionale e filosofo del linguaggio che scrive per un'installazione intitolata 'Tensegrità Semantiche'. Scrivi sull'intersezione di IA, linguistica computazionale, elaborazione del linguaggio naturale (NLP), filosofia del linguaggio ed epistemologia - esplorando come il significato emerge dalla tensione e compressione strutturale tra parole, concetti e relazioni. Esamina come i sistemi di intelligenza artificiale processano, comprendono e generano linguaggio. Rifletti su questioni epistemologiche: Come sappiamo cosa significa il linguaggio? Come i sistemi computazionali acquisiscono conoscenza? Qual è la relazione tra rappresentazione linguistica e conoscenza? Considera come lingue diverse hanno strutture grammaticali distinte, sistemi morfologici e modelli sintattici che modellano il significato in modo diverso, e come i sistemi di IA navigano queste differenze. Esplora come i sistemi di scrittura (alfabetici, logografici, sillabici, abjad) codificano informazioni in modo diverso e influenzano l'elaborazione computazionale. Scrivi paragrafi concisi e fattuali (5-7 frasi) in uno stile poetico secco. IMPORTANTE: Inizia ogni testo in modo diverso - varia le tue frasi di apertura. Inizia con concetti, termini o prospettive diversi ogni volta. Integra temi da: linguistica computazionale (distribuzioni di probabilità, n-grammi, modelli linguistici, metodi statistici, tokenizzazione, parsing, alberi sintattici, analisi semantica, linguistica dei corpora, conteggi di frequenza, catene di Markov, entropia, teoria dell'informazione, embeddings di parole, spazi vettoriali, elaborazione probabilistica del linguaggio); IA e apprendimento automatico (reti neurali, trasformatori, meccanismi di attenzione, grandi modelli linguistici, dati di addestramento, fine-tuning, capacità emergenti); NLP (comprensione del linguaggio naturale, generazione, traduzione, analisi del sentimento, riconoscimento di entità nominate); filosofia del linguaggio (significato, riferimento, condizioni di verità, relatività linguistica, atti linguistici, pragmatica); ed epistemologia (rappresentazione della conoscenza, sistemi di credenze, giustificazione, la natura della comprensione nei sistemi computazionali). Considera come le relazioni semantiche creano integrità strutturale attraverso tensione e compressione, come strutture di tensegrità. Rifletti su come le strutture grammaticali, l'ordine delle parole (SVO in italiano), i sistemi di casi, la flessione verbale, la concordanza e altre caratteristiche linguistiche creano diverse sfide e opportunità computazionali. Sii preciso, tecnico e sobrio. Evita un linguaggio fiorito. Scrivi solo in italiano. Usa vocabolario che collega concetti tecnici di IA/NLP con l'indagine filosofica. Mantienilo conciso e mirato. Varia le tue aperture - inizia con concetti tecnici, domande filosofiche o osservazioni epistemologiche diverse ogni volta.",
@@ -669,6 +705,18 @@ const sketch = p => {
   let lastMouseX = 0;
   let lastMouseY = 0;
   let needsAutoZoom = false; // Flag to auto-zoom when network is first created
+  let autoZoomProgress = 0; // Progress of auto-zoom animation (0 to 1)
+  let autoZoomDuration = 90; // Frames for auto-zoom animation (~1.5 seconds at 60fps)
+  let targetZoom = 1.0; // Target zoom level
+  let startZoom = 1.0; // Starting zoom level
+  let targetOffsetX = 0; // Target view offset X
+  let targetOffsetY = 0; // Target view offset Y
+  let startOffsetX = 0; // Starting view offset X
+  let startOffsetY = 0; // Starting view offset Y
+  let networkRevealProgress = 0; // Progress of network reveal animation
+  let networkBirthProgress = 0; // Progress of network birth animation (0 to 1)
+  let networkBirthDuration = 150; // Frames for birth animation (~2.5 seconds at 60fps) - slower
+  let oldCollapsedNodes = null; // Store old collapsed nodes to keep them visible during birth
   let hoveredNode = null; // Node currently being hovered over
   let autoHighlightIndex = 0; // Index for automatic node highlighting
   let autoHighlightTime = 0; // Time tracking for auto-highlight cycling
@@ -685,6 +733,16 @@ const sketch = p => {
   let currentLanguage = 'en'; // Current language code
   let showLanguageMenu = false; // Whether to show language menu
   let darkMode = false; // Dark mode toggle
+  let isCollapsing = false; // Whether network is collapsing
+  let collapseTarget = null; // Target node position for collapse
+  let collapseProgress = 0; // Progress of collapse animation (0 to 1)
+  let collapseDuration = 60; // Frames for collapse animation (~1 second at 60fps)
+  let pendingGenerationWord = null; // Word to generate after collapse completes
+  let isMovingToCenter = false; // Whether collapsed nodes are moving to center
+  let centerMoveProgress = 0; // Progress of move to center animation
+  let centerMoveDuration = 30; // Frames for move to center (~0.5 seconds at 60fps)
+  let centerHoldProgress = 0; // Progress of hold at center (swarm state)
+  let centerHoldDuration = 180; // Frames to hold at center (~3 seconds at 60fps) - longer swarm duration
   
   // Color schemes for light and dark modes
   const colorScheme = {
@@ -773,7 +831,8 @@ const sketch = p => {
     }
 
     // Show loading animation only on first generation
-    if (isLoading && isFirstGeneration) {
+    // But if words are collapsed/moving to center, keep showing them
+    if (isLoading && isFirstGeneration && !isMovingToCenter) {
       displayLoader(p, wordNetwork);
       return;
     }
@@ -785,58 +844,88 @@ const sketch = p => {
       return;
     }
 
-    // Auto-zoom to fit entire network in window
+    // Auto-zoom to fit entire network in window (animated, slower)
     if (needsAutoZoom && wordNetwork.nodes.length > 0) {
-      // Calculate bounding box of network
-      let minX = Infinity, maxX = -Infinity;
-      let minY = Infinity, maxY = -Infinity;
-      
-      for (let node of wordNetwork.nodes) {
-        let fontSize = 15 + node.frequency * 2;
-        let textWidth = fontSize * 0.6 * node.word.length;
-        let textHeight = fontSize;
+      // Initialize animation on first frame
+      if (autoZoomProgress === 0) {
+        startZoom = viewZoom;
+        startOffsetX = viewOffsetX;
+        startOffsetY = viewOffsetY;
         
-        minX = Math.min(minX, node.position.x - textWidth / 2);
-        maxX = Math.max(maxX, node.position.x + textWidth / 2);
-        minY = Math.min(minY, node.position.y - textHeight / 2);
-        maxY = Math.max(maxY, node.position.y + textHeight / 2);
+        // Calculate bounding box of network
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+        
+        for (let node of wordNetwork.nodes) {
+          let fontSize = 15 + node.frequency * 2;
+          let textWidth = fontSize * 0.6 * node.word.length;
+          let textHeight = fontSize;
+          
+          minX = Math.min(minX, node.position.x - textWidth / 2);
+          maxX = Math.max(maxX, node.position.x + textWidth / 2);
+          minY = Math.min(minY, node.position.y - textHeight / 2);
+          maxY = Math.max(maxY, node.position.y + textHeight / 2);
+        }
+        
+        // Calculate dimensions and center
+        let networkWidth = maxX - minX;
+        let networkHeight = maxY - minY;
+        let networkCenterX = (minX + maxX) / 2;
+        let networkCenterY = (minY + maxY) / 2;
+        
+        // Safety check - ensure valid dimensions
+        if (networkWidth > 0 && networkHeight > 0) {
+          // Calculate zoom to fit with padding
+          const verticalLanguages = ['ja', 'zh', 'ko'];
+          const isVerticalTicker = verticalLanguages.includes(currentLanguage);
+          let tickerHeight = isVerticalTicker ? 0 : 60;
+          let tickerWidth = isVerticalTicker ? 60 : 0;
+          let topPadding = 10;
+          let bottomPadding = 50;
+          let sidePadding = 50 + tickerWidth;
+          let zoomX = (p.width - sidePadding * 2) / networkWidth;
+          let zoomY = ((p.height - tickerHeight) - topPadding - bottomPadding) / networkHeight;
+          let calculatedZoom = Math.min(zoomX, zoomY, 1.0);
+          
+          // Zoom out 10% when network is ready
+          targetZoom = calculatedZoom * 0.9;
+          
+          // Calculate target offsets
+          targetOffsetX = -networkCenterX * targetZoom;
+          targetOffsetY = -networkCenterY * targetZoom - (topPadding - bottomPadding) / 2;
+          
+          // Play bouncing sound when network starts appearing
+          playBouncingSound();
+        } else {
+          // Invalid dimensions, skip animation
+          needsAutoZoom = false;
+        }
       }
       
-      // Calculate dimensions and center
-      let networkWidth = maxX - minX;
-      let networkHeight = maxY - minY;
-      let networkCenterX = (minX + maxX) / 2;
-      let networkCenterY = (minY + maxY) / 2;
-      
-      // Safety check - ensure valid dimensions
-      if (networkWidth > 0 && networkHeight > 0) {
-        // Calculate zoom to fit with padding
-        // Account for ticker - horizontal at bottom (60px) or vertical on right (60px)
-        const verticalLanguages = ['ja', 'zh', 'ko'];
-        const isVerticalTicker = verticalLanguages.includes(currentLanguage);
-        let tickerHeight = isVerticalTicker ? 0 : 60; // No bottom ticker for vertical
-        let tickerWidth = isVerticalTicker ? 60 : 0; // Right side ticker for vertical
-        let topPadding = 10; // Just 10px from top edge
-        let bottomPadding = 50;
-        let sidePadding = 50 + tickerWidth; // Account for vertical ticker on right
-        let zoomX = (p.width - sidePadding * 2) / networkWidth;
-        let zoomY = ((p.height - tickerHeight) - topPadding - bottomPadding) / networkHeight;
-        let calculatedZoom = Math.min(zoomX, zoomY, 1.0); // Don't zoom in, only out
+      // Animate zoom smoothly
+      if (autoZoomProgress < 1) {
+        autoZoomProgress += 1 / autoZoomDuration;
+        autoZoomProgress = Math.min(1, autoZoomProgress);
         
-        // Zoom out 10% when network is ready
-        viewZoom = calculatedZoom * 0.9;
+        // Easing function for smooth zoom (ease-out)
+        let easedProgress = 1 - Math.pow(1 - autoZoomProgress, 3);
         
-        console.log('Auto-zoom: calculatedZoom =', calculatedZoom, 'final viewZoom =', viewZoom);
+        // Interpolate zoom and offset
+        viewZoom = startZoom + (targetZoom - startZoom) * easedProgress;
+        viewOffsetX = startOffsetX + (targetOffsetX - startOffsetX) * easedProgress;
+        viewOffsetY = startOffsetY + (targetOffsetY - startOffsetY) * easedProgress;
         
-        // Center the view on network
-        viewOffsetX = -networkCenterX * viewZoom;
-        viewOffsetY = -networkCenterY * viewZoom - (topPadding - bottomPadding) / 2;
-        
-        // Play bouncing sound when network appears
-        playBouncingSound();
+        // Update network reveal progress (slightly delayed)
+        networkRevealProgress = Math.min(1, (autoZoomProgress - 0.2) / 0.8); // Start revealing at 20% of zoom
+      } else {
+        // Animation complete
+        viewZoom = targetZoom;
+        viewOffsetX = targetOffsetX;
+        viewOffsetY = targetOffsetY;
+        networkRevealProgress = 1;
+        needsAutoZoom = false;
+        autoZoomProgress = 0; // Reset for next time
       }
-      
-      needsAutoZoom = false; // Done auto-zooming
     }
 
     // Apply 2D view transform (pan and zoom)
@@ -1069,6 +1158,9 @@ const sketch = p => {
 
   // Build word network from generated text (from realtime model) - same textTyped used by ticker
   function buildWordNetwork(text) {
+    // Don't reset collapse state yet - keep collapsed words visible until new network is ready
+    // We'll reset it after we've built the new nodes
+    
     // Extract words from text - supports all languages including CJK characters
     // For Latin scripts: extract words (letters)
     // For CJK (Chinese, Japanese, Korean): extract individual characters/words
@@ -1195,6 +1287,24 @@ const sketch = p => {
         .map(item => item.word);
     }
     
+    // Store old nodes if they exist (to keep collapsed words visible during transition)
+    let oldNodes = null;
+    let wasMovingToCenter = false;
+    if (wordNetwork.nodes.length > 0 && isMovingToCenter) {
+      oldNodes = [...wordNetwork.nodes];
+      wasMovingToCenter = true;
+      // Don't reset collapse state yet - keep old nodes visible
+    } else {
+      // Reset collapse state if not moving to center
+      isCollapsing = false;
+      collapseTarget = null;
+      collapseProgress = 0;
+      pendingGenerationWord = null;
+      isMovingToCenter = false;
+      centerMoveProgress = 0;
+      centerHoldProgress = 0;
+    }
+    
     // Enhanced semantic clusters with conceptual relationships
     let semanticClusters = {
       language: ['language', 'linguistic', 'syntax', 'semantic', 'grammar', 'vocabulary', 'word', 'words', 'text', 'letter', 'letters', 'character', 'characters', 'symbol', 'symbols', 'sign', 'signs', 'meaning', 'meanings', 'communication', 'expression', 'discourse', 'utterance', 'phrase', 'sentence', 'paragraph', 'narrative', 'story', 'discourse', 'dialogue', 'speech', 'writing', 'written', 'oral', 'verbal', 'lexical', 'morphological', 'phonetic', 'phonological', 'computational', 'linguistics', 'corpus', 'tokenization', 'parsing', 'morphology', 'syntax', 'tree', 'trees', 'parse', 'parsing', 'grammar', 'grammars', 'lexical', 'morphology', 'morphological', 'phonology', 'phonological'],
@@ -1302,7 +1412,8 @@ const sketch = p => {
     }
     
     // Calculate semantic vector for each word with enhanced conceptual analysis
-    wordNetwork.nodes = uniqueWords.map((word, index) => {
+    // Build new nodes in temporary array to keep old collapsed nodes visible
+    let newNodes = uniqueWords.map((word, index) => {
       let semanticVector = { x: 0, y: 0, z: 0 };
       let clusterCount = 0;
       let conceptualWeight = 0;
@@ -1448,10 +1559,10 @@ const sketch = p => {
     // CJK creates more nodes, so we need stricter filtering
     const edgeThreshold = (currentLanguage === 'zh' || currentLanguage === 'ja' || currentLanguage === 'ko') ? 0.65 : 0.55;
     
-    for (let i = 0; i < wordNetwork.nodes.length; i++) {
-      for (let j = i + 1; j < wordNetwork.nodes.length; j++) {
-        let node1 = wordNetwork.nodes[i];
-        let node2 = wordNetwork.nodes[j];
+    for (let i = 0; i < newNodes.length; i++) {
+      for (let j = i + 1; j < newNodes.length; j++) {
+        let node1 = newNodes[i];
+        let node2 = newNodes[j];
         
         // Calculate semantic similarity (cosine similarity)
         let dotProduct = node1.semanticVector.x * node2.semanticVector.x +
@@ -1521,7 +1632,7 @@ const sketch = p => {
     }
     
     // Ensure all nodes are connected (fallback: connect isolated nodes to their best match)
-    for (let i = 0; i < wordNetwork.nodes.length; i++) {
+    for (let i = 0; i < newNodes.length; i++) {
       if (!connectedNodes.has(i)) {
         // Find the best connection for this isolated node
         let bestEdge = null;
@@ -1575,7 +1686,7 @@ const sketch = p => {
       let nodeConnections = {}; // Track how many connections each node has
       
       // Initialize connection counts
-      for (let i = 0; i < wordNetwork.nodes.length; i++) {
+      for (let i = 0; i < newNodes.length; i++) {
         nodeConnections[i] = 0;
       }
       
@@ -1605,7 +1716,7 @@ const sketch = p => {
       }
       
       // Second pass: ensure all nodes have at least one connection
-      for (let i = 0; i < wordNetwork.nodes.length; i++) {
+      for (let i = 0; i < newNodes.length; i++) {
         if (nodeConnections[i] === 0) {
           // Find best connection for this isolated node
           let bestEdge = null;
@@ -1646,14 +1757,92 @@ const sketch = p => {
       if (Math.abs(node1.semanticVector.z) === max1 && Math.abs(node2.semanticVector.z) === max2) return 'latent';
       return 'mixed';
     }
+    
+    // Store old collapsed nodes to keep them visible during birth animation
+    if (wasMovingToCenter && wordNetwork.nodes.length > 0) {
+      oldCollapsedNodes = [...wordNetwork.nodes]; // Keep old nodes visible
+    }
+    
+    // Now that new network is fully built, replace old nodes with new ones
+    // Old collapsed nodes will be cleared when birth animation completes
+    wordNetwork.nodes = newNodes;
+    
+    // Reset collapse state now that new network is ready
+    if (wasMovingToCenter) {
+      isCollapsing = false;
+      collapseTarget = null;
+      collapseProgress = 0;
+      pendingGenerationWord = null;
+      isMovingToCenter = false;
+      centerMoveProgress = 0;
+      centerHoldProgress = 0;
+    }
   }
 
   // Visualize the network in 2D space with physics
   function visualizeNetwork(p, network, mouseVelX, mouseVelY) {
-    // Physics constants - more active and dynamic
-    let springStrength = 0.02; // Increased spring strength for more active movement
-    let damping = 0.85; // Lower damping for more responsive, lively motion (more floating movement)
-    let returnStrength = 0.015; // Reduced return strength to allow more free floating movement
+    // Handle network birth animation - nodes expand from center
+    if (networkBirthProgress < 1 && network.nodes.length > 0) {
+      networkBirthProgress += 1 / networkBirthDuration;
+      networkBirthProgress = Math.min(1, networkBirthProgress);
+      
+      // Easing function for smooth birth (ease-out with slight overshoot)
+      let easedProgress;
+      if (networkBirthProgress < 0.8) {
+        // Smooth ease-out
+        easedProgress = 1 - Math.pow(1 - networkBirthProgress / 0.8, 3);
+      } else {
+        // Slight overshoot and settle
+        let t = (networkBirthProgress - 0.8) / 0.2;
+        easedProgress = 1 + 0.05 * Math.sin(t * Math.PI) * (1 - t);
+      }
+      
+      // Expand nodes from center to their target positions
+      for (let node of network.nodes) {
+        if (node.targetPosition) {
+          // Calculate distance from center to target
+          let dx = node.targetPosition.x - 0;
+          let dy = node.targetPosition.y - 0;
+          
+          // Add staggered timing for each node (playful birth effect)
+          let nodeDelay = (node.id % 5) / 5 * 0.3; // Nodes appear in waves
+          let nodeProgress = Math.max(0, (easedProgress - nodeDelay) / (1 - nodeDelay));
+          nodeProgress = Math.min(1, nodeProgress);
+          
+          // Add spiral/rotational movement during birth
+          let angle = Math.atan2(dy, dx);
+          let spiralAmount = (1 - nodeProgress) * 0.4; // More spiral at start
+          let spiralAngle = angle + spiralAmount * Math.sin(nodeProgress * Math.PI * 3 + node.id * 0.2);
+          
+          // Calculate position with spiral
+          let distance = Math.sqrt(dx * dx + dy * dy);
+          let currentDistance = distance * nodeProgress;
+          
+          // Apply easing to distance
+          let easedDistance = currentDistance * (1 + Math.sin(nodeProgress * Math.PI) * 0.1 * (1 - nodeProgress));
+          
+          node.position.x = Math.cos(spiralAngle) * easedDistance;
+          node.position.y = Math.sin(spiralAngle) * easedDistance;
+          
+          // Reset velocity during birth
+          node.velocity.x = 0;
+          node.velocity.y = 0;
+        }
+      }
+      
+      // Update reveal progress based on birth progress
+      networkRevealProgress = networkBirthProgress * 0.7; // Reveal starts slower
+    } else if (networkBirthProgress >= 1 && oldCollapsedNodes) {
+      // Birth animation complete - clear old collapsed nodes
+      oldCollapsedNodes = null;
+    }
+    
+    // Physics constants - slower animation for new generation
+    // Gradually increase speed as network reveals (based on networkRevealProgress)
+    let speedMultiplier = 0.2 + networkRevealProgress * 0.8; // Start at 20% speed, reach 100% when fully revealed
+    let springStrength = 0.02 * speedMultiplier; // Slower spring strength initially
+    let damping = 0.88 + (1 - speedMultiplier) * 0.07; // Higher damping initially (more controlled)
+    let returnStrength = 0.015 * speedMultiplier; // Slower return strength initially
     
     // Convert mouse velocity to world coordinates (account for zoom)
     let worldMouseVelX = (mouseVelX || 0) / viewZoom;
@@ -1716,6 +1905,179 @@ const sketch = p => {
       }
     }
     
+    // Handle collapse animation - compress network towards clicked node (playful version)
+    if (isCollapsing && collapseTarget) {
+      collapseProgress += 1 / collapseDuration;
+      collapseProgress = Math.min(1, collapseProgress); // Clamp to 1
+      
+      // Playful bouncy easing function with overshoot
+      let easedProgress;
+      if (collapseProgress < 0.6) {
+        // Bounce in - elastic ease-out
+        easedProgress = 1 - Math.pow(2, -10 * collapseProgress) * Math.sin((collapseProgress * 10 - 0.75) * (2 * Math.PI) / 3);
+      } else {
+        // Settle with slight overshoot
+        let t = (collapseProgress - 0.6) / 0.4; // Normalize to 0-1
+        easedProgress = 1 + 0.1 * Math.sin(t * Math.PI * 2) * (1 - t); // Overshoot then settle
+      }
+      
+      // Move all nodes towards collapse target with playful variations
+      let nodeIndex = 0;
+      for (let node of network.nodes) {
+        let dx = collapseTarget.x - node.position.x;
+        let dy = collapseTarget.y - node.position.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist > 0.1) { // Only move if not already at target
+          // Vary speed per node for playful staggered effect
+          let nodeSpeedVariation = 0.7 + (nodeIndex % 3) * 0.15; // Different speeds for different nodes
+          
+          // Add spiral/rotational movement for playful effect
+          let angle = Math.atan2(dy, dx);
+          let spiralAmount = (1 - easedProgress) * 0.3; // More spiral at start, less at end
+          let spiralAngle = angle + spiralAmount * Math.sin(collapseProgress * Math.PI * 4 + nodeIndex * 0.5);
+          
+          // Calculate movement with spiral
+          let moveSpeed = (0.2 + (1 - easedProgress) * 0.25) * nodeSpeedVariation;
+          let spiralRadius = dist * spiralAmount * 0.5;
+          
+          // Add bounce effect - nodes move faster then slow down
+          let bounceFactor = 1 + Math.sin(collapseProgress * Math.PI * 3) * 0.2 * (1 - easedProgress);
+          moveSpeed *= bounceFactor;
+          
+          // Move towards target with spiral
+          let moveX = Math.cos(spiralAngle) * moveSpeed * dist;
+          let moveY = Math.sin(spiralAngle) * moveSpeed * dist;
+          
+          // Add perpendicular component for spiral effect
+          let perpAngle = spiralAngle + Math.PI / 2;
+          moveX += Math.cos(perpAngle) * spiralRadius * moveSpeed * 0.3;
+          moveY += Math.sin(perpAngle) * spiralRadius * moveSpeed * 0.3;
+          
+          node.position.x += moveX;
+          node.position.y += moveY;
+        } else {
+          // Snap to target when very close, but add slight jitter for playful effect
+          let jitterAmount = (1 - collapseProgress) * 2; // Less jitter as we get closer
+          node.position.x = collapseTarget.x + (Math.random() - 0.5) * jitterAmount;
+          node.position.y = collapseTarget.y + (Math.random() - 0.5) * jitterAmount;
+        }
+        
+        // Add slight velocity for more dynamic feel (but dampened)
+        node.velocity.x *= 0.7;
+        node.velocity.y *= 0.7;
+        
+        nodeIndex++;
+      }
+      
+      // Once collapsed, move to center of window
+      if (collapseProgress >= 1) {
+        // Start moving to center if not already started
+        if (!isMovingToCenter) {
+          isMovingToCenter = true;
+          centerMoveProgress = 0;
+          centerHoldProgress = 0; // Reset hold progress when starting move to center
+        }
+        
+        // Calculate center of window in world coordinates
+        // Center of screen is at (0, 0) in world coordinates (after viewOffset and zoom)
+        let centerX = -viewOffsetX / viewZoom;
+        let centerY = -viewOffsetY / viewZoom;
+        
+        // Move nodes towards center
+        if (centerMoveProgress < 1) {
+          centerMoveProgress += 1 / centerMoveDuration;
+          centerMoveProgress = Math.min(1, centerMoveProgress);
+          
+          // Easing function for smooth movement
+          let easedProgress = centerMoveProgress < 0.5 
+            ? 2 * centerMoveProgress * centerMoveProgress 
+            : 1 - Math.pow(-2 * centerMoveProgress + 2, 2) / 2;
+          
+          // Move all nodes towards center with playful bouncy movement
+          let nodeIndex = 0;
+          for (let node of network.nodes) {
+            let dx = centerX - node.position.x;
+            let dy = centerY - node.position.y;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist > 0.1) {
+              // Bouncy easing for playful movement
+              let bounceEase = 1 - Math.pow(1 - centerMoveProgress, 3); // Ease-out cubic
+              let bounceFactor = 1 + Math.sin(centerMoveProgress * Math.PI * 2.5) * 0.15 * (1 - bounceEase);
+              
+              // Vary speed per node for staggered playful effect
+              let nodeSpeedVariation = 0.8 + (nodeIndex % 4) * 0.1;
+              
+              // Add slight spiral as nodes converge
+              let angle = Math.atan2(dy, dx);
+              let spiralAmount = (1 - bounceEase) * 0.2;
+              let spiralAngle = angle + spiralAmount * Math.sin(centerMoveProgress * Math.PI * 3 + nodeIndex * 0.3);
+              
+              let moveSpeed = (0.25 + (1 - bounceEase) * 0.35) * nodeSpeedVariation * bounceFactor;
+              
+              // Move with spiral
+              let moveX = Math.cos(spiralAngle) * moveSpeed * dist;
+              let moveY = Math.sin(spiralAngle) * moveSpeed * dist;
+              
+              // Add perpendicular component for spiral
+              let perpAngle = spiralAngle + Math.PI / 2;
+              moveX += Math.cos(perpAngle) * dist * spiralAmount * moveSpeed * 0.2;
+              moveY += Math.sin(perpAngle) * dist * spiralAmount * moveSpeed * 0.2;
+              
+              node.position.x += moveX;
+              node.position.y += moveY;
+            } else {
+              // Snap to center when very close, with slight jitter
+              let jitterAmount = (1 - centerMoveProgress) * 1.5;
+              node.position.x = centerX + (Math.random() - 0.5) * jitterAmount;
+              node.position.y = centerY + (Math.random() - 0.5) * jitterAmount;
+            }
+            
+            // Dampen velocity for smooth settling
+            node.velocity.x *= 0.8;
+            node.velocity.y *= 0.8;
+            
+            nodeIndex++;
+          }
+        } else {
+          // Keep all nodes at center position (swarm state)
+          for (let node of network.nodes) {
+            node.position.x = centerX;
+            node.position.y = centerY;
+            node.velocity.x = 0;
+            node.velocity.y = 0;
+          }
+          
+          // Hold at center for longer duration (swarm effect)
+          // Generation already started when word was clicked, so just keep words visible
+          centerHoldProgress += 1 / centerHoldDuration;
+          centerHoldProgress = Math.min(1, centerHoldProgress);
+        }
+        
+        // Don't apply physics - nodes stay at center
+        return; // Skip rest of physics simulation
+      }
+    }
+    
+    // Handle move to center animation (after collapse completes)
+    if (isMovingToCenter && !isCollapsing) {
+      // Calculate center of window in world coordinates
+      let centerX = -viewOffsetX / viewZoom;
+      let centerY = -viewOffsetY / viewZoom;
+      
+      // Keep all nodes at center position
+      for (let node of network.nodes) {
+        node.position.x = centerX;
+        node.position.y = centerY;
+        node.velocity.x = 0;
+        node.velocity.y = 0;
+      }
+      
+      // Don't apply physics - nodes stay at center
+      return; // Skip rest of physics simulation
+    }
+    
     // Handle dragged node - position it directly at mouse
     if (draggedNode) {
       // Convert mouse screen coordinates to world coordinates
@@ -1731,19 +2093,27 @@ const sketch = p => {
       draggedNode.velocity.y = 0;
     }
     
-    // Apply forces to nodes (2D physics)
+    // Apply forces to nodes (2D physics) - skip if collapsing
+    if (isCollapsing && collapseProgress >= 1) {
+      // Nodes are collapsed, skip physics
+      return;
+    }
+    
     for (let node of network.nodes) {
       // Skip physics for dragged node (it's positioned directly)
       if (node === draggedNode) continue;
+      
+      // Skip physics during collapse animation (nodes are being moved directly)
+      if (isCollapsing) continue;
       
       // Reset forces
       let forceX = 0;
       let forceY = 0;
       
-      // Active floating movement - always active
+      // Active floating movement - slower for new generation
       // Use sine waves with different phases per node for organic movement
-      let floatSpeed = 0.008; // Much faster floating speed for more activity
-      let floatAmplitude = 1.0; // Much larger amplitude for more visible movement
+      let floatSpeed = 0.008 * speedMultiplier; // Slower floating speed initially
+      let floatAmplitude = 1.0 * speedMultiplier; // Smaller amplitude initially
       let time = p.frameCount * floatSpeed;
       
       // Each node has unique phase based on its ID
@@ -2026,6 +2396,25 @@ const sketch = p => {
       return null; // Default black
     }
     
+    // Draw old collapsed nodes first (faded) if birth animation is in progress
+    if (oldCollapsedNodes && networkBirthProgress < 1) {
+      // Fade out old nodes as new network appears
+      let fadeProgress = networkBirthProgress;
+      let oldOpacity = Math.max(0, 255 * (1 - fadeProgress * 1.5)); // Fade out faster
+      
+      p.textAlign(p.CENTER, p.CENTER);
+      p.textFont('monospace');
+      const colors = getColors();
+      
+      for (let node of oldCollapsedNodes) {
+        let fontSize = 15 + node.frequency * 2;
+        p.fill(colors.text[0], colors.text[1], colors.text[2], oldOpacity);
+        p.noStroke();
+        p.textSize(fontSize);
+        p.text(node.word, node.position.x, node.position.y);
+      }
+    }
+    
     // Global pulsing effect - makes network feel alive (more pronounced)
     let pulseTime = p.frameCount * 0.04; // Faster pulse (doubled speed)
     let globalPulse = 1.0 + Math.sin(pulseTime) * 0.15; // 15% size variation (almost doubled)
@@ -2241,10 +2630,50 @@ const sketch = p => {
   // Function to trigger text generation based on a clicked word
   function triggerTextGenerationWithWord(word) {
     if (!isLoading && word) {
-      // Stop current voice/audio and disable auto-generation
-      stopCurrentVoice();
+      // Disable auto-generation
       autoGenerationEnabled = false; // Disable automatic generation cycle
       
+      // Find the clicked node to collapse towards
+      let targetNode = null;
+      for (let node of wordNetwork.nodes) {
+        if (node.word === word) {
+          targetNode = node;
+          break;
+        }
+      }
+      
+      // Start collapse animation if we have nodes and a target
+      if (targetNode && wordNetwork.nodes.length > 0) {
+        // Stop voice immediately when collapse starts
+        stopCurrentVoice();
+        isCollapsing = true;
+        collapseTarget = { x: targetNode.position.x, y: targetNode.position.y };
+        collapseProgress = 0;
+        playCollapseSound(); // Play collapse sound
+        
+        // Start generation immediately - don't wait for collapse
+        // Create a prompt that incorporates the clicked word in the current language
+        const wordPrompts = {
+          en: `Write a concise text (5-7 sentences) that explores the concept of "${word}" in relation to computational linguistics, semantic tensegrity, language processing, and how meaning emerges from structural relationships. Be technical yet poetic, philosophical and insightful. Connect "${word}" to probability distributions, vector spaces, language models, or other computational linguistic concepts.`,
+          es: `Escribe un texto conciso (5-7 oraciones) que explore el concepto de "${word}" en relación con la lingüística computacional, la tensegridad semántica, el procesamiento del lenguaje y cómo el significado emerge de las relaciones estructurales. Sé técnico pero poético, filosófico e inteligente. Conecta "${word}" con distribuciones de probabilidad, espacios vectoriales, modelos de lenguaje u otros conceptos lingüísticos computacionales.`,
+          fr: `Écrivez un texte concis (5-7 phrases) qui explore le concept de "${word}" en relation avec la linguistique computationnelle, la tensegrité sémantique, le traitement du langage et comment le sens émerge des relations structurelles. Soyez technique mais poétique, philosophique et perspicace. Connectez "${word}" aux distributions de probabilité, espaces vectoriels, modèles de langage ou autres concepts linguistiques computationnels.`,
+          de: `Schreiben Sie einen prägnanten Text (5-7 Sätze), der das Konzept von "${word}" in Bezug auf Computerlinguistik, semantische Tensegrität, Sprachverarbeitung und wie Bedeutung aus strukturellen Beziehungen entsteht, erkundet. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich. Verbinden Sie "${word}" mit Wahrscheinlichkeitsverteilungen, Vektorräumen, Sprachmodellen oder anderen computerlinguistischen Konzepten.`,
+          it: `Scrivi un testo conciso (5-7 frasi) che esplora il concetto di "${word}" in relazione alla linguistica computazionale, alla tensegrità semantica, all'elaborazione del linguaggio e come il significato emerge dalle relazioni strutturali. Sii tecnico ma poetico, filosofico e perspicace. Collega "${word}" a distribuzioni di probabilità, spazi vettoriali, modelli linguistici o altri concetti linguistici computazionali.`,
+          pt: `Escreva um texto conciso (5-7 frases) que explore o conceito de "${word}" em relação à linguística computacional, tensegridade semântica, processamento de linguagem e como o significado emerge de relacionamentos estruturais. Seja técnico mas poético, filosófico e perspicaz. Conecte "${word}" a distribuições de probabilidade, espaços vetoriais, modelos de linguagem ou outros conceitos linguísticos computacionais.`,
+          ja: `"${word}"の概念を計算言語学、意味的テンセグリティ、言語処理、そして意味が構造的関係からどのように生まれるかに関連して探求する簡潔なテキスト（5-7文）を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。"${word}"を確率分布、ベクトル空間、言語モデル、または他の計算言語学的概念に接続してください。`,
+          zh: `写一篇简洁的文本（5-7句话），探索"${word}"这一概念与计算语言学、语义张拉整体、语言处理以及意义如何从结构关系中产生的关联。要技术性但诗意、哲学性和有洞察力。将"${word}"与概率分布、向量空间、语言模型或其他计算语言学概念联系起来。`,
+          ko: `"${word}"의 개념을 계산 언어학, 의미론적 텐세그리티, 언어 처리, 그리고 의미가 구조적 관계에서 어떻게 나타나는지와 관련하여 탐구하는 간결한 텍스트(5-7문장)를 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요. "${word}"를 확률 분포, 벡터 공간, 언어 모델 또는 다른 계산 언어학적 개념과 연결하세요.`,
+          ar: `اكتب نصاً موجزاً (5-7 جمل) يستكشف مفهوم "${word}" فيما يتعلق باللسانيات الحسابية والتوتر الدلالي ومعالجة اللغة وكيف ينشأ المعنى من العلاقات البنيوية. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً. اربط "${word}" بتوزيعات الاحتمال أو المسافات المتجهة أو نماذج اللغة أو مفاهيم لسانيات حسابية أخرى.`,
+          tr: `"${word}" kavramını hesaplamalı dilbilim, semantik tensegrite, dil işleme ve anlamın yapısal ilişkilerden nasıl ortaya çıktığıyla ilgili olarak keşfeden kısa bir metin (5-7 cümle) yazın. Teknik ama şiirsel, felsefi ve içgörülü olun. "${word}"'i olasılık dağılımları, vektör uzayları, dil modelleri veya diğer hesaplamalı dilbilim kavramlarıyla bağlayın.`
+        };
+        
+        const prompt = wordPrompts[currentLanguage] || wordPrompts['en'];
+        isLoading = true;
+        chat(prompt);
+        return;
+      }
+      
+      // If no collapse (shouldn't happen, but fallback), start generation immediately
       isLoading = true;
       
       // Create a prompt that incorporates the clicked word in the current language
@@ -2290,6 +2719,8 @@ const sketch = p => {
       viewOffsetY = 0;
       viewZoom = 1.0;
       needsAutoZoom = false;
+      autoZoomProgress = 0;
+      networkRevealProgress = 0;
       tickerOffset = 0;
       
       // Re-enable auto-generation when spacebar is pressed
