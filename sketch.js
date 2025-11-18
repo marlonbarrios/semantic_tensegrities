@@ -3437,10 +3437,10 @@ const sketch = p => {
       // Set current text being read
       currentTextBeingRead = text;
       
-      // Generate speech using OpenAI TTS
+      // Generate speech using OpenAI TTS (HD model for better quality, matching Realtime API voice)
       const mp3 = await openai.audio.speech.create({
-        model: "tts-1", // Use OpenAI TTS model
-        voice: "alloy", // Natural-sounding voice
+        model: "tts-1-hd", // Use OpenAI TTS HD model for better quality (matches Realtime API quality)
+        voice: "nova", // Natural, expressive voice (matches Realtime API default voice)
         input: cleanText,
       });
       
