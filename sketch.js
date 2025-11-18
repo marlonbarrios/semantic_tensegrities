@@ -871,6 +871,9 @@ const sketch = p => {
   let mouseDownX = 0; // Mouse X position when pressed
   let mouseDownY = 0; // Mouse Y position when pressed
   let clickedNode = null; // Node that was clicked (before drag check)
+  let initialPinchDistance = 0; // Initial distance between two touches for pinch zoom
+  let lastPinchDistance = 0; // Last pinch distance for smooth zoom
+  let isPinching = false; // Track if user is pinching
   let currentLanguage = 'en'; // Current language code
   let showLanguageMenu = false; // Whether to show language menu
   let darkMode = false; // Dark mode toggle
@@ -1019,8 +1022,9 @@ const sketch = p => {
           // Calculate zoom to fit with padding
           const verticalLanguages = ['ja', 'zh', 'ko'];
           const isVerticalTicker = verticalLanguages.includes(currentLanguage);
-          let tickerHeight = isVerticalTicker ? 0 : 60;
-          let tickerWidth = isVerticalTicker ? 60 : 0;
+          const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+          let tickerHeight = isVerticalTicker ? 0 : (isMobile ? 100 : 60);
+          let tickerWidth = isVerticalTicker ? (isMobile ? 100 : 60) : 0;
           let topPadding = 10;
           let bottomPadding = 50;
           let sidePadding = 50 + tickerWidth;
@@ -1138,6 +1142,9 @@ const sketch = p => {
       return;
     }
     
+    // Detect mobile device for larger ticker
+    const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    
     // Determine text direction and orientation based on language
     const rtlLanguages = ['ar']; // Right-to-left languages (horizontal)
     const verticalLanguages = ['ja', 'zh', 'ko']; // Vertical writing languages
@@ -1145,15 +1152,16 @@ const sketch = p => {
     const isVertical = verticalLanguages.includes(currentLanguage);
     
     const colors = getColors();
-    let fontSize = 14;
-    let padding = 20;
+    // Larger font and padding on mobile for better visibility
+    let fontSize = isMobile ? 22 : 14; // Larger font on mobile
+    let padding = isMobile ? 30 : 20; // More padding on mobile
     
     // Clean up text for display (uses currentTextBeingRead - same text being spoken)
     let displayText = currentTextBeingRead.replace(/\n+/g, ' ').trim();
     
     if (isVertical) {
       // Vertical ticker on right side - scrolls bottom to top
-      let tickerWidth = 60;
+      let tickerWidth = isMobile ? 100 : 60; // Much wider on mobile for better visibility
       let tickerX = p.width - tickerWidth;
       
       // Background for vertical ticker
@@ -1234,7 +1242,7 @@ const sketch = p => {
       p.pop(); // Close the text styling push from line 889
     } else {
       // Horizontal ticker at bottom
-      let tickerHeight = 60;
+      let tickerHeight = isMobile ? 100 : 60; // Much taller on mobile for better visibility
       let tickerY = p.height - tickerHeight;
       
       // Background for ticker
@@ -2442,9 +2450,10 @@ const sketch = p => {
       // Also account for ticker - horizontal at bottom or vertical on right
       const verticalLanguages = ['ja', 'zh', 'ko'];
       const isVerticalTicker = verticalLanguages.includes(currentLanguage);
+      const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
       let topPadding = 10; // Just 10px from top edge
-      let tickerHeight = isVerticalTicker ? 0 : 60; // No bottom ticker for vertical
-      let tickerWidth = isVerticalTicker ? 60 : 0; // Right side ticker for vertical
+      let tickerHeight = isVerticalTicker ? 0 : (isMobile ? 100 : 60); // Taller on mobile
+      let tickerWidth = isVerticalTicker ? (isMobile ? 100 : 60) : 0; // Wider on mobile
       let availableHeight = p.height - tickerHeight - topPadding;
       let availableWidth = p.width - tickerWidth;
       
@@ -2857,45 +2866,167 @@ const sketch = p => {
     return false; // Prevent default scrolling
   };
   
+  // Helper function to calculate distance between two touches
+  function getTouchDistance(touch1, touch2) {
+    const dx = touch2.x - touch1.x;
+    const dy = touch2.y - touch1.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+  
   // Handle touch events for mobile devices
   p.touchStarted = function() {
+    const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    
+    // ALWAYS check buttons first (works on both landing page and network view)
+    // p5.js automatically sets mouseX/mouseY from touch coordinates
+    if (checkHomeButtonClick(p, p.mouseX, p.mouseY) ||
+        checkDarkModeToggleClick(p, p.mouseX, p.mouseY) ||
+        checkLanguageMenuClick(p, p.mouseX, p.mouseY) ||
+        checkCreditsClick(p, p.mouseX, p.mouseY)) {
+      return false; // Button was clicked, let UI handle it
+    }
+    
     // On landing page, tap anywhere to start
     if (textTyped.length === 0 && !isLoading) {
-      const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
       if (isMobile) {
-        // p5.js automatically sets mouseX/mouseY from touch coordinates
-        // Check if touching UI elements first
-        if (checkHomeButtonClick(p, p.mouseX, p.mouseY) ||
-            checkDarkModeToggleClick(p, p.mouseX, p.mouseY) ||
-            checkLanguageMenuClick(p, p.mouseX, p.mouseY) ||
-            checkCreditsClick(p, p.mouseX, p.mouseY)) {
-          return false; // Let UI handle the touch
-        }
         // Trigger text generation
         triggerTextGeneration();
         return false; // Prevent default scrolling
       }
     }
-    // For other cases, let mousePressed handle it
+    
+    // Handle pinch zoom start (2 touches)
+    if (p.touches && p.touches.length === 2 && wordNetwork.nodes.length > 0) {
+      isPinching = true;
+      initialPinchDistance = getTouchDistance(p.touches[0], p.touches[1]);
+      lastPinchDistance = initialPinchDistance;
+      return false; // Prevent default
+    }
+    
+    // For single touch on network, handle word clicking and panning
+    if (wordNetwork.nodes.length > 0) {
+      // Store touch position for word click detection
+      mouseDownX = p.mouseX;
+      mouseDownY = p.mouseY;
+      clickedNode = null;
+      
+      // Check if touching a node
+      let worldX = (p.mouseX - p.width / 2 - viewOffsetX) / viewZoom;
+      let worldY = (p.mouseY - p.height / 2 - viewOffsetY) / viewZoom;
+      
+      let closestNode = null;
+      let closestDist = Infinity;
+      let clickRadius = 100;
+      
+      for (let node of wordNetwork.nodes) {
+        let dx = node.position.x - worldX;
+        let dy = node.position.y - worldY;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < clickRadius && dist < closestDist) {
+          closestDist = dist;
+          closestNode = node;
+        }
+      }
+      
+      clickedNode = closestNode;
+      if (closestNode) {
+        isDraggingNode = true;
+        draggedNode = closestNode;
+        dragOffsetX = closestNode.position.x - worldX;
+        dragOffsetY = closestNode.position.y - worldY;
+      } else {
+        // Start pan drag
+        isDragging = true;
+        lastMouseX = p.mouseX;
+        lastMouseY = p.mouseY;
+      }
+    }
+    
     return false;
   };
   
-  // Prevent default touch behavior on landing page to avoid scrolling/zooming
+  // Handle touch movement for pinch zoom and panning
   p.touchMoved = function() {
     // Only prevent default on landing page
     if (textTyped.length === 0) {
       return false; // Prevent default scrolling on landing page
     }
-    // Allow normal touch behavior when network is visible (for panning)
-    return true;
+    
+    // Handle pinch zoom (2 touches)
+    if (p.touches && p.touches.length === 2 && isPinching) {
+      const currentDistance = getTouchDistance(p.touches[0], p.touches[1]);
+      const zoomFactor = currentDistance / lastPinchDistance;
+      
+      // Update zoom
+      viewZoom *= zoomFactor;
+      viewZoom = Math.max(0.1, Math.min(5.0, viewZoom)); // Limit zoom range
+      
+      lastPinchDistance = currentDistance;
+      return false; // Prevent default
+    }
+    
+    // Handle single touch panning
+    if (p.touches && p.touches.length === 1 && wordNetwork.nodes.length > 0) {
+      if (isDraggingNode && draggedNode) {
+        // Node dragging is handled in visualizeNetwork
+        lastMouseX = p.mouseX;
+        lastMouseY = p.mouseY;
+      } else if (isDragging) {
+        // Pan the view
+        let deltaX = p.mouseX - lastMouseX;
+        let deltaY = p.mouseY - lastMouseY;
+        
+        viewOffsetX += deltaX / viewZoom;
+        viewOffsetY += deltaY / viewZoom;
+        
+        lastMouseX = p.mouseX;
+        lastMouseY = p.mouseY;
+      }
+      return false; // Prevent default scrolling
+    }
+    
+    return false;
   };
   
   p.touchEnded = function() {
+    // Reset pinch state
+    if (p.touches && p.touches.length < 2) {
+      isPinching = false;
+      initialPinchDistance = 0;
+      lastPinchDistance = 0;
+    }
+    
+    // Handle word tap (single touch, no movement)
+    if (p.touches && p.touches.length === 0 && wordNetwork.nodes.length > 0) {
+      const touchMoved = Math.abs(p.mouseX - mouseDownX) > 10 || Math.abs(p.mouseY - mouseDownY) > 10;
+      
+      // If tapped on a node without dragging, trigger generation
+      if (!touchMoved && clickedNode && isDraggingNode) {
+        triggerTextGenerationWithWord(clickedNode.word);
+        isDraggingNode = false;
+        draggedNode = null;
+        clickedNode = null;
+        return false;
+      }
+      
+      // Stop dragging
+      if (isDraggingNode && draggedNode) {
+        draggedNode.velocity.x *= 0.3;
+        draggedNode.velocity.y *= 0.3;
+        isDraggingNode = false;
+        draggedNode = null;
+      }
+      
+      isDragging = false;
+      clickedNode = null;
+    }
+    
     // Only prevent default on landing page
     if (textTyped.length === 0) {
       return false; // Prevent default on landing page
     }
-    return true;
+    return false;
   };
 
   // Old rendering code removed - network visualization handles rendering now
