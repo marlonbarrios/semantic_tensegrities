@@ -953,12 +953,21 @@ const sketch = p => {
 
     // Build network from generated text (from realtime model) - uses same textTyped as ticker
     if (textTyped.length > 0 && (wordNetwork.needsUpdate || wordNetwork.nodes.length === 0)) {
-      buildWordNetwork(textTyped); // Uses textTyped from realtime model
-      wordNetwork.needsUpdate = false;
-      needsAutoZoom = true; // Flag to auto-zoom to fit network
-      // Reset auto-highlight for new network
-      autoHighlightIndex = 0;
-      autoHighlightTime = 0;
+      try {
+        buildWordNetwork(textTyped); // Uses textTyped from realtime model
+        wordNetwork.needsUpdate = false;
+        needsAutoZoom = true; // Flag to auto-zoom to fit network
+        // Reset auto-highlight for new network
+        autoHighlightIndex = 0;
+        autoHighlightTime = 0;
+      } catch (err) {
+        console.error('Error building word network:', err);
+        // If buildWordNetwork fails, mark as updated to prevent infinite retries
+        wordNetwork.needsUpdate = false;
+        // Set isLoading to false to prevent stuck loading state
+        isLoading = false;
+        isFirstGeneration = false;
+      }
     }
 
     // Show instructions if no text yet and not loading
@@ -976,7 +985,9 @@ const sketch = p => {
 
     // For subsequent generations, skip loading animation and build network directly
     // Show network only if we have nodes (or if not first generation, skip loader)
-    if (wordNetwork.nodes.length === 0 && isFirstGeneration) {
+    // Only show loader if we're still loading AND it's the first generation
+    // Once loading is complete, proceed to show network even if empty (shouldn't happen, but prevents stuck state)
+    if (wordNetwork.nodes.length === 0 && isFirstGeneration && isLoading) {
       displayLoader(p, wordNetwork);
       return;
     }
@@ -3386,7 +3397,12 @@ const sketch = p => {
 
   async function chat(prompt) {
     try {
-      const completion = await openai.chat.completions.create({
+      // Add timeout wrapper to prevent hanging on mobile (30 seconds)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('API call timeout after 30 seconds')), 30000);
+      });
+      
+      const apiPromise = openai.chat.completions.create({
         model: "gpt-4o", // Using latest realtime/fast model
         temperature: 1.0,
         messages: [
@@ -3397,6 +3413,8 @@ const sketch = p => {
           { "role": "user", "content": prompt }
         ]
       });
+      
+      const completion = await Promise.race([apiPromise, timeoutPromise]);
 
       // Stop any current voice reading from previous text
       if (currentUtterance && audioContext) {
@@ -3437,8 +3455,15 @@ const sketch = p => {
       }
     } catch (err) {
       console.error("An error occurred in the chat function:", err);
-      textTyped = "Error generating text. Please try again.\n";
+      // Set a fallback text so the user sees something
+      if (!textTyped || textTyped.length === 0) {
+        textTyped = err.message && err.message.includes('timeout') 
+          ? "Connection timeout. Please check your internet connection and try again.\n"
+          : "Error generating text. Please try again.\n";
+      }
       isLoading = false;
+      isFirstGeneration = false; // Prevent stuck loading state
+      wordNetwork.needsUpdate = false; // Prevent infinite retries
     }
   }
 
