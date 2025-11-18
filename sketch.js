@@ -9,6 +9,8 @@ const openAIKey = import.meta.env.VITE_OPENAI_KEY;
 
 let openai;
 let isLoading = false;
+let loadingStartTime = 0; // Track when loading started
+const MAX_LOADING_TIME = 60000; // 60 seconds max loading time
 let speechSynthesis = null;
 let currentUtterance = null;
 let audioContext = null;
@@ -966,6 +968,7 @@ const sketch = p => {
         wordNetwork.needsUpdate = false;
         // Set isLoading to false to prevent stuck loading state
         isLoading = false;
+        loadingStartTime = 0;
         isFirstGeneration = false;
       }
     }
@@ -974,6 +977,21 @@ const sketch = p => {
     if (textTyped.length === 0 && !isLoading) {
       displayInstructions(p);
       return;
+    }
+
+    // Safety check: if loading has been going on too long, force exit loading state
+    if (isLoading && loadingStartTime > 0) {
+      const loadingDuration = Date.now() - loadingStartTime;
+      if (loadingDuration > MAX_LOADING_TIME) {
+        console.warn('Loading timeout - forcing exit from loading state');
+        isLoading = false;
+        isFirstGeneration = false;
+        loadingStartTime = 0;
+        // Set a fallback text if none exists
+        if (!textTyped || textTyped.length === 0) {
+          textTyped = "Loading timeout. Please try again.\n";
+        }
+      }
     }
 
     // Show loading animation only on first generation
@@ -990,6 +1008,17 @@ const sketch = p => {
     if (wordNetwork.nodes.length === 0 && isFirstGeneration && isLoading) {
       displayLoader(p, wordNetwork);
       return;
+    }
+    
+    // If we have text but no nodes and loading is complete, try to build network or show error
+    if (textTyped.length > 0 && wordNetwork.nodes.length === 0 && !isLoading) {
+      // If network build failed or created 0 nodes, show error message
+      if (!wordNetwork.needsUpdate) {
+        // Network was already built but has 0 nodes - show error
+        console.warn('Network has 0 nodes after build - this should not happen');
+        // Force exit first generation to prevent stuck state
+        isFirstGeneration = false;
+      }
     }
 
     // Auto-zoom to fit entire network in window (animated, slower)
@@ -3050,6 +3079,7 @@ const sketch = p => {
   async function triggerTextGeneration() {
     if (!isLoading) {
       isLoading = true;
+      loadingStartTime = Date.now(); // Track when loading started
       
       // Initialize audio context on first user interaction (required for mobile)
       if (!audioContext) {
@@ -3077,6 +3107,7 @@ const sketch = p => {
   // Function to trigger text generation based on a clicked word
   async function triggerTextGenerationWithWord(word) {
     if (!isLoading && word) {
+      loadingStartTime = Date.now(); // Track when loading started
       // Initialize audio context on user interaction (required for mobile)
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -3178,6 +3209,7 @@ const sketch = p => {
       // Reset to show loading animation
       isFirstGeneration = true;
       isLoading = false; // Will be set to true by triggerTextGeneration
+      loadingStartTime = 0;
       
       // Reset view/zoom
       viewOffsetX = 0;
@@ -3436,6 +3468,7 @@ const sketch = p => {
       wordNetwork.needsUpdate = true;
       tickerOffset = 0; // Reset ticker for new text (will use textTyped)
       isLoading = false;
+      loadingStartTime = 0; // Reset loading start time
       
       // Mark first generation as complete
       if (isFirstGeneration) {
@@ -3462,6 +3495,7 @@ const sketch = p => {
           : "Error generating text. Please try again.\n";
       }
       isLoading = false;
+      loadingStartTime = 0; // Reset loading start time
       isFirstGeneration = false; // Prevent stuck loading state
       wordNetwork.needsUpdate = false; // Prevent infinite retries
     }
@@ -3651,6 +3685,7 @@ const sketch = p => {
     
     // Stop any ongoing generation
     isLoading = false;
+    loadingStartTime = 0;
     
     // Clear current text and network
     textTyped = '';
