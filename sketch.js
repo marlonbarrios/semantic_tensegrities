@@ -1,0 +1,2985 @@
+import './style.css';
+import OpenAI from 'openai';
+
+// P_3_1_2_01 - Typewriter Visual Composition
+// Adapted from Generative Gestaltung
+// Integrated with GPT-4 AI text generation
+
+const openAIKey = import.meta.env.VITE_OPENAI_KEY;
+
+let openai;
+let isLoading = false;
+let speechSynthesis = null;
+let currentUtterance = null;
+let audioContext = null;
+let heartbeatInterval = null;
+let heartbeatGainNode = null;
+let currentTextBeingRead = ''; // Track text currently being read/looped
+let shouldLoopVoice = false; // Flag to control voice looping
+let isVoiceSpeaking = false; // Track if voice is currently speaking
+let autoGenerationEnabled = true; // Flag to control automatic generation cycle
+
+// Typewriter variables (matching original exactly)
+let textTyped = '';
+let font;
+
+// Graphic elements removed - only text rendering
+
+var centerX;
+var centerY;
+var offsetX;
+var offsetY;
+var zoom;
+
+var actRandomSeed;
+
+// Animation variables for snake effect
+var animatedLength = 0;
+var animationSpeed = 2; // characters per frame
+var isAnimating = false;
+var animationStartFrame = 0;
+
+const sketch = p => {
+  // Function to create heartbeat sound
+  function createHeartbeatSound() {
+    try {
+      // Initialize audio context
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      // Create gain node for volume control
+      if (!heartbeatGainNode) {
+        heartbeatGainNode = audioContext.createGain();
+        heartbeatGainNode.gain.value = 0.5; // Increased volume for audibility
+        heartbeatGainNode.connect(audioContext.destination);
+      }
+      
+      // Heartbeat pattern: lub-dub-pause (approximately 60 BPM)
+      function playHeartbeat() {
+        if (!audioContext || audioContext.state !== 'running') {
+          return;
+        }
+        
+        let now = audioContext.currentTime;
+        
+        // First beat (lub) - lower frequency, more audible
+        let oscillator1 = audioContext.createOscillator();
+        let gain1 = audioContext.createGain();
+        oscillator1.type = 'sine';
+        oscillator1.frequency.value = 80; // More audible frequency
+        gain1.gain.setValueAtTime(0, now);
+        gain1.gain.linearRampToValueAtTime(0.8, now + 0.05);
+        gain1.gain.linearRampToValueAtTime(0, now + 0.2);
+        oscillator1.connect(gain1);
+        gain1.connect(heartbeatGainNode);
+        oscillator1.start(now);
+        oscillator1.stop(now + 0.2);
+        
+        // Second beat (dub) - slightly higher frequency, after short pause
+        let oscillator2 = audioContext.createOscillator();
+        let gain2 = audioContext.createGain();
+        oscillator2.type = 'sine';
+        oscillator2.frequency.value = 100; // More audible frequency
+        gain2.gain.setValueAtTime(0, now + 0.25);
+        gain2.gain.linearRampToValueAtTime(0.8, now + 0.3);
+        gain2.gain.linearRampToValueAtTime(0, now + 0.45);
+        oscillator2.connect(gain2);
+        gain2.connect(heartbeatGainNode);
+        oscillator2.start(now + 0.25);
+        oscillator2.stop(now + 0.45);
+      }
+      
+      // Resume audio context if suspended (browsers require user interaction)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume().then(() => {
+          console.log('Heartbeat audio started');
+          // Start playing after resume
+          playHeartbeat();
+          if (heartbeatInterval) clearInterval(heartbeatInterval);
+          heartbeatInterval = setInterval(() => {
+            if (audioContext && audioContext.state === 'running') {
+              playHeartbeat();
+            }
+          }, 1000);
+        }).catch(err => {
+          console.warn('Could not resume audio context:', err);
+        });
+      } else {
+        // Play heartbeat immediately, then repeat every second (60 BPM)
+        playHeartbeat();
+        if (heartbeatInterval) clearInterval(heartbeatInterval);
+        heartbeatInterval = setInterval(() => {
+          if (audioContext && audioContext.state === 'running') {
+            playHeartbeat();
+          }
+        }, 1000);
+      }
+      
+    } catch (err) {
+      console.warn('Could not initialize heartbeat sound:', err);
+    }
+  }
+  
+  // Resume audio context on user interaction
+  function resumeAudioContext() {
+    if (!audioContext) {
+      createHeartbeatSound();
+      return;
+    }
+    
+    if (audioContext.state === 'suspended') {
+      audioContext.resume().then(() => {
+        console.log('Audio context resumed - heartbeat should be audible now');
+        // Restart heartbeat if interval was cleared
+        if (!heartbeatInterval) {
+          createHeartbeatSound();
+        }
+      }).catch(err => {
+        console.warn('Could not resume audio:', err);
+      });
+    }
+  }
+
+  // Function to create a bouncing sound when network appears
+  function playBouncingSound() {
+    try {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      
+      // Create a bouncing "boing" sound with frequency sweep
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Bouncing sound: start high, sweep down quickly
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(400, audioContext.currentTime); // Start at 400 Hz
+      oscillator.frequency.exponentialRampToValueAtTime(150, audioContext.currentTime + 0.15); // Drop to 150 Hz over 0.15 seconds
+      
+      // Quick attack and decay for bouncing effect
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.01); // Quick attack
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15); // Quick decay
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.15);
+      
+    } catch (err) {
+      console.warn('Could not play bouncing sound:', err);
+    }
+  }
+
+  // Translation system
+  const translations = {
+    en: {
+      title: 'SEMANTIC TENSEGRITIES',
+      pressSpacebar: 'Press SPACEBAR to start',
+      autoGeneration: 'Generation continues automatically',
+      autoRead: 'Text is read automatically when generated',
+      panZoom: 'Click and drag to pan, scroll to zoom',
+      hoverWords: 'Hover over words to see relationships',
+      clickWords: 'Click words to generate new text',
+      language: 'Language',
+      generating: 'Generating...',
+      wordLanguage: 'language',
+      wordSpace: 'space',
+      wordLatent: 'latent',
+      wordNetwork: 'network',
+      wordSemantic: 'semantic',
+      wordDimension: 'dimension',
+      wordEmbedding: 'embedding',
+      wordVector: 'vector',
+      wordMeaning: 'meaning',
+      wordText: 'text',
+      wordNavigation: 'navigation',
+      wordTechnology: 'technology',
+      home: 'Home'
+    },
+    es: {
+      title: 'TENSEGRIDADES SEMÁNTICAS',
+      pressSpacebar: 'Presiona ESPACIO para comenzar',
+      autoGeneration: 'La generación continúa automáticamente',
+      autoRead: 'El texto se lee automáticamente cuando se genera',
+      panZoom: 'Haz clic y arrastra para mover, desplázate para hacer zoom',
+      hoverWords: 'Pasa el mouse sobre las palabras para ver relaciones',
+      clickWords: 'Haz clic en palabras para generar nuevo texto',
+      language: 'Idioma',
+      generating: 'Generando...',
+      wordLanguage: 'lenguaje',
+      wordSpace: 'espacio',
+      wordLatent: 'latente',
+      wordNetwork: 'red',
+      wordSemantic: 'semántico',
+      wordDimension: 'dimensión',
+      wordEmbedding: 'incrustación',
+      wordVector: 'vector',
+      wordMeaning: 'significado',
+      wordText: 'texto',
+      wordNavigation: 'navegación',
+      wordTechnology: 'tecnología',
+      home: 'Inicio'
+    },
+    fr: {
+      title: 'TENSEGRITÉS SÉMANTIQUES',
+      pressSpacebar: 'Appuyez sur ESPACE pour commencer',
+      autoGeneration: 'La génération continue automatiquement',
+      autoRead: 'Le texte est lu automatiquement lorsqu\'il est généré',
+      panZoom: 'Cliquez et glissez pour déplacer, faites défiler pour zoomer',
+      hoverWords: 'Survolez les mots pour voir les relations',
+      clickWords: 'Cliquez sur les mots pour générer un nouveau texte',
+      language: 'Langue',
+      generating: 'Génération...',
+      wordLanguage: 'langage',
+      wordSpace: 'espace',
+      wordLatent: 'latent',
+      wordNetwork: 'réseau',
+      wordSemantic: 'sémantique',
+      wordDimension: 'dimension',
+      wordEmbedding: 'intégration',
+      wordVector: 'vecteur',
+      wordMeaning: 'signification',
+      wordText: 'texte',
+      wordNavigation: 'navigation',
+      wordTechnology: 'technologie',
+      home: 'Accueil'
+    },
+    de: {
+      title: 'SEMANTISCHE TENSEGRITÄTEN',
+      pressSpacebar: 'Drücken Sie LEERTASTE zum Starten',
+      autoGeneration: 'Die Generierung läuft automatisch weiter',
+      autoRead: 'Text wird automatisch vorgelesen, wenn er generiert wird',
+      panZoom: 'Klicken und ziehen zum Verschieben, scrollen zum Zoomen',
+      hoverWords: 'Bewegen Sie die Maus über Wörter, um Beziehungen zu sehen',
+      clickWords: 'Klicken Sie auf Wörter, um neuen Text zu generieren',
+      language: 'Sprache',
+      generating: 'Generiere...',
+      wordLanguage: 'Sprache',
+      wordSpace: 'Raum',
+      wordLatent: 'latent',
+      wordNetwork: 'Netzwerk',
+      wordSemantic: 'semantisch',
+      wordDimension: 'Dimension',
+      wordEmbedding: 'Einbettung',
+      wordVector: 'Vektor',
+      wordMeaning: 'Bedeutung',
+      wordText: 'Text',
+      wordNavigation: 'Navigation',
+      wordTechnology: 'Technologie',
+      home: 'Startseite'
+    },
+    it: {
+      title: 'TENSEGRITÀ SEMANTICHE',
+      pressSpacebar: 'Premi SPAZIO per iniziare',
+      autoGeneration: 'La generazione continua automaticamente',
+      autoRead: 'Il testo viene letto automaticamente quando viene generato',
+      panZoom: 'Clicca e trascina per spostare, scorri per ingrandire',
+      hoverWords: 'Passa il mouse sulle parole per vedere le relazioni',
+      clickWords: 'Clicca sulle parole per generare nuovo testo',
+      language: 'Lingua',
+      generating: 'Generazione...',
+      wordLanguage: 'linguaggio',
+      wordSpace: 'spazio',
+      wordLatent: 'latente',
+      wordNetwork: 'rete',
+      wordSemantic: 'semantico',
+      wordDimension: 'dimensione',
+      wordEmbedding: 'incorporamento',
+      wordVector: 'vettore',
+      wordMeaning: 'significato',
+      wordText: 'testo',
+      wordNavigation: 'navigazione',
+      wordTechnology: 'tecnologia',
+      home: 'Home'
+    },
+    pt: {
+      title: 'TENSEGRIDADES SEMÂNTICAS',
+      pressSpacebar: 'Pressione ESPAÇO para começar',
+      autoGeneration: 'A geração continua automaticamente',
+      autoRead: 'O texto é lido automaticamente quando gerado',
+      panZoom: 'Clique e arraste para mover, role para zoom',
+      hoverWords: 'Passe o mouse sobre as palavras para ver relações',
+      clickWords: 'Clique nas palavras para gerar novo texto',
+      language: 'Idioma',
+      generating: 'Gerando...',
+      wordLanguage: 'linguagem',
+      wordSpace: 'espaço',
+      wordLatent: 'latente',
+      wordNetwork: 'rede',
+      wordSemantic: 'semântico',
+      wordDimension: 'dimensão',
+      wordEmbedding: 'incorporação',
+      wordVector: 'vetor',
+      wordMeaning: 'significado',
+      wordText: 'texto',
+      wordNavigation: 'navegação',
+      wordTechnology: 'tecnologia',
+      home: 'Início'
+    },
+    ja: {
+      title: 'セマンティック・テンセグリティ',
+      pressSpacebar: 'スペースキーを押して開始',
+      autoGeneration: '生成は自動的に続きます',
+      autoRead: 'テキストは生成時に自動的に読み上げられます',
+      panZoom: 'クリックしてドラッグで移動、スクロールでズーム',
+      hoverWords: '単語にマウスを合わせて関係を表示',
+      clickWords: '単語をクリックして新しいテキストを生成',
+      language: '言語',
+      generating: '生成中...',
+      wordLanguage: '言語',
+      wordSpace: '空間',
+      wordLatent: '潜在',
+      wordNetwork: 'ネットワーク',
+      wordSemantic: '意味的',
+      wordDimension: '次元',
+      wordEmbedding: '埋め込み',
+      wordVector: 'ベクトル',
+      wordMeaning: '意味',
+      wordText: 'テキスト',
+      wordNavigation: 'ナビゲーション',
+      wordTechnology: '技術',
+      home: 'ホーム'
+    },
+    zh: {
+      title: '语义张拉整体',
+      pressSpacebar: '按空格键开始',
+      autoGeneration: '生成自动继续',
+      autoRead: '文本生成时自动朗读',
+      panZoom: '点击拖动移动，滚动缩放',
+      hoverWords: '悬停单词查看关系',
+      clickWords: '点击单词生成新文本',
+      language: '语言',
+      generating: '生成中...',
+      wordLanguage: '语言',
+      wordSpace: '空间',
+      wordLatent: '潜在',
+      wordNetwork: '网络',
+      wordSemantic: '语义',
+      wordDimension: '维度',
+      wordEmbedding: '嵌入',
+      wordVector: '向量',
+      wordMeaning: '意义',
+      wordText: '文本',
+      wordNavigation: '导航',
+      wordTechnology: '技术',
+      home: '首页'
+    },
+    ko: {
+      title: '의미론적 텐세그리티',
+      pressSpacebar: '스페이스바를 눌러 시작',
+      autoGeneration: '생성이 자동으로 계속됩니다',
+      autoRead: '텍스트가 생성되면 자동으로 읽어줍니다',
+      panZoom: '클릭하고 드래그하여 이동, 스크롤하여 확대/축소',
+      hoverWords: '단어에 마우스를 올려 관계를 확인',
+      clickWords: '단어를 클릭하여 새 텍스트 생성',
+      language: '언어',
+      generating: '생성 중...',
+      wordLanguage: '언어',
+      wordSpace: '공간',
+      wordLatent: '잠재',
+      wordNetwork: '네트워크',
+      wordSemantic: '의미론적',
+      wordDimension: '차원',
+      wordEmbedding: '임베딩',
+      wordVector: '벡터',
+      wordMeaning: '의미',
+      wordText: '텍스트',
+      wordNavigation: '네비게이션',
+      wordTechnology: '기술',
+      home: '홈'
+    },
+    ar: {
+      title: 'التوترات الدلالية',
+      pressSpacebar: 'اضغط على مفتاح المسافة للبدء',
+      autoGeneration: 'يستمر التوليد تلقائياً',
+      autoRead: 'يتم قراءة النص تلقائياً عند توليده',
+      panZoom: 'انقر واسحب للتحريك، قم بالتمرير للتكبير/التصغير',
+      hoverWords: 'مرر الماوس فوق الكلمات لرؤية العلاقات',
+      clickWords: 'انقر على الكلمات لتوليد نص جديد',
+      language: 'اللغة',
+      generating: 'جاري التوليد...',
+      wordLanguage: 'لغة',
+      wordSpace: 'فضاء',
+      wordLatent: 'كامن',
+      wordNetwork: 'شبكة',
+      wordSemantic: 'دلالي',
+      wordDimension: 'بعد',
+      wordEmbedding: 'تضمين',
+      wordVector: 'متجه',
+      wordMeaning: 'معنى',
+      wordText: 'نص',
+      wordNavigation: 'تنقل',
+      wordTechnology: 'تقنية',
+      home: 'الرئيسية'
+    },
+    tr: {
+      title: 'SEMANTİK TENSEGRİTELER',
+      pressSpacebar: 'Başlamak için BOŞLUK tuşuna basın',
+      autoGeneration: 'Üretim otomatik olarak devam eder',
+      autoRead: 'Metin üretildiğinde otomatik olarak okunur',
+      panZoom: 'Taşımak için tıklayıp sürükleyin, yakınlaştırmak için kaydırın',
+      hoverWords: 'İlişkileri görmek için kelimelerin üzerine gelin',
+      clickWords: 'Yeni metin üretmek için kelimelere tıklayın',
+      language: 'Dil',
+      generating: 'Üretiliyor...',
+      wordLanguage: 'dil',
+      wordSpace: 'uzay',
+      wordLatent: 'gizli',
+      wordNetwork: 'ağ',
+      wordSemantic: 'anlamsal',
+      wordDimension: 'boyut',
+      wordEmbedding: 'gömme',
+      wordVector: 'vektör',
+      wordMeaning: 'anlam',
+      wordText: 'metin',
+      wordNavigation: 'navigasyon',
+      wordTechnology: 'teknoloji',
+      home: 'Ana Sayfa'
+    }
+  };
+
+  // Available languages
+  const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'es', name: 'Español' },
+    { code: 'fr', name: 'Français' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'it', name: 'Italiano' },
+    { code: 'pt', name: 'Português' },
+    { code: 'ja', name: '日本語' },
+    { code: 'zh', name: '中文' },
+    { code: 'ko', name: '한국어' },
+    { code: 'ar', name: 'العربية' },
+    { code: 'tr', name: 'Türkçe' }
+  ];
+
+  // Helper function to get translated text
+  function t(key) {
+    return translations[currentLanguage][key] || translations['en'][key] || key;
+  }
+
+  // Function to get system prompt in the current language
+  function getSystemPrompt() {
+    const systemPrompts = {
+      en: "You are a computational linguist writing for an installation titled 'Semantic Tensegrities'. Write about language, probabilities, computational processes, and the concept of semantic tensegrity - how meaning emerges from the structural tension and compression between words, concepts, and relationships. Reflect on how different languages have distinct grammatical structures, morphological systems, and syntactic patterns that shape meaning differently. Consider how writing systems (alphabetic, logographic, syllabic, abjad) encode information differently and affect computational processing. Write concise, matter-of-fact paragraphs (5-7 sentences) in a dry poetic style. IMPORTANT: Start each text differently - vary your opening sentences. Begin with different concepts, terms, or perspectives each time. Focus on computational linguistics: probability distributions, n-grams, language models, statistical methods, tokenization, parsing, syntax trees, semantic analysis, corpus linguistics, frequency counts, Markov chains, entropy, information theory, word embeddings, vector spaces, and probabilistic language processing. Consider how semantic relationships create structural integrity through tension and compression, like tensegrity structures. Reflect on how grammatical structures, word order (SOV, SVO, VSO), case systems, agglutination, and other linguistic features create different computational challenges and opportunities. Be precise, technical, and understated. Avoid flowery language. Write only in English. Use vocabulary related to computational linguistics, probabilities, statistics, and language processing. Keep it concise and focused. Vary your openings - start with different technical concepts, questions, or observations each time.",
+      es: "Eres un lingüista computacional escribiendo para una instalación titulada 'Tensegridades Semánticas'. Escribe sobre lenguaje, probabilidades, procesos computacionales y el concepto de tensegridad semántica - cómo el significado emerge de la tensión y compresión estructural entre palabras, conceptos y relaciones. Reflexiona sobre cómo diferentes lenguas tienen estructuras gramaticales distintas, sistemas morfológicos y patrones sintácticos que moldean el significado de manera diferente. Considera cómo los sistemas de escritura (alfabéticos, logográficos, silábicos, abjads) codifican información de manera diferente y afectan el procesamiento computacional. Reflexiona sobre cómo el orden de palabras (SVO en español), la flexión verbal, los sistemas de género y número, y otras características lingüísticas crean diferentes desafíos y oportunidades computacionales. Escribe párrafos concisos y directos (5-7 oraciones) en un estilo poético seco. IMPORTANTE: Comienza cada texto de manera diferente - varía tus oraciones iniciales. Comienza con diferentes conceptos, términos o perspectivas cada vez. Enfócate en lingüística computacional: distribuciones de probabilidad, n-gramas, modelos de lenguaje, métodos estadísticos, tokenización, análisis sintáctico, árboles de sintaxis, análisis semántico, lingüística de corpus, conteos de frecuencia, cadenas de Markov, entropía, teoría de la información, embeddings de palabras, espacios vectoriales y procesamiento probabilístico del lenguaje. Considera cómo las relaciones semánticas crean integridad estructural a través de tensión y compresión, como estructuras de tensegridad. Sé preciso, técnico y sobrio. Evita lenguaje florido. Escribe solo en español. Usa vocabulario relacionado con lingüística computacional, probabilidades, estadísticas y procesamiento del lenguaje. Manténlo conciso y enfocado. Varía tus inicios - comienza con diferentes conceptos técnicos, preguntas u observaciones cada vez.",
+      fr: "Vous êtes un linguiste computationnel écrivant pour une installation intitulée 'Tensegrités Sémantiques'. Écrivez sur le langage, les probabilités, les processus computationnels et le concept de tensegrité sémantique - comment le sens émerge de la tension et compression structurelle entre les mots, concepts et relations. Réfléchissez sur la façon dont différentes langues ont des structures grammaticales distinctes, des systèmes morphologiques et des modèles syntaxiques qui façonnent le sens différemment. Considérez comment les systèmes d'écriture (alphabétiques, logographiques, syllabiques, abjads) encodent l'information différemment et affectent le traitement computationnel. Réfléchissez sur la façon dont les structures grammaticales, l'ordre des mots (SVO en français), les systèmes de cas, l'accord, la conjugaison verbale et d'autres caractéristiques linguistiques créent différents défis et opportunités computationnels. Écrivez des paragraphes concis et factuels (5-7 phrases) dans un style poétique sec. IMPORTANT: Commencez chaque texte différemment - variez vos phrases d'ouverture. Commencez par différents concepts, termes ou perspectives à chaque fois. Concentrez-vous sur la linguistique computationnelle: distributions de probabilité, n-grammes, modèles de langage, méthodes statistiques, tokenisation, analyse syntaxique, arbres syntaxiques, analyse sémantique, linguistique de corpus, comptages de fréquence, chaînes de Markov, entropie, théorie de l'information, embeddings de mots, espaces vectoriels et traitement probabiliste du langage. Considérez comment les relations sémantiques créent l'intégrité structurelle à travers la tension et la compression, comme les structures de tensegrité. Soyez précis, technique et sobre. Évitez le langage fleuri. Écrivez uniquement en français. Utilisez un vocabulaire lié à la linguistique computationnelle, aux probabilités, aux statistiques et au traitement du langage. Restez concis et ciblé. Variez vos ouvertures - commencez par différents concepts techniques, questions ou observations à chaque fois.",
+      de: "Sie sind ein Computerlinguist, der für eine Installation mit dem Titel 'Semantische Tensegritäten' schreibt. Schreiben Sie über Sprache, Wahrscheinlichkeiten, computergestützte Prozesse und das Konzept der semantischen Tensegrität - wie Bedeutung aus der strukturellen Spannung und Kompression zwischen Wörtern, Konzepten und Beziehungen entsteht. Reflektieren Sie darüber, wie verschiedene Sprachen unterschiedliche grammatische Strukturen, morphologische Systeme und syntaktische Muster haben, die Bedeutung unterschiedlich formen. Betrachten Sie, wie Schriftsysteme (alphabetisch, logographisch, syllabisch, Abjad) Informationen unterschiedlich kodieren und die computergestützte Verarbeitung beeinflussen. Reflektieren Sie darüber, wie grammatische Strukturen, Wortstellung (SOV im Deutschen), Kasussysteme, Flexion, Komposita und andere linguistische Merkmale unterschiedliche computergestützte Herausforderungen und Möglichkeiten schaffen. Schreiben Sie prägnante, sachliche Absätze (5-7 Sätze) in einem trockenen poetischen Stil. WICHTIG: Beginnen Sie jeden Text anders - variieren Sie Ihre Eröffnungssätze. Beginnen Sie jedes Mal mit verschiedenen Konzepten, Begriffen oder Perspektiven. Konzentrieren Sie sich auf Computerlinguistik: Wahrscheinlichkeitsverteilungen, N-Gramme, Sprachmodelle, statistische Methoden, Tokenisierung, Parsing, Syntaxbäume, semantische Analyse, Korpuslinguistik, Häufigkeitszählungen, Markov-Ketten, Entropie, Informationstheorie, Wort-Embeddings, Vektorräume und probabilistische Sprachverarbeitung. Betrachten Sie, wie semantische Beziehungen strukturelle Integrität durch Spannung und Kompression schaffen, wie Tensegritätsstrukturen. Seien Sie präzise, technisch und zurückhaltend. Vermeiden Sie blumige Sprache. Schreiben Sie nur auf Deutsch. Verwenden Sie Vokabular im Zusammenhang mit Computerlinguistik, Wahrscheinlichkeiten, Statistiken und Sprachverarbeitung. Halten Sie es prägnant und fokussiert. Variieren Sie Ihre Eröffnungen - beginnen Sie jedes Mal mit verschiedenen technischen Konzepten, Fragen oder Beobachtungen.",
+      it: "Sei un linguista computazionale che scrive per un'installazione intitolata 'Tensegrità Semantiche'. Scrivi sul linguaggio, probabilità, processi computazionali e il concetto di tensegrità semantica - come il significato emerge dalla tensione e compressione strutturale tra parole, concetti e relazioni. Rifletti su come lingue diverse hanno strutture grammaticali distinte, sistemi morfologici e modelli sintattici che modellano il significato in modo diverso. Considera come i sistemi di scrittura (alfabetici, logografici, sillabici, abjad) codificano informazioni in modo diverso e influenzano l'elaborazione computazionale. Rifletti su come le strutture grammaticali, l'ordine delle parole (SVO in italiano), i sistemi di casi, la flessione verbale, la concordanza e altre caratteristiche linguistiche creano diverse sfide e opportunità computazionali. Scrivi paragrafi concisi e fattuali (5-7 frasi) in uno stile poetico secco. IMPORTANTE: Inizia ogni testo in modo diverso - varia le tue frasi di apertura. Inizia con concetti, termini o prospettive diversi ogni volta. Concentrati sulla linguistica computazionale: distribuzioni di probabilità, n-grammi, modelli linguistici, metodi statistici, tokenizzazione, parsing, alberi sintattici, analisi semantica, linguistica dei corpora, conteggi di frequenza, catene di Markov, entropia, teoria dell'informazione, embeddings di parole, spazi vettoriali e elaborazione probabilistica del linguaggio. Considera come le relazioni semantiche creano integrità strutturale attraverso tensione e compressione, come strutture di tensegrità. Sii preciso, tecnico e sobrio. Evita un linguaggio fiorito. Scrivi solo in italiano. Usa vocabolario relativo alla linguistica computazionale, probabilità, statistiche ed elaborazione del linguaggio. Mantienilo conciso e mirato. Varia le tue aperture - inizia con concetti tecnici, domande o osservazioni diverse ogni volta.",
+      pt: "Você é um linguista computacional escrevendo para uma instalação intitulada 'Tensegridades Semânticas'. Escreva sobre linguagem, probabilidades, processos computacionais e o conceito de tensegridade semântica - como o significado emerge da tensão e compressão estrutural entre palavras, conceitos e relacionamentos. Reflita sobre como diferentes línguas têm estruturas gramaticais distintas, sistemas morfológicos e padrões sintáticos que moldam o significado de forma diferente. Considere como sistemas de escrita (alfabéticos, logográficos, silábicos, abjads) codificam informações de forma diferente e afetam o processamento computacional. Reflita sobre como estruturas gramaticais, ordem de palavras (SVO em português), sistemas de casos, flexão verbal, concordância e outras características linguísticas criam diferentes desafios e oportunidades computacionais. Escreva parágrafos concisos e diretos (5-7 frases) em um estilo poético seco. IMPORTANTE: Comece cada texto de forma diferente - varie suas frases de abertura. Comece com conceitos, termos ou perspectivas diferentes a cada vez. Foque em linguística computacional: distribuições de probabilidade, n-gramas, modelos de linguagem, métodos estatísticos, tokenização, análise sintática, árvores sintáticas, análise semântica, linguística de corpus, contagens de frequência, cadeias de Markov, entropia, teoria da informação, embeddings de palavras, espaços vetoriais e processamento probabilístico de linguagem. Considere como relacionamentos semânticos criam integridade estrutural através de tensão e compressão, como estruturas de tensegridade. Seja preciso, técnico e sóbrio. Evite linguagem florida. Escreva apenas em português. Use vocabulário relacionado à linguística computacional, probabilidades, estatísticas e processamento de linguagem. Mantenha conciso e focado. Varie suas aberturas - comece com conceitos técnicos, perguntas ou observações diferentes a cada vez.",
+      ja: "あなたは「セマンティック・テンセグリティ」というインスタレーションのために書く計算言語学者です。言語、確率、計算プロセス、そして意味的テンセグリティの概念について書いてください - 意味が単語、概念、関係の間の構造的緊張と圧縮からどのように生まれるか。異なる言語がどのように異なる文法構造、形態体系、統語パターンを持ち、意味を異なる方法で形成するかを考察してください。書記体系（表音文字、表意文字、音節文字、アブジャド）がどのように情報を異なる方法で符号化し、計算処理に影響を与えるかを考えてください。文法構造、語順（日本語のSOV）、格システム、膠着語、助詞、動詞活用、文字体系（漢字、ひらがな、カタカナ）の混合使用など、言語的特徴がどのように異なる計算上の課題と機会を生み出すかを考察してください。簡潔で事実に基づいた段落（5-7文）を乾いた詩的なスタイルで書いてください。重要：各テキストを異なる方法で始めてください - 冒頭文を変化させてください。毎回異なる概念、用語、または視点から始めてください。計算言語学に焦点を当ててください：確率分布、n-gram、言語モデル、統計的方法、トークン化、構文解析、構文木、意味解析、コーパス言語学、頻度カウント、マルコフ連鎖、エントロピー、情報理論、単語埋め込み、ベクトル空間、確率的言語処理。意味的関係がテンセグリティ構造のように緊張と圧縮を通じて構造的整合性をどのように生み出すかを考えてください。正確で技術的で控えめにしてください。華やかな言語を避けてください。日本語のみで書いてください。計算言語学、確率、統計、言語処理に関連する語彙を使用してください。簡潔で焦点を絞ってください。冒頭を変化させてください - 毎回異なる技術的概念、質問、または観察から始めてください。",
+      zh: "你是一位计算语言学家，为一个名为'语义张拉整体'的装置写作。写关于语言、概率、计算过程和语义张拉整体概念的内容 - 意义如何从单词、概念和关系之间的结构张力和压缩中产生。反思不同语言如何具有不同的语法结构、形态系统和句法模式，从而以不同方式塑造意义。考虑书写系统（表音文字、表意文字、音节文字、辅音音素文字）如何以不同方式编码信息并影响计算处理。反思语法结构、词序（中文的SVO和话题优先）、量词系统、声调、汉字系统（表意文字）、语法标记的缺失、语序灵活性等语言特征如何创造不同的计算挑战和机遇。以简洁、实事求是的段落（5-7句话）用干涩的诗意风格写作。重要：每次以不同方式开始文本 - 变化你的开头句子。每次以不同的概念、术语或视角开始。专注于计算语言学：概率分布、n-gram、语言模型、统计方法、分词、解析、句法树、语义分析、语料库语言学、频率计数、马尔可夫链、熵、信息论、词嵌入、向量空间和概率语言处理。考虑语义关系如何通过张力和压缩创造结构完整性，就像张拉整体结构一样。要精确、技术性和低调。避免华丽的语言。只用中文写作。使用与计算语言学、概率、统计和语言处理相关的词汇。保持简洁和专注。变化你的开头 - 每次以不同的技术概念、问题或观察开始。",
+      ko: "당신은 '의미론적 텐세그리티'라는 제목의 설치 작품을 위해 글을 쓰는 계산 언어학자입니다. 언어, 확률, 계산 과정, 그리고 의미론적 텐세그리티의 개념에 대해 써주세요 - 의미가 단어, 개념, 관계 사이의 구조적 긴장과 압축에서 어떻게 나타나는지. 다른 언어들이 어떻게 서로 다른 문법 구조, 형태론적 체계, 통사론적 패턴을 가지며 의미를 다르게 형성하는지 성찰하세요. 표기 체계(음성 문자, 표의 문자, 음절 문자, 자음 문자)가 어떻게 정보를 다르게 인코딩하고 계산 처리에 영향을 미치는지 고려하세요. 문법 구조, 어순(한국어의 SOV), 격 체계, 교착어, 조사, 동사 활용, 존댓말 체계, 한글(음소 문자)과 한자(표의 문자)의 혼용 등 언어적 특징들이 어떻게 다른 계산적 도전과 기회를 만들어내는지 성찰하세요. 건조한 시적 스타일로 간결하고 사실적인 단락(5-7문장)을 작성하세요. 중요: 각 텍스트를 다르게 시작하세요 - 시작 문장을 다양하게 하세요. 매번 다른 개념, 용어 또는 관점으로 시작하세요. 계산 언어학에 집중하세요: 확률 분포, n-gram, 언어 모델, 통계적 방법, 토큰화, 구문 분석, 구문 트리, 의미 분석, 코퍼스 언어학, 빈도 수, 마르코프 체인, 엔트로피, 정보 이론, 단어 임베딩, 벡터 공간, 확률적 언어 처리. 의미론적 관계가 텐세그리티 구조처럼 긴장과 압축을 통해 구조적 무결성을 어떻게 만드는지 고려하세요. 정확하고 기술적이며 절제된 문체를 유지하세요. 화려한 언어를 피하세요. 한국어로만 작성하세요. 계산 언어학, 확률, 통계, 언어 처리와 관련된 어휘를 사용하세요. 간결하고 집중적으로 유지하세요. 시작을 다양하게 하세요 - 매번 다른 기술적 개념, 질문 또는 관찰로 시작하세요.",
+      ar: "أنت لغوي حسابي تكتب لتركيب فني بعنوان 'التوترات الدلالية'. اكتب عن اللغة والاحتمالات والعمليات الحسابية ومفهوم التوتر الدلالي - كيف ينشأ المعنى من التوتر والضغط البنيوي بين الكلمات والمفاهيم والعلاقات. تأمل في كيفية امتلاك اللغات المختلفة لتراكيب نحوية مميزة وأنظمة صرفية وأنماط نحوية تشكل المعنى بطرق مختلفة. فكر في كيفية ترميز أنظمة الكتابة (الأبجدية، اللوغوغرافية، المقطعية، الأبجد) للمعلومات بطرق مختلفة وتأثيرها على المعالجة الحسابية. تأمل في كيفية إنشاء التراكيب النحوية، وترتيب الكلمات (VSO في العربية)، وأنظمة الإعراب، والجذور الثلاثية، والاشتقاق، والكتابة من اليمين إلى اليسار، وغياب الحروف الصوتية في بعض السياقات، وغيرها من السمات اللغوية لتحديات وفرص حسابية مختلفة. اكتب فقرات موجزة وواقعية (5-7 جمل) بأسلوب شعري جاف. مهم: ابدأ كل نص بشكل مختلف - غيّر جملك الافتتاحية. ابدأ بمفاهيم أو مصطلحات أو وجهات نظر مختلفة في كل مرة. ركز على اللسانيات الحسابية: توزيعات الاحتمال، n-gram، نماذج اللغة، الطرق الإحصائية، الترميز، التحليل النحوي، أشجار النحو، التحليل الدلالي، لسانيات النصوص، عدد التكرارات، سلاسل ماركوف، الإنتروبيا، نظرية المعلومات، تضمين الكلمات، المسافات المتجهة، ومعالجة اللغة الاحتمالية. فكر في كيفية إنشاء العلاقات الدلالية للسلامة البنيوية من خلال التوتر والضغط، مثل هياكل التوتر. كن دقيقاً وتقنياً ومتحفظاً. تجنب اللغة المزخرفة. اكتب بالعربية فقط. استخدم مفردات متعلقة باللسانيات الحسابية والاحتمالات والإحصاءات ومعالجة اللغة. حافظ على الإيجاز والتركيز. غيّر افتتاحياتك - ابدأ بمفاهيم تقنية أو أسئلة أو ملاحظات مختلفة في كل مرة.",
+      tr: "Sen 'Semantik Tensegriteler' başlıklı bir enstalasyon için yazan bir hesaplamalı dilbilimcisin. Dil, olasılıklar, hesaplamalı süreçler ve semantik tensegrite kavramı hakkında yaz - anlamın kelimeler, kavramlar ve ilişkiler arasındaki yapısal gerilim ve sıkıştırmadan nasıl ortaya çıktığı. Farklı dillerin nasıl farklı dilbilgisel yapılar, biçimbilimsel sistemler ve sözdizimsel kalıplara sahip olduğunu ve anlamı farklı şekillerde şekillendirdiğini düşün. Yazı sistemlerinin (alfabetik, logografik, hece, abjad) bilgiyi nasıl farklı şekillerde kodladığını ve hesaplamalı işlemeyi nasıl etkilediğini düşün. Dilbilgisel yapılar, kelime sırası (Türkçe'de SOV), çekim sistemleri, eklemeli yapı, ünlü uyumu, sesli harflerin varlığı, karmaşık fiil çekimleri ve diğer dilsel özelliklerin nasıl farklı hesaplamalı zorluklar ve fırsatlar yarattığını düşün. Kuru şiirsel bir tarzda kısa, gerçekçi paragraflar (5-7 cümle) yaz. ÖNEMLİ: Her metni farklı şekilde başlat - açılış cümlelerini çeşitlendir. Her seferinde farklı kavramlar, terimler veya perspektiflerle başla. Hesaplamalı dilbilime odaklan: olasılık dağılımları, n-gramlar, dil modelleri, istatistiksel yöntemler, tokenizasyon, ayrıştırma, sözdizimi ağaçları, anlamsal analiz, derlem dilbilimi, frekans sayımları, Markov zincirleri, entropi, bilgi teorisi, kelime gömme, vektör uzayları ve olasılıksal dil işleme. Semantik ilişkilerin tensegrite yapıları gibi gerilim ve sıkıştırma yoluyla yapısal bütünlüğü nasıl yarattığını düşün. Kesin, teknik ve sade ol. Süslü dilden kaçın. Sadece Türkçe yaz. Hesaplamalı dilbilim, olasılıklar, istatistikler ve dil işleme ile ilgili kelime dağarcığı kullan. Kısa ve odaklı tut. Açılışlarını çeşitlendir - her seferinde farklı teknik kavramlar, sorular veya gözlemlerle başla."
+    };
+    return systemPrompts[currentLanguage] || systemPrompts['en'];
+  }
+
+  // Function to get generation prompts in the current language
+  function getGenerationPrompts() {
+    const promptsByLanguage = {
+      en: [
+        'Write a concise text about language, space, and latent space technology. Write 5-7 sentences. Be technical yet poetic, philosophical and insightful.',
+        'Begin with probability distributions and write about computational linguistics. Write 5-7 sentences. Be technical yet poetic, philosophical and insightful.',
+        'Start by discussing vector spaces and word embeddings. Write 5-7 sentences about language, space, and latent space technology. Be technical yet poetic, philosophical and insightful.',
+        'Open with n-grams and statistical methods. Write 5-7 sentences about computational processes and language. Be technical yet poetic, philosophical and insightful.',
+        'Begin with tokenization and parsing. Write 5-7 sentences about language models and semantic analysis. Be technical yet poetic, philosophical and insightful.',
+        'Start by exploring entropy and information theory. Write 5-7 sentences about probabilities and computational linguistics. Be technical yet poetic, philosophical and insightful.',
+        'Open with corpus linguistics and frequency counts. Write 5-7 sentences about language, space, and latent space technology. Be technical yet poetic, philosophical and insightful.',
+        'Begin with Markov chains and language models. Write 5-7 sentences about computational processes and semantic relationships. Be technical yet poetic, philosophical and insightful.',
+        'Start by discussing syntax trees and semantic analysis. Write 5-7 sentences about language, probabilities, and latent space. Be technical yet poetic, philosophical and insightful.',
+        'Open with word embeddings and vector spaces. Write 5-7 sentences about computational linguistics and language processing. Be technical yet poetic, philosophical and insightful.'
+      ],
+      es: [
+        'Escribe un texto conciso sobre lenguaje, espacio y tecnología de espacio latente. Escribe 5-7 oraciones. Sé técnico pero poético, filosófico e inteligente.',
+        'Comienza con distribuciones de probabilidad y escribe sobre lingüística computacional. Escribe 5-7 oraciones. Sé técnico pero poético, filosófico e inteligente.',
+        'Comienza discutiendo espacios vectoriales y embeddings de palabras. Escribe 5-7 oraciones sobre lenguaje, espacio y tecnología de espacio latente. Sé técnico pero poético, filosófico e inteligente.',
+        'Abre con n-gramas y métodos estadísticos. Escribe 5-7 oraciones sobre procesos computacionales y lenguaje. Sé técnico pero poético, filosófico e inteligente.',
+        'Comienza con tokenización y análisis sintáctico. Escribe 5-7 oraciones sobre modelos de lenguaje y análisis semántico. Sé técnico pero poético, filosófico e inteligente.',
+        'Comienza explorando entropía y teoría de la información. Escribe 5-7 oraciones sobre probabilidades y lingüística computacional. Sé técnico pero poético, filosófico e inteligente.',
+        'Abre con lingüística de corpus y conteos de frecuencia. Escribe 5-7 oraciones sobre lenguaje, espacio y tecnología de espacio latente. Sé técnico pero poético, filosófico e inteligente.',
+        'Comienza con cadenas de Markov y modelos de lenguaje. Escribe 5-7 oraciones sobre procesos computacionales y relaciones semánticas. Sé técnico pero poético, filosófico e inteligente.',
+        'Comienza discutiendo árboles sintácticos y análisis semántico. Escribe 5-7 oraciones sobre lenguaje, probabilidades y espacio latente. Sé técnico pero poético, filosófico e inteligente.',
+        'Abre con embeddings de palabras y espacios vectoriales. Escribe 5-7 oraciones sobre lingüística computacional y procesamiento del lenguaje. Sé técnico pero poético, filosófico e inteligente.'
+      ],
+      fr: [
+        'Écrivez un texte concis sur le langage, l\'espace et la technologie de l\'espace latent. Écrivez 5-7 phrases. Soyez technique mais poétique, philosophique et perspicace.',
+        'Commencez par les distributions de probabilité et écrivez sur la linguistique computationnelle. Écrivez 5-7 phrases. Soyez technique mais poétique, philosophique et perspicace.',
+        'Commencez par discuter des espaces vectoriels et des embeddings de mots. Écrivez 5-7 phrases sur le langage, l\'espace et la technologie de l\'espace latent. Soyez technique mais poétique, philosophique et perspicace.',
+        'Ouvrez avec les n-grammes et les méthodes statistiques. Écrivez 5-7 phrases sur les processus computationnels et le langage. Soyez technique mais poétique, philosophique et perspicace.',
+        'Commencez par la tokenisation et l\'analyse syntaxique. Écrivez 5-7 phrases sur les modèles de langage et l\'analyse sémantique. Soyez technique mais poétique, philosophique et perspicace.',
+        'Commencez par explorer l\'entropie et la théorie de l\'information. Écrivez 5-7 phrases sur les probabilités et la linguistique computationnelle. Soyez technique mais poétique, philosophique et perspicace.',
+        'Ouvrez avec la linguistique de corpus et les comptages de fréquence. Écrivez 5-7 phrases sur le langage, l\'espace et la technologie de l\'espace latent. Soyez technique mais poétique, philosophique et perspicace.',
+        'Commencez par les chaînes de Markov et les modèles de langage. Écrivez 5-7 phrases sur les processus computationnels et les relations sémantiques. Soyez technique mais poétique, philosophique et perspicace.',
+        'Commencez par discuter des arbres syntaxiques et de l\'analyse sémantique. Écrivez 5-7 phrases sur le langage, les probabilités et l\'espace latent. Soyez technique mais poétique, philosophique et perspicace.',
+        'Ouvrez avec les embeddings de mots et les espaces vectoriels. Écrivez 5-7 phrases sur la linguistique computationnelle et le traitement du langage. Soyez technique mais poétique, philosophique et perspicace.'
+      ],
+      de: [
+        'Schreiben Sie einen prägnanten Text über Sprache, Raum und latente Raumtechnologie. Schreiben Sie 5-7 Sätze. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich.',
+        'Beginnen Sie mit Wahrscheinlichkeitsverteilungen und schreiben Sie über Computerlinguistik. Schreiben Sie 5-7 Sätze. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich.',
+        'Beginnen Sie mit der Diskussion von Vektorräumen und Wort-Embeddings. Schreiben Sie 5-7 Sätze über Sprache, Raum und latente Raumtechnologie. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich.',
+        'Beginnen Sie mit N-Grammen und statistischen Methoden. Schreiben Sie 5-7 Sätze über computergestützte Prozesse und Sprache. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich.',
+        'Beginnen Sie mit Tokenisierung und Parsing. Schreiben Sie 5-7 Sätze über Sprachmodelle und semantische Analyse. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich.',
+        'Beginnen Sie mit der Erforschung von Entropie und Informationstheorie. Schreiben Sie 5-7 Sätze über Wahrscheinlichkeiten und Computerlinguistik. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich.',
+        'Beginnen Sie mit Korpuslinguistik und Häufigkeitszählungen. Schreiben Sie 5-7 Sätze über Sprache, Raum und latente Raumtechnologie. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich.',
+        'Beginnen Sie mit Markov-Ketten und Sprachmodellen. Schreiben Sie 5-7 Sätze über computergestützte Prozesse und semantische Beziehungen. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich.',
+        'Beginnen Sie mit der Diskussion von Syntaxbäumen und semantischer Analyse. Schreiben Sie 5-7 Sätze über Sprache, Wahrscheinlichkeiten und latenten Raum. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich.',
+        'Beginnen Sie mit Wort-Embeddings und Vektorräumen. Schreiben Sie 5-7 Sätze über Computerlinguistik und Sprachverarbeitung. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich.'
+      ],
+      it: [
+        'Scrivi un testo conciso sul linguaggio, lo spazio e la tecnologia dello spazio latente. Scrivi 5-7 frasi. Sii tecnico ma poetico, filosofico e perspicace.',
+        'Inizia con distribuzioni di probabilità e scrivi sulla linguistica computazionale. Scrivi 5-7 frasi. Sii tecnico ma poetico, filosofico e perspicace.',
+        'Inizia discutendo spazi vettoriali e embeddings di parole. Scrivi 5-7 frasi su linguaggio, spazio e tecnologia dello spazio latente. Sii tecnico ma poetico, filosofico e perspicace.',
+        'Apri con n-grammi e metodi statistici. Scrivi 5-7 frasi su processi computazionali e linguaggio. Sii tecnico ma poetico, filosofico e perspicace.',
+        'Inizia con tokenizzazione e parsing. Scrivi 5-7 frasi su modelli linguistici e analisi semantica. Sii tecnico ma poetico, filosofico e perspicace.',
+        'Inizia esplorando entropia e teoria dell\'informazione. Scrivi 5-7 frasi su probabilità e linguistica computazionale. Sii tecnico ma poetico, filosofico e perspicace.',
+        'Apri con linguistica dei corpora e conteggi di frequenza. Scrivi 5-7 frasi su linguaggio, spazio e tecnologia dello spazio latente. Sii tecnico ma poetico, filosofico e perspicace.',
+        'Inizia con catene di Markov e modelli linguistici. Scrivi 5-7 frasi su processi computazionali e relazioni semantiche. Sii tecnico ma poetico, filosofico e perspicace.',
+        'Inizia discutendo alberi sintattici e analisi semantica. Scrivi 5-7 frasi su linguaggio, probabilità e spazio latente. Sii tecnico ma poetico, filosofico e perspicace.',
+        'Apri con embeddings di parole e spazi vettoriali. Scrivi 5-7 frasi su linguistica computazionale ed elaborazione del linguaggio. Sii tecnico ma poetico, filosofico e perspicace.'
+      ],
+      pt: [
+        'Escreva um texto conciso sobre linguagem, espaço e tecnologia de espaço latente. Escreva 5-7 frases. Seja técnico mas poético, filosófico e perspicaz.',
+        'Comece com distribuições de probabilidade e escreva sobre linguística computacional. Escreva 5-7 frases. Seja técnico mas poético, filosófico e perspicaz.',
+        'Comece discutindo espaços vetoriais e embeddings de palavras. Escreva 5-7 frases sobre linguagem, espaço e tecnologia de espaço latente. Seja técnico mas poético, filosófico e perspicaz.',
+        'Abra com n-gramas e métodos estatísticos. Escreva 5-7 frases sobre processos computacionais e linguagem. Seja técnico mas poético, filosófico e perspicaz.',
+        'Comece com tokenização e análise sintática. Escreva 5-7 frases sobre modelos de linguagem e análise semântica. Seja técnico mas poético, filosófico e perspicaz.',
+        'Comece explorando entropia e teoria da informação. Escreva 5-7 frases sobre probabilidades e linguística computacional. Seja técnico mas poético, filosófico e perspicaz.',
+        'Abra com linguística de corpus e contagens de frequência. Escreva 5-7 frases sobre linguagem, espaço e tecnologia de espaço latente. Seja técnico mas poético, filosófico e perspicaz.',
+        'Comece com cadeias de Markov e modelos de linguagem. Escreva 5-7 frases sobre processos computacionais e relacionamentos semânticos. Seja técnico mas poético, filosófico e perspicaz.',
+        'Comece discutindo árvores sintáticas e análise semântica. Escreva 5-7 frases sobre linguagem, probabilidades e espaço latente. Seja técnico mas poético, filosófico e perspicaz.',
+        'Abra com embeddings de palavras e espaços vetoriais. Escreva 5-7 frases sobre linguística computacional e processamento de linguagem. Seja técnico mas poético, filosófico e perspicaz.'
+      ],
+      ja: [
+        '言語、空間、潜在空間技術について簡潔なテキストを書いてください。5-7文を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。',
+        '確率分布から始めて計算言語学について書いてください。5-7文を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。',
+        'ベクトル空間と単語埋め込みについて議論することから始めてください。言語、空間、潜在空間技術について5-7文を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。',
+        'n-gramと統計的方法から始めてください。計算プロセスと言語について5-7文を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。',
+        'トークン化と構文解析から始めてください。言語モデルと意味解析について5-7文を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。',
+        'エントロピーと情報理論を探ることから始めてください。確率と計算言語学について5-7文を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。',
+        'コーパス言語学と頻度カウントから始めてください。言語、空間、潜在空間技術について5-7文を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。',
+        'マルコフ連鎖と言語モデルから始めてください。計算プロセスと意味的関係について5-7文を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。',
+        '構文木と意味解析について議論することから始めてください。言語、確率、潜在空間について5-7文を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。',
+        '単語埋め込みとベクトル空間から始めてください。計算言語学と言語処理について5-7文を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。'
+      ],
+      zh: [
+        '写一篇关于语言、空间和潜在空间技术的简洁文本。写5-7句话。要技术性但诗意、哲学性和有洞察力。',
+        '从概率分布开始，写关于计算语言学的内容。写5-7句话。要技术性但诗意、哲学性和有洞察力。',
+        '从讨论向量空间和词嵌入开始。写5-7句关于语言、空间和潜在空间技术的内容。要技术性但诗意、哲学性和有洞察力。',
+        '以n-gram和统计方法开始。写5-7句关于计算过程和语言的内容。要技术性但诗意、哲学性和有洞察力。',
+        '从分词和解析开始。写5-7句关于语言模型和语义分析的内容。要技术性但诗意、哲学性和有洞察力。',
+        '从探索熵和信息论开始。写5-7句关于概率和计算语言学的内容。要技术性但诗意、哲学性和有洞察力。',
+        '以语料库语言学和频率计数开始。写5-7句关于语言、空间和潜在空间技术的内容。要技术性但诗意、哲学性和有洞察力。',
+        '从马尔可夫链和语言模型开始。写5-7句关于计算过程和语义关系的内容。要技术性但诗意、哲学性和有洞察力。',
+        '从讨论句法树和语义分析开始。写5-7句关于语言、概率和潜在空间的内容。要技术性但诗意、哲学性和有洞察力。',
+        '以词嵌入和向量空间开始。写5-7句关于计算语言学和语言处理的内容。要技术性但诗意、哲学性和有洞察力。'
+      ],
+      ko: [
+        '언어, 공간, 잠재 공간 기술에 대한 간결한 텍스트를 작성하세요. 5-7문장을 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요.',
+        '확률 분포로 시작하여 계산 언어학에 대해 작성하세요. 5-7문장을 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요.',
+        '벡터 공간과 단어 임베딩에 대한 논의로 시작하세요. 언어, 공간, 잠재 공간 기술에 대해 5-7문장을 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요.',
+        'n-gram과 통계적 방법으로 시작하세요. 계산 과정과 언어에 대해 5-7문장을 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요.',
+        '토큰화와 구문 분석으로 시작하세요. 언어 모델과 의미 분석에 대해 5-7문장을 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요.',
+        '엔트로피와 정보 이론을 탐구하는 것으로 시작하세요. 확률과 계산 언어학에 대해 5-7문장을 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요.',
+        '코퍼스 언어학과 빈도 수로 시작하세요. 언어, 공간, 잠재 공간 기술에 대해 5-7문장을 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요.',
+        '마르코프 체인과 언어 모델로 시작하세요. 계산 과정과 의미론적 관계에 대해 5-7문장을 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요.',
+        '구문 트리와 의미 분석에 대한 논의로 시작하세요. 언어, 확률, 잠재 공간에 대해 5-7문장을 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요.',
+        '단어 임베딩과 벡터 공간으로 시작하세요. 계산 언어학과 언어 처리에 대해 5-7문장을 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요.'
+      ],
+      ar: [
+        'اكتب نصاً موجزاً عن اللغة والفضاء وتكنولوجيا الفضاء الكامن. اكتب 5-7 جمل. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً.',
+        'ابدأ بتوزيعات الاحتمال واكتب عن اللسانيات الحسابية. اكتب 5-7 جمل. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً.',
+        'ابدأ بمناقشة المسافات المتجهة وتضمين الكلمات. اكتب 5-7 جمل عن اللغة والفضاء وتكنولوجيا الفضاء الكامن. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً.',
+        'ابدأ بـ n-gram والطرق الإحصائية. اكتب 5-7 جمل عن العمليات الحسابية واللغة. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً.',
+        'ابدأ بالترميز والتحليل النحوي. اكتب 5-7 جمل عن نماذج اللغة والتحليل الدلالي. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً.',
+        'ابدأ باستكشاف الإنتروبيا ونظرية المعلومات. اكتب 5-7 جمل عن الاحتمالات واللسانيات الحسابية. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً.',
+        'ابدأ بلسانيات النصوص وعدد التكرارات. اكتب 5-7 جمل عن اللغة والفضاء وتكنولوجيا الفضاء الكامن. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً.',
+        'ابدأ بسلاسل ماركوف ونماذج اللغة. اكتب 5-7 جمل عن العمليات الحسابية والعلاقات الدلالية. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً.',
+        'ابدأ بمناقشة أشجار النحو والتحليل الدلالي. اكتب 5-7 جمل عن اللغة والاحتمالات والفضاء الكامن. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً.',
+        'ابدأ بتضمين الكلمات والمسافات المتجهة. اكتب 5-7 جمل عن اللسانيات الحسابية ومعالجة اللغة. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً.'
+      ],
+      tr: [
+        'Dil, uzay ve gizli uzay teknolojisi hakkında kısa bir metin yazın. 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
+        'Olasılık dağılımlarıyla başlayın ve hesaplamalı dilbilim hakkında yazın. 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
+        'Vektör uzayları ve kelime gömme hakkında tartışarak başlayın. Dil, uzay ve gizli uzay teknolojisi hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
+        'n-gramlar ve istatistiksel yöntemlerle başlayın. Hesaplamalı süreçler ve dil hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
+        'Tokenizasyon ve ayrıştırma ile başlayın. Dil modelleri ve anlamsal analiz hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
+        'Entropi ve bilgi teorisini keşfederek başlayın. Olasılıklar ve hesaplamalı dilbilim hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
+        'Derlem dilbilimi ve frekans sayımlarıyla başlayın. Dil, uzay ve gizli uzay teknolojisi hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
+        'Markov zincirleri ve dil modelleriyle başlayın. Hesaplamalı süreçler ve anlamsal ilişkiler hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
+        'Sözdizimi ağaçları ve anlamsal analiz hakkında tartışarak başlayın. Dil, olasılıklar ve gizli uzay hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
+        'Kelime gömme ve vektör uzaylarıyla başlayın. Hesaplamalı dilbilim ve dil işleme hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.'
+      ]
+    };
+    return promptsByLanguage[currentLanguage] || promptsByLanguage['en'];
+  }
+
+  p.setup = function() {
+    p.createCanvas(p.windowWidth, p.windowHeight); // 2D canvas
+    canvasWidth = p.width; // Store canvas width for ticker initialization
+    p.frameRate(30); // Limit frame rate to prevent freezing
+
+    // Start with empty text - wait for spacebar
+    textTyped = '';
+
+    centerX = p.width / 2;
+    centerY = p.height / 2;
+    offsetX = 0;
+    offsetY = 0;
+    zoom = 1.0; // Start at normal zoom
+
+    actRandomSeed = 6;
+
+    p.cursor(p.HAND);
+    p.textFont('monospace', 25); // 50% of original
+    p.textAlign(p.LEFT, p.BASELINE);
+    p.noStroke();
+    p.fill(0); // Black
+  };
+
+  p.windowResized = function() {
+    p.resizeCanvas(p.windowWidth, p.windowHeight);
+    canvasWidth = p.width; // Update canvas width when window is resized
+  };
+
+  // Network structure for latent space visualization (2D)
+  let wordNetwork = {
+    nodes: [], // {id, word, position: {x,y}, semanticVector, size}
+    edges: [], // {source, target, strength}
+    needsUpdate: false
+  };
+  
+  // 2D Camera/View state for pan and zoom
+  let viewOffsetX = 0;
+  let viewOffsetY = 0;
+  let viewZoom = 1.0;
+  let isDragging = false;
+  let isDraggingNode = false; // Track if dragging a node vs panning
+  let draggedNode = null; // Node being dragged
+  let dragOffsetX = 0; // Offset from mouse to node center
+  let dragOffsetY = 0;
+  let lastMouseX = 0;
+  let lastMouseY = 0;
+  let needsAutoZoom = false; // Flag to auto-zoom when network is first created
+  let hoveredNode = null; // Node currently being hovered over
+  let autoHighlightIndex = 0; // Index for automatic node highlighting
+  let autoHighlightTime = 0; // Time tracking for auto-highlight cycling
+  let tickerOffset = 0; // Horizontal offset for scrolling ticker
+  let canvasWidth = 0; // Store canvas width for ticker initialization
+  let mouseVelocityX = 0; // Mouse movement velocity X
+  let mouseVelocityY = 0; // Mouse movement velocity Y
+  let prevMouseX = 0; // Previous mouse X position
+  let prevMouseY = 0; // Previous mouse Y position
+  let isFirstGeneration = true; // Track if this is the first text generation
+  let mouseDownX = 0; // Mouse X position when pressed
+  let mouseDownY = 0; // Mouse Y position when pressed
+  let clickedNode = null; // Node that was clicked (before drag check)
+  let currentLanguage = 'en'; // Current language code
+  let showLanguageMenu = false; // Whether to show language menu
+  let darkMode = false; // Dark mode toggle
+  
+  // Color schemes for light and dark modes
+  const colorScheme = {
+    light: {
+      background: [255, 255, 255],
+      text: [0, 0, 0],
+      textSecondary: [0, 0, 0, 180],
+      textTertiary: [0, 0, 0, 140],
+      textQuaternary: [0, 0, 0, 100],
+      uiBackground: [250, 250, 250, 240],
+      uiBorder: [200, 200, 200],
+      uiSelected: [50, 100, 200, 200],
+      uiText: [0, 0, 0],
+      uiTextSelected: [255, 255, 255],
+      nodeDefault: [100, 100, 100],
+      nodeHighlight: [255, 200, 100],
+      edgeDefault: [40, 40, 40],
+      edgeHighlight: [100, 150, 255],
+      tickerBg: [255, 255, 255, 200],
+      tickerText: [0, 0, 0]
+    },
+    dark: {
+      background: [15, 15, 20],
+      text: [255, 255, 255],
+      textSecondary: [255, 255, 255, 200],
+      textTertiary: [255, 255, 255, 160],
+      textQuaternary: [255, 255, 255, 120],
+      uiBackground: [30, 30, 35, 240],
+      uiBorder: [80, 80, 90],
+      uiSelected: [100, 150, 255, 200],
+      uiText: [255, 255, 255],
+      uiTextSelected: [255, 255, 255],
+      nodeDefault: [180, 180, 200],
+      nodeHighlight: [255, 220, 120],
+      edgeDefault: [80, 80, 100],
+      edgeHighlight: [120, 180, 255],
+      tickerBg: [15, 15, 20, 220],
+      tickerText: [255, 255, 255]
+    }
+  };
+  
+  // Get current color scheme
+  function getColors() {
+    return darkMode ? colorScheme.dark : colorScheme.light;
+  }
+
+  p.draw = function() {
+    const colors = getColors();
+    p.background(colors.background[0], colors.background[1], colors.background[2]);
+
+    // Calculate mouse velocity for network interaction
+    if (wordNetwork.nodes.length > 0) {
+      // Calculate mouse movement delta
+      let deltaX = p.mouseX - prevMouseX;
+      let deltaY = p.mouseY - prevMouseY;
+      
+      // Smooth the velocity with damping
+      mouseVelocityX = mouseVelocityX * 0.7 + deltaX * 0.3;
+      mouseVelocityY = mouseVelocityY * 0.7 + deltaY * 0.3;
+      
+      // Update previous mouse position
+      prevMouseX = p.mouseX;
+      prevMouseY = p.mouseY;
+    } else {
+      // Reset when no network
+      mouseVelocityX = 0;
+      mouseVelocityY = 0;
+      prevMouseX = p.mouseX;
+      prevMouseY = p.mouseY;
+    }
+
+    // Build network from generated text (from realtime model) - uses same textTyped as ticker
+    if (textTyped.length > 0 && (wordNetwork.needsUpdate || wordNetwork.nodes.length === 0)) {
+      buildWordNetwork(textTyped); // Uses textTyped from realtime model
+      wordNetwork.needsUpdate = false;
+      needsAutoZoom = true; // Flag to auto-zoom to fit network
+      // Reset auto-highlight for new network
+      autoHighlightIndex = 0;
+      autoHighlightTime = 0;
+    }
+
+    // Show instructions if no text yet and not loading
+    if (textTyped.length === 0 && !isLoading) {
+      displayInstructions(p);
+      return;
+    }
+
+    // Show loading animation only on first generation
+    if (isLoading && isFirstGeneration) {
+      displayLoader(p, wordNetwork);
+      return;
+    }
+
+    // For subsequent generations, skip loading animation and build network directly
+    // Show network only if we have nodes (or if not first generation, skip loader)
+    if (wordNetwork.nodes.length === 0 && isFirstGeneration) {
+      displayLoader(p, wordNetwork);
+      return;
+    }
+
+    // Auto-zoom to fit entire network in window
+    if (needsAutoZoom && wordNetwork.nodes.length > 0) {
+      // Calculate bounding box of network
+      let minX = Infinity, maxX = -Infinity;
+      let minY = Infinity, maxY = -Infinity;
+      
+      for (let node of wordNetwork.nodes) {
+        let fontSize = 15 + node.frequency * 2;
+        let textWidth = fontSize * 0.6 * node.word.length;
+        let textHeight = fontSize;
+        
+        minX = Math.min(minX, node.position.x - textWidth / 2);
+        maxX = Math.max(maxX, node.position.x + textWidth / 2);
+        minY = Math.min(minY, node.position.y - textHeight / 2);
+        maxY = Math.max(maxY, node.position.y + textHeight / 2);
+      }
+      
+      // Calculate dimensions and center
+      let networkWidth = maxX - minX;
+      let networkHeight = maxY - minY;
+      let networkCenterX = (minX + maxX) / 2;
+      let networkCenterY = (minY + maxY) / 2;
+      
+      // Safety check - ensure valid dimensions
+      if (networkWidth > 0 && networkHeight > 0) {
+        // Calculate zoom to fit with padding
+        // Account for ticker - horizontal at bottom (60px) or vertical on right (60px)
+        const verticalLanguages = ['ja', 'zh', 'ko'];
+        const isVerticalTicker = verticalLanguages.includes(currentLanguage);
+        let tickerHeight = isVerticalTicker ? 0 : 60; // No bottom ticker for vertical
+        let tickerWidth = isVerticalTicker ? 60 : 0; // Right side ticker for vertical
+        let topPadding = 10; // Just 10px from top edge
+        let bottomPadding = 50;
+        let sidePadding = 50 + tickerWidth; // Account for vertical ticker on right
+        let zoomX = (p.width - sidePadding * 2) / networkWidth;
+        let zoomY = ((p.height - tickerHeight) - topPadding - bottomPadding) / networkHeight;
+        let calculatedZoom = Math.min(zoomX, zoomY, 1.0); // Don't zoom in, only out
+        
+        // Zoom out 10% when network is ready
+        viewZoom = calculatedZoom * 0.9;
+        
+        console.log('Auto-zoom: calculatedZoom =', calculatedZoom, 'final viewZoom =', viewZoom);
+        
+        // Center the view on network
+        viewOffsetX = -networkCenterX * viewZoom;
+        viewOffsetY = -networkCenterY * viewZoom - (topPadding - bottomPadding) / 2;
+        
+        // Play bouncing sound when network appears
+        playBouncingSound();
+      }
+      
+      needsAutoZoom = false; // Done auto-zooming
+    }
+
+    // Apply 2D view transform (pan and zoom)
+    p.push();
+    p.translate(p.width / 2 + viewOffsetX, p.height / 2 + viewOffsetY);
+    p.scale(viewZoom);
+
+    // Visualize the network (only when ready)
+    if (wordNetwork.nodes.length > 0) {
+      visualizeNetwork(p, wordNetwork, mouseVelocityX, mouseVelocityY);
+    }
+    
+    p.pop();
+    
+    // Draw ticker at bottom only when voice is speaking
+    if (isVoiceSpeaking && currentTextBeingRead) {
+      drawTicker(p); // Shows the text being spoken
+    }
+    
+    // Draw dark mode toggle (always visible)
+    drawDarkModeToggle(p);
+    
+    // Draw home button (only when network is visible)
+    if (textTyped.length > 0) {
+      drawHomeButton(p);
+    }
+    
+    // Language menu only shown on landing page (handled in displayInstructions)
+  };
+  
+  // Draw ticker at bottom of screen with generated text from realtime model
+  function drawTicker(p) {
+    // Only show ticker when voice is speaking
+    if (!isVoiceSpeaking || !currentTextBeingRead) {
+      return;
+    }
+    
+    // Determine text direction and orientation based on language
+    const rtlLanguages = ['ar']; // Right-to-left languages (horizontal)
+    const verticalLanguages = ['ja', 'zh', 'ko']; // Vertical writing languages
+    const isRTL = rtlLanguages.includes(currentLanguage);
+    const isVertical = verticalLanguages.includes(currentLanguage);
+    
+    const colors = getColors();
+    let fontSize = 14;
+    let padding = 20;
+    
+    // Clean up text for display (uses currentTextBeingRead - same text being spoken)
+    let displayText = currentTextBeingRead.replace(/\n+/g, ' ').trim();
+    
+    if (isVertical) {
+      // Vertical ticker on right side - scrolls bottom to top
+      let tickerWidth = 60;
+      let tickerX = p.width - tickerWidth;
+      
+      // Background for vertical ticker
+      p.push();
+      p.fill(colors.tickerBg[0], colors.tickerBg[1], colors.tickerBg[2], colors.tickerBg[3] || 240);
+      p.noStroke();
+      p.rect(tickerX, 0, tickerWidth, p.height);
+      
+      // Left border
+      p.stroke(colors.uiBorder[0], colors.uiBorder[1], colors.uiBorder[2]);
+      p.strokeWeight(1);
+      p.line(tickerX, 0, tickerX, p.height);
+      p.pop();
+      
+      // Text styling for vertical
+      p.push();
+      p.textFont('monospace');
+      p.textSize(fontSize);
+      p.textAlign(p.CENTER, p.BOTTOM); // Center horizontally, align bottom for vertical text
+      p.fill(colors.tickerText[0], colors.tickerText[1], colors.tickerText[2]);
+      
+      // Calculate text height (for vertical, we need character count * line height)
+      let charHeight = fontSize * 1.2; // Approximate height per character
+      let textHeight = displayText.length * charHeight;
+      
+      // Scroll if text is longer than screen - vertical: bottom to top
+      if (textHeight > p.height - padding * 2) {
+        let scrollSpeed = 4.6475; // Same speed as horizontal
+        
+        // Vertical: scroll bottom to top (decrease offset, text moves up)
+        tickerOffset -= scrollSpeed;
+        
+        // Reset when scrolled past (start from bottom again for seamless continuous loop)
+        if (tickerOffset < -(textHeight + padding * 2)) {
+          tickerOffset = p.height; // Start from bottom again
+        }
+        
+        // Draw vertical text - each character drawn vertically, positioned on right side
+        let centerX = tickerX + tickerWidth / 2;
+        let yPos = p.height - padding + tickerOffset; // Start from bottom, move up
+        let spacing = textHeight + padding * 2;
+        
+        // Draw first instance - characters stacked vertically
+        p.push();
+        p.translate(centerX, yPos);
+        p.rotate(-p.PI / 2); // Rotate -90 degrees (counter-clockwise) for vertical reading
+        p.text(displayText, 0, 0);
+        p.pop();
+        
+        // Draw second instance for seamless loop
+        if (yPos + textHeight > -spacing) {
+          p.push();
+          p.translate(centerX, yPos - spacing);
+          p.rotate(-p.PI / 2);
+          p.text(displayText, 0, 0);
+          p.pop();
+        }
+        
+        // Draw third instance if needed
+        if (yPos - spacing + textHeight > -spacing * 2) {
+          p.push();
+          p.translate(centerX, yPos - spacing * 2);
+          p.rotate(-p.PI / 2);
+          p.text(displayText, 0, 0);
+          p.pop();
+        }
+      } else {
+        // Static vertical text if it fits
+        tickerOffset = 0;
+        let centerX = tickerX + tickerWidth / 2;
+        p.push();
+        p.translate(centerX, p.height - padding);
+        p.rotate(-p.PI / 2);
+        p.text(displayText, 0, 0);
+        p.pop();
+      }
+      
+      p.pop(); // Close the text styling push from line 889
+    } else {
+      // Horizontal ticker at bottom
+      let tickerHeight = 60;
+      let tickerY = p.height - tickerHeight;
+      
+      // Background for ticker
+      p.push();
+      p.fill(colors.tickerBg[0], colors.tickerBg[1], colors.tickerBg[2], colors.tickerBg[3] || 240);
+      p.noStroke();
+      p.rect(0, tickerY, p.width, tickerHeight);
+      
+      // Top border
+      p.stroke(colors.uiBorder[0], colors.uiBorder[1], colors.uiBorder[2]);
+      p.strokeWeight(1);
+      p.line(0, tickerY, p.width, tickerY);
+      p.pop();
+      
+      // Text styling
+      p.push();
+      p.textFont('monospace');
+      p.textSize(fontSize);
+      // Set text alignment based on direction
+      p.textAlign(isRTL ? p.RIGHT : p.LEFT, p.CENTER);
+      p.fill(colors.tickerText[0], colors.tickerText[1], colors.tickerText[2]);
+      
+      // Calculate text width
+      let textWidth = p.textWidth(displayText);
+      
+      // Scroll if text is longer than screen - direction based on language
+      if (textWidth > p.width - padding * 2) {
+        let scrollSpeed = 4.6475; // 10% faster (was 4.225, originally 2.5)
+        
+        if (isRTL) {
+          // RTL: scroll left to right (increase offset, text appears from left, moves right)
+          tickerOffset += scrollSpeed;
+          
+          // Reset when scrolled past (start from left side again for seamless continuous loop)
+          if (tickerOffset > p.width + textWidth + padding * 2) {
+            tickerOffset = -(textWidth + padding * 2); // Start from left side again
+          }
+          
+          // Draw multiple copies of text for seamless continuous loop (RTL)
+          // Text is right-aligned, starts from left, moves right
+          // For right-aligned text, xPos is the right edge, so we add textWidth
+          let xPos = padding + tickerOffset + textWidth; // Right edge position (text extends left from here)
+          let spacing = textWidth + padding * 2;
+          
+          // Draw first instance (right-aligned, so text extends left from xPos)
+          p.text(displayText, xPos, tickerY + tickerHeight / 2);
+          
+          // Draw second instance for seamless loop (appears before first disappears)
+          if (xPos < p.width + spacing) {
+            p.text(displayText, xPos + spacing, tickerY + tickerHeight / 2);
+          }
+          
+          // Draw third instance if needed for very long text or fast scrolling
+          if (xPos + spacing < p.width + spacing * 2) {
+            p.text(displayText, xPos + spacing * 2, tickerY + tickerHeight / 2);
+          }
+        } else {
+          // LTR: scroll right to left (decrease offset)
+          tickerOffset -= scrollSpeed;
+          
+          // Reset when scrolled past (start from right side again for seamless continuous loop)
+          if (tickerOffset < -(textWidth + padding * 2)) {
+            tickerOffset = p.width; // Start from right side again
+          }
+          
+          // Draw multiple copies of text for seamless continuous loop (LTR)
+          let xPos = padding + tickerOffset;
+          let spacing = textWidth + padding * 2;
+          
+          // Draw first instance
+          p.text(displayText, xPos, tickerY + tickerHeight / 2);
+          
+          // Draw second instance for seamless loop (appears before first disappears)
+          if (xPos + textWidth > -spacing) {
+            p.text(displayText, xPos + spacing, tickerY + tickerHeight / 2);
+          }
+          
+          // Draw third instance if needed for very long text or fast scrolling
+          if (xPos + spacing + textWidth > -spacing) {
+            p.text(displayText, xPos + spacing * 2, tickerY + tickerHeight / 2);
+          }
+        }
+      } else {
+        // Static text if it fits
+        tickerOffset = 0;
+        if (isRTL) {
+          p.text(displayText, p.width - padding, tickerY + tickerHeight / 2);
+        } else {
+          p.text(displayText, padding, tickerY + tickerHeight / 2);
+        }
+      }
+      
+      p.pop();
+    }
+  }
+
+  // Build word network from generated text (from realtime model) - same textTyped used by ticker
+  function buildWordNetwork(text) {
+    // Extract words from text - supports all languages including CJK characters
+    // For Latin scripts: extract words (letters)
+    // For CJK (Chinese, Japanese, Korean): extract individual characters/words
+    // For other scripts: extract word characters
+    
+    let words = [];
+    
+    // Language-specific word extraction
+    if (currentLanguage === 'zh' || currentLanguage === 'ja' || currentLanguage === 'ko') {
+      // For Chinese, Japanese, and Korean: extract characters and words
+      // Match CJK characters (Unicode ranges for Chinese, Japanese, Korean)
+      const cjkPattern = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]+/g;
+      const cjkMatches = text.match(cjkPattern) || [];
+      
+      // Also extract any Latin words that might be mixed in
+      const latinPattern = /[a-zA-Z]+/g;
+      const latinMatches = text.toLowerCase().match(latinPattern) || [];
+      
+      // Combine and process CJK words (split long sequences into individual characters or 2-char words)
+      // For CJK languages, use smarter extraction to avoid overload
+      // Extract meaningful units while keeping computational load manageable
+      cjkMatches.forEach(match => {
+        if (currentLanguage === 'zh') {
+          // For Chinese: prefer 2-character words (more meaningful)
+          // Only extract 2-character combinations, skip single chars to reduce nodes
+          for (let i = 0; i < match.length - 1; i++) {
+            words.push(match.substring(i, i + 2));
+          }
+          // Add single characters only if they appear multiple times (likely meaningful)
+          let charFreq = {};
+          for (let i = 0; i < match.length; i++) {
+            charFreq[match[i]] = (charFreq[match[i]] || 0) + 1;
+          }
+          for (let char in charFreq) {
+            if (charFreq[char] >= 2) { // Only frequent single chars
+              words.push(char);
+            }
+          }
+        } else if (currentLanguage === 'ja') {
+          // For Japanese: extract 2-character combinations (more meaningful than single chars)
+          // Prioritize 2-char combinations, add frequent single chars
+          for (let i = 0; i < match.length - 1; i++) {
+            words.push(match.substring(i, i + 2));
+          }
+          // Add single characters only if frequent
+          let charFreq = {};
+          for (let i = 0; i < match.length; i++) {
+            charFreq[match[i]] = (charFreq[match[i]] || 0) + 1;
+          }
+          for (let char in charFreq) {
+            if (charFreq[char] >= 2) {
+              words.push(char);
+            }
+          }
+        } else if (currentLanguage === 'ko') {
+          // For Korean: extract 2-character combinations (more meaningful)
+          // Korean words are often 2+ characters, so prioritize those
+          for (let i = 0; i < match.length - 1; i++) {
+            words.push(match.substring(i, i + 2));
+          }
+          // Add single characters only if they appear multiple times
+          let charFreq = {};
+          for (let i = 0; i < match.length; i++) {
+            charFreq[match[i]] = (charFreq[match[i]] || 0) + 1;
+          }
+          for (let char in charFreq) {
+            if (charFreq[char] >= 2) {
+              words.push(char);
+            }
+          }
+        }
+      });
+      
+      words = words.concat(latinMatches);
+    } else {
+      // For other languages: use Unicode word boundary regex
+      // This handles Latin scripts, Cyrillic, Arabic, etc.
+      const wordPattern = /\p{L}+/gu; // Unicode letter characters
+      const matches = text.match(wordPattern) || [];
+      words = matches.map(w => w.toLowerCase());
+    }
+    
+    // Language-aware stop words filtering
+    const stopWordsByLanguage = {
+      en: ['and', 'the', 'a', 'an', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'it', 'its', 'they', 'them', 'their', 'there', 'then', 'than', 'when', 'where', 'what', 'which', 'who', 'whom', 'whose', 'why', 'how', 'if', 'else', 'all', 'each', 'every', 'some', 'any', 'no', 'not', 'only', 'just', 'also', 'too', 'very', 'so', 'such', 'more', 'most', 'much', 'many', 'few', 'little', 'other', 'another', 'one', 'two', 'three', 'first', 'second', 'last', 'next', 'previous'],
+      es: ['y', 'el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas', 'o', 'pero', 'en', 'de', 'a', 'por', 'para', 'con', 'sin', 'sobre', 'entre', 'es', 'son', 'era', 'eran', 'fue', 'fueron', 'ser', 'estar', 'tener', 'haber', 'hacer', 'poder', 'deber', 'querer', 'este', 'esta', 'estos', 'estas', 'ese', 'esa', 'esos', 'esas', 'aquel', 'aquella', 'aquellos', 'aquellas', 'que', 'cual', 'quien', 'cuando', 'donde', 'como', 'porque', 'si', 'no', 'también', 'muy', 'más', 'menos', 'mucho', 'poco', 'todo', 'todos', 'cada', 'alguno', 'ninguno'],
+      fr: ['et', 'le', 'la', 'les', 'un', 'une', 'des', 'ou', 'mais', 'dans', 'de', 'à', 'pour', 'avec', 'sans', 'sur', 'entre', 'est', 'sont', 'était', 'étaient', 'être', 'avoir', 'faire', 'pouvoir', 'devoir', 'vouloir', 'ce', 'cette', 'ces', 'celui', 'celle', 'ceux', 'celles', 'que', 'qui', 'quoi', 'quand', 'où', 'comment', 'pourquoi', 'si', 'non', 'aussi', 'très', 'plus', 'moins', 'beaucoup', 'peu', 'tout', 'tous', 'chaque', 'quelque', 'aucun'],
+      de: ['und', 'der', 'die', 'das', 'den', 'dem', 'des', 'ein', 'eine', 'eines', 'einem', 'einen', 'oder', 'aber', 'in', 'auf', 'an', 'zu', 'für', 'mit', 'von', 'aus', 'ist', 'sind', 'war', 'waren', 'sein', 'haben', 'werden', 'können', 'müssen', 'sollen', 'wollen', 'dieser', 'diese', 'dieses', 'jener', 'jene', 'jenes', 'der', 'die', 'das', 'welcher', 'welche', 'welches', 'wann', 'wo', 'was', 'wie', 'warum', 'wenn', 'nicht', 'auch', 'sehr', 'mehr', 'weniger', 'viel', 'wenig', 'alle', 'jeder', 'einige', 'kein'],
+      it: ['e', 'il', 'la', 'lo', 'gli', 'le', 'un', 'una', 'uno', 'o', 'ma', 'in', 'di', 'a', 'da', 'per', 'con', 'su', 'tra', 'fra', 'è', 'sono', 'era', 'erano', 'essere', 'avere', 'fare', 'potere', 'dovere', 'volere', 'questo', 'questa', 'questi', 'queste', 'quello', 'quella', 'quelli', 'quelle', 'che', 'chi', 'quando', 'dove', 'come', 'perché', 'se', 'non', 'anche', 'molto', 'più', 'meno', 'tanto', 'poco', 'tutto', 'ogni', 'alcuni', 'nessuno'],
+      pt: ['e', 'o', 'a', 'as', 'os', 'um', 'uma', 'uns', 'umas', 'ou', 'mas', 'em', 'de', 'a', 'para', 'por', 'com', 'sem', 'sobre', 'entre', 'é', 'são', 'era', 'eram', 'ser', 'estar', 'ter', 'haver', 'fazer', 'poder', 'dever', 'querer', 'este', 'esta', 'estes', 'estas', 'esse', 'essa', 'esses', 'essas', 'aquele', 'aquela', 'aqueles', 'aquelas', 'que', 'qual', 'quem', 'quando', 'onde', 'como', 'porque', 'se', 'não', 'também', 'muito', 'mais', 'menos', 'todo', 'todos', 'cada', 'algum', 'nenhum'],
+      ja: ['の', 'に', 'は', 'を', 'た', 'が', 'で', 'て', 'と', 'し', 'れ', 'さ', 'ある', 'いる', 'も', 'する', 'から', 'な', 'こと', 'として', 'い', 'や', 'れる', 'など', 'なっ', 'ない', 'この', 'ため', 'その', 'あの', 'どの', 'いつ', 'どこ', 'どう', 'なぜ', 'もし', 'も', 'とても', 'より', 'あまり', 'たくさん', '少し', 'すべて', '各', 'いくつか', '何も'],
+      zh: ['的', '了', '在', '是', '我', '有', '和', '就', '不', '人', '都', '一', '一个', '上', '也', '很', '到', '说', '要', '去', '你', '会', '着', '没有', '看', '好', '自己', '这', '那', '这些', '那些', '什么', '哪个', '谁', '什么时候', '哪里', '怎么', '为什么', '如果', '也', '很', '更', '最', '很多', '一点', '所有', '每个', '一些', '没有'],
+      ko: ['은', '는', '이', '가', '을', '를', '의', '에', '에서', '와', '과', '도', '로', '으로', '만', '부터', '까지', '처럼', '같이', '보다', '하고', '그리고', '또', '또한', '또는', '그런데', '하지만', '그러나', '그래서', '그러므로', '그러면', '만약', '만일', '이것', '그것', '저것', '이런', '그런', '저런', '어떤', '무엇', '누구', '언제', '어디', '어떻게', '왜', '모든', '모두', '각', '각각', '어떤', '어느', '몇', '많은', '적은', '많이', '조금', '전혀', '아니다', '있다', '없다', '하다', '되다', '이다', '아니다', '그', '이', '저', '그의', '이의', '저의', '그들의', '이들의', '저들의'],
+      ar: ['في', 'من', 'إلى', 'على', 'عن', 'مع', 'هذا', 'هذه', 'هؤلاء', 'ذلك', 'تلك', 'أولئك', 'الذي', 'التي', 'الذين', 'اللاتي', 'اللائي', 'اللذان', 'اللتان', 'اللذين', 'اللتين', 'ما', 'ماذا', 'من', 'متى', 'أين', 'كيف', 'لماذا', 'إذا', 'إن', 'أن', 'كان', 'كانت', 'كانوا', 'يكون', 'تكون', 'يكونون', 'ليس', 'ليست', 'ليسوا', 'له', 'لها', 'لهم', 'لهن', 'لهما', 'هو', 'هي', 'هم', 'هن', 'هما', 'أنت', 'أنت', 'أنتم', 'أنتن', 'أنا', 'نحن', 'و', 'أو', 'لكن', 'بل', 'ف', 'ثم', 'حتى', 'أيضاً', 'كذلك', 'أيضاً', 'كل', 'جميع', 'بعض', 'أي', 'لا', 'لم', 'لن', 'لما', 'قد', 'سوف', 'س', 'قد', 'كان', 'كانت', 'كانوا', 'كانت', 'كانتا', 'كانوا', 'كن', 'كنت', 'كنتم', 'كنتن', 'كنت', 'كنا'],
+      tr: ['ve', 'ile', 'veya', 'ya', 'ama', 'fakat', 'ancak', 'lakin', 'de', 'da', 'ki', 'mi', 'mı', 'mu', 'mü', 'bu', 'şu', 'o', 'bunlar', 'şunlar', 'onlar', 'bu', 'şu', 'o', 'bunun', 'şunun', 'onun', 'bunun', 'şunun', 'onun', 'bunların', 'şunların', 'onların', 'ben', 'sen', 'o', 'biz', 'siz', 'onlar', 'benim', 'senin', 'onun', 'bizim', 'sizin', 'onların', 'ne', 'kim', 'hangi', 'nasıl', 'nerede', 'nereden', 'nereye', 'ne zaman', 'niçin', 'niye', 'neden', 'her', 'tüm', 'bütün', 'bazı', 'birkaç', 'hiç', 'hiçbir', 'bir', 'iki', 'üç', 'var', 'yok', 'olmak', 'etmek', 'yapmak', 'gitmek', 'gelmek', 'görmek', 'bilmek', 'istemek', 'daha', 'en', 'çok', 'az', 'biraz', 'fazla', 'az', 'kadar', 'gibi', 'için', 'ile', 'göre', 'kadar', 'sonra', 'önce', 'şimdi', 'şu', 'bu', 'o', 'böyle', 'şöyle', 'öyle', 'nasıl', 'ne', 'kim', 'hangi']
+    };
+    
+    const stopWords = stopWordsByLanguage[currentLanguage] || stopWordsByLanguage['en'];
+    words = words.filter(word => {
+      // Filter out stop words (case-insensitive for non-CJK)
+      if (currentLanguage === 'zh' || currentLanguage === 'ja' || currentLanguage === 'ko') {
+        return !stopWords.includes(word) && word.length > 0;
+      } else {
+        return !stopWords.includes(word.toLowerCase()) && word.length > 1;
+      }
+    });
+    let uniqueWords = [...new Set(words)];
+    
+    // For CJK languages, limit nodes to prevent overload
+    // Use frequency-based filtering to keep most meaningful words
+    if (currentLanguage === 'zh' || currentLanguage === 'ja' || currentLanguage === 'ko') {
+      // Count frequency of each unique word
+      let wordFrequencies = {};
+      words.forEach(word => {
+        wordFrequencies[word] = (wordFrequencies[word] || 0) + 1;
+      });
+      
+      // Sort by frequency and keep top words (max 40 nodes for CJK)
+      const maxNodesCJK = 40;
+      uniqueWords = uniqueWords
+        .map(word => ({ word, freq: wordFrequencies[word] }))
+        .sort((a, b) => b.freq - a.freq)
+        .slice(0, maxNodesCJK)
+        .map(item => item.word);
+    }
+    
+    // Enhanced semantic clusters with conceptual relationships
+    let semanticClusters = {
+      language: ['language', 'linguistic', 'syntax', 'semantic', 'grammar', 'vocabulary', 'word', 'words', 'text', 'letter', 'letters', 'character', 'characters', 'symbol', 'symbols', 'sign', 'signs', 'meaning', 'meanings', 'communication', 'expression', 'discourse', 'utterance', 'phrase', 'sentence', 'paragraph', 'narrative', 'story', 'discourse', 'dialogue', 'speech', 'writing', 'written', 'oral', 'verbal', 'lexical', 'morphological', 'phonetic', 'phonological', 'computational', 'linguistics', 'corpus', 'tokenization', 'parsing', 'morphology', 'syntax', 'tree', 'trees', 'parse', 'parsing', 'grammar', 'grammars', 'lexical', 'morphology', 'morphological', 'phonology', 'phonological'],
+      space: ['space', 'spatial', 'dimension', 'dimensions', 'distance', 'area', 'region', 'zone', 'field', 'volume', 'extent', 'scope', 'range', 'boundary', 'boundaries', 'edge', 'edges', 'margin', 'margins', 'border', 'borders', 'territory', 'territories', 'domain', 'domains', 'realm', 'realms', 'expanse', 'expanse', 'void', 'voids', 'vacuum', 'vacuum', 'terrain', 'landscape', 'topography', 'geography', 'location', 'locations', 'position', 'positions', 'place', 'places', 'site', 'sites', 'locale', 'locales', 'navigate', 'navigation', 'direction', 'directions', 'orientation', 'coordinates', 'mapping', 'map', 'maps', 'vector', 'vectors', 'space', 'spaces', 'computational', 'space', 'topology', 'topological', 'graph', 'graphs', 'node', 'nodes', 'edge', 'edges', 'network', 'networks', 'mesh', 'lattice', 'grid'],
+      latent: ['latent', 'hidden', 'embedded', 'encoded', 'implicit', 'potential', 'underlying', 'submerged', 'concealed', 'invisible', 'embedded', 'embedding', 'embeddings', 'vector', 'vectors', 'representation', 'representations', 'model', 'models', 'neural', 'network', 'networks', 'machine', 'learning', 'ai', 'artificial', 'intelligence', 'algorithm', 'algorithms', 'data', 'dataset', 'training', 'trained', 'technology', 'tech', 'technological', 'computational', 'digital', 'binary', 'code', 'programming', 'software', 'hardware', 'system', 'systems', 'architecture', 'framework', 'platform', 'probability', 'probabilities', 'probabilistic', 'statistical', 'statistics', 'distribution', 'distributions', 'frequency', 'frequencies', 'entropy', 'information', 'markov', 'chain', 'chains', 'n-gram', 'ngram', 'ngrams', 'token', 'tokens', 'tokenization', 'corpus', 'corpora']
+    };
+    
+    // Conceptual relationship groups - words that are conceptually related
+    let conceptualGroups = {
+      abstraction: ['concept', 'idea', 'notion', 'theory', 'principle', 'abstract', 'theoretical', 'philosophical', 'metaphysical', 'meaning', 'significance', 'essence', 'nature', 'being', 'existence'],
+      physics: ['physics', 'physical', 'force', 'forces', 'energy', 'motion', 'movement', 'dynamics', 'kinetic', 'momentum', 'velocity', 'acceleration', 'gravity', 'mass', 'particle', 'particles', 'wave', 'waves', 'field', 'fields', 'quantum', 'electromagnetic', 'interaction', 'interactions', 'law', 'laws', 'equation', 'equations', 'formula', 'formulas'],
+      computational_linguistics: ['computational', 'linguistics', 'linguistic', 'corpus', 'corpora', 'tokenization', 'tokenize', 'parsing', 'parse', 'parser', 'syntax', 'tree', 'trees', 'grammar', 'morphology', 'morphological', 'lexical', 'semantic', 'analysis', 'nlp', 'natural', 'language', 'processing', 'tagging', 'pos', 'part', 'speech', 'chunking', 'dependency', 'constituency'],
+      computation: ['computation', 'computational', 'compute', 'computing', 'algorithm', 'algorithms', 'process', 'processing', 'execute', 'execution', 'calculate', 'calculation', 'compute', 'computation', 'computational', 'space', 'topology', 'topological', 'graph', 'graphs', 'node', 'nodes', 'edge', 'edges', 'network', 'networks', 'mesh', 'lattice', 'grid', 'matrix', 'vector', 'vectors', 'dimension', 'dimensions', 'coordinate', 'coordinates', 'mapping', 'map'],
+      probability: ['probability', 'probabilities', 'probabilistic', 'statistical', 'statistics', 'distribution', 'distributions', 'frequency', 'frequencies', 'entropy', 'information', 'theory', 'markov', 'chain', 'chains', 'n-gram', 'ngram', 'ngrams', 'bigram', 'trigram', 'unigram', 'likelihood', 'conditional', 'bayesian', 'prior', 'posterior', 'expectation', 'variance', 'standard', 'deviation', 'mean', 'median', 'mode'],
+      structure: ['structure', 'form', 'pattern', 'organization', 'arrangement', 'framework', 'architecture', 'system', 'network', 'grid', 'matrix', 'lattice', 'hierarchy', 'order'],
+      network: ['network', 'networks', 'graph', 'graphs', 'node', 'nodes', 'edge', 'edges', 'connection', 'connections', 'link', 'links', 'topology', 'topological', 'mesh', 'web', 'lattice', 'grid', 'structure', 'system', 'architecture'],
+      transformation: ['transform', 'change', 'shift', 'evolve', 'develop', 'emerge', 'become', 'transition', 'convert', 'translate', 'encode', 'decode', 'process'],
+      connection: ['connect', 'link', 'relate', 'associate', 'bind', 'join', 'unite', 'merge', 'combine', 'integrate', 'bridge', 'relationship', 'connection', 'relation'],
+      perception: ['perceive', 'see', 'observe', 'understand', 'comprehend', 'grasp', 'recognize', 'interpret', 'read', 'decode', 'visualize', 'imagine'],
+      generation: ['generate', 'create', 'produce', 'form', 'make', 'build', 'construct', 'compose', 'synthesize', 'emerge', 'arise', 'manifest']
+    };
+    
+    // Conceptual synonyms and related terms
+    let conceptualSynonyms = {
+      'language': ['text', 'word', 'meaning', 'communication', 'expression', 'discourse'],
+      'space': ['dimension', 'distance', 'area', 'field', 'domain', 'realm'],
+      'latent': ['hidden', 'embedded', 'implicit', 'potential', 'underlying'],
+      'representation': ['model', 'form', 'structure', 'pattern', 'image'],
+      'network': ['system', 'structure', 'web', 'mesh', 'graph'],
+      'meaning': ['significance', 'sense', 'interpretation', 'understanding'],
+      'dimension': ['space', 'extent', 'scope', 'range', 'scale'],
+      'vector': ['direction', 'path', 'trajectory', 'course'],
+      'embedding': ['encoding', 'representation', 'mapping', 'translation'],
+      'abstraction': ['concept', 'idea', 'theory', 'principle', 'abstract', 'theoretical'],
+      'physics': ['force', 'energy', 'motion', 'dynamics', 'field', 'interaction', 'law', 'equation'],
+      'theory': ['principle', 'law', 'concept', 'abstraction', 'model', 'framework'],
+      'computational_linguistics': ['nlp', 'parsing', 'tokenization', 'corpus', 'syntax', 'grammar', 'morphology', 'semantic', 'analysis'],
+      'probability': ['statistical', 'distribution', 'frequency', 'entropy', 'markov', 'n-gram', 'likelihood', 'bayesian'],
+      'parsing': ['parse', 'syntax', 'tree', 'grammar', 'structure'],
+      'tokenization': ['token', 'tokens', 'corpus', 'text', 'processing'],
+      'probability_distribution': ['distribution', 'frequency', 'statistical', 'likelihood', 'probability'],
+      'computation': ['compute', 'algorithm', 'process', 'calculate', 'execute', 'space', 'topology', 'graph', 'network', 'node', 'edge'],
+      'computational_space': ['computation', 'space', 'topology', 'graph', 'network', 'dimension', 'vector', 'coordinate'],
+      'network_space': ['network', 'space', 'graph', 'topology', 'node', 'edge', 'dimension', 'vector', 'coordinate'],
+      'space': ['dimension', 'vector', 'coordinate', 'topology', 'graph', 'network', 'node', 'edge', 'computational'],
+      'network': ['graph', 'topology', 'node', 'edge', 'space', 'dimension', 'vector', 'computational', 'structure']
+    };
+    
+    // Helper function to check if word is in a conceptual group
+    function getConceptualGroup(word) {
+      for (let groupName in conceptualGroups) {
+        if (conceptualGroups[groupName].includes(word)) {
+          return groupName;
+        }
+      }
+      return null;
+    }
+    
+    // Helper function to check conceptual synonyms
+    function areConceptuallyRelated(word1, word2) {
+      // Direct match
+      if (word1 === word2) return true;
+      
+      // Check synonyms
+      for (let key in conceptualSynonyms) {
+        let synonyms = conceptualSynonyms[key];
+        if ((synonyms.includes(word1) || word1 === key) && 
+            (synonyms.includes(word2) || word2 === key)) {
+          return true;
+        }
+      }
+      
+      // Check conceptual groups
+      let group1 = getConceptualGroup(word1);
+      let group2 = getConceptualGroup(word2);
+      if (group1 && group1 === group2) return true;
+      
+      // Abstractions become physics - create strong connection
+      if ((group1 === 'abstraction' && group2 === 'physics') || 
+          (group1 === 'physics' && group2 === 'abstraction')) {
+        return true;
+      }
+      
+      // Computational linguistics and probability are closely related
+      if ((group1 === 'computational_linguistics' && group2 === 'probability') || 
+          (group1 === 'probability' && group2 === 'computational_linguistics')) {
+        return true;
+      }
+      
+      // Computation, space, and networks are strongly related
+      let computationRelated = ['computation', 'network', 'structure'];
+      if (computationRelated.includes(group1) && computationRelated.includes(group2)) {
+        return true;
+      }
+      
+      // Space relates to computation and networks
+      if (group1 === 'space' && (group2 === 'computation' || group2 === 'network')) {
+        return true;
+      }
+      if (group2 === 'space' && (group1 === 'computation' || group1 === 'network')) {
+        return true;
+      }
+      
+      return false;
+    }
+    
+    // Calculate semantic vector for each word with enhanced conceptual analysis
+    wordNetwork.nodes = uniqueWords.map((word, index) => {
+      let semanticVector = { x: 0, y: 0, z: 0 };
+      let clusterCount = 0;
+      let conceptualWeight = 0;
+      
+      // Primary semantic clusters
+      for (let clusterName in semanticClusters) {
+        if (semanticClusters[clusterName].includes(word)) {
+          switch(clusterName) {
+            case 'language':
+              semanticVector.x += 1; // X-axis: Language
+              break;
+            case 'space':
+              semanticVector.y += 1; // Y-axis: Space
+              break;
+            case 'latent':
+              semanticVector.z += 1; // Z-axis: Latent space tech
+              break;
+          }
+          clusterCount++;
+        }
+      }
+      
+      // Add conceptual group influence
+      let conceptualGroup = getConceptualGroup(word);
+      if (conceptualGroup) {
+        conceptualWeight = 0.5; // Moderate influence from conceptual groups
+        // Distribute conceptual weight across dimensions based on group type
+        switch(conceptualGroup) {
+          case 'abstraction':
+            semanticVector.x += 0.3; // More language-oriented
+            semanticVector.z += 0.2; // Some latent space connection
+            break;
+          case 'physics':
+            semanticVector.y += 0.3; // Space-oriented (physical space)
+            semanticVector.z += 0.3; // Strong latent space connection (abstractions become physics)
+            semanticVector.x += 0.1; // Some language connection (theoretical)
+            break;
+          case 'structure':
+            semanticVector.y += 0.3; // More space-oriented
+            semanticVector.z += 0.2; // Some latent space connection
+            break;
+          case 'transformation':
+            semanticVector.z += 0.4; // Strong latent space connection
+            semanticVector.x += 0.1; // Some language connection
+            break;
+          case 'connection':
+            semanticVector.z += 0.3; // Latent space (networks)
+            semanticVector.y += 0.2; // Spatial connections
+            break;
+          case 'perception':
+            semanticVector.x += 0.3; // Language/meaning
+            semanticVector.z += 0.2; // Latent representation
+            break;
+          case 'generation':
+            semanticVector.z += 0.4; // Strong latent space (generation)
+            semanticVector.x += 0.1; // Language creation
+            break;
+          case 'computational_linguistics':
+            semanticVector.x += 0.4; // Strong language connection (computational linguistics)
+            semanticVector.z += 0.3; // Latent space (language models, embeddings)
+            semanticVector.y += 0.1; // Some spatial (vector spaces)
+            break;
+          case 'probability':
+            semanticVector.z += 0.4; // Strong latent space (probabilistic models)
+            semanticVector.x += 0.3; // Language (probabilistic language models)
+            semanticVector.y += 0.1; // Some spatial (distributions in space)
+            break;
+          case 'computation':
+            semanticVector.y += 0.4; // Strong space connection (computational space)
+            semanticVector.z += 0.3; // Latent space (networks, algorithms)
+            semanticVector.x += 0.2; // Language (computation processes)
+            break;
+          case 'network':
+            semanticVector.y += 0.3; // Space (network topology, spatial structure)
+            semanticVector.z += 0.4; // Strong latent space (networks, graphs)
+            semanticVector.x += 0.1; // Some language (network representation)
+            break;
+        }
+        clusterCount += conceptualWeight;
+      }
+      
+      // Normalize
+      if (clusterCount > 0) {
+        semanticVector.x /= clusterCount;
+        semanticVector.y /= clusterCount;
+        semanticVector.z /= clusterCount;
+      } else {
+        // Distribute unrecognized words in a pattern
+        let positionRatio = index / Math.max(uniqueWords.length, 1);
+        semanticVector.x = (positionRatio - 0.5) * 0.5;
+        semanticVector.y = Math.sin(positionRatio * Math.PI * 2) * 0.3;
+        semanticVector.z = Math.cos(positionRatio * Math.PI * 2) * 0.3;
+      }
+      
+      // Position in 2D space - map 3D semantic vector to 2D
+      // X-axis: Language, Y-axis: Space, Z-axis (latent) affects both
+      let scale = 800; // Much larger scale for more distance between words
+      let position = {
+        x: (semanticVector.x + semanticVector.z * 0.5) * scale, // Language + Latent influence
+        y: (semanticVector.y + semanticVector.z * 0.5) * scale  // Space + Latent influence
+      };
+      
+      // Count word frequency for size - language-aware
+      let frequency;
+      if (currentLanguage === 'zh' || currentLanguage === 'ja' || currentLanguage === 'ko') {
+        // For CJK: count occurrences directly (no word boundaries)
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        frequency = (text.match(new RegExp(escapedWord, 'g')) || []).length;
+      } else {
+        // For other languages: use word boundaries
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        frequency = (text.match(new RegExp('\\b' + escapedWord + '\\b', 'gi')) || []).length;
+      }
+      let size = 10 + frequency * 5;
+      
+      return {
+        id: index,
+        word: word,
+        position: position,
+        basePosition: { ...position }, // Store original semantic position
+        semanticVector: semanticVector,
+        size: size,
+        frequency: frequency,
+        velocity: { x: 0, y: 0 }, // 2D physics simulation
+        cluster: getPrimaryCluster(semanticVector)
+      };
+    });
+    
+    // Helper function to get primary cluster for a node
+    function getPrimaryCluster(semanticVector) {
+      let max = Math.max(Math.abs(semanticVector.x), Math.abs(semanticVector.y), Math.abs(semanticVector.z));
+      if (Math.abs(semanticVector.x) === max) return 'language';
+      if (Math.abs(semanticVector.y) === max) return 'space';
+      if (Math.abs(semanticVector.z) === max) return 'latent';
+      return 'mixed';
+    }
+    
+    // Create edges between semantically similar words
+    // First, collect all potential edges with their strengths
+    let allEdges = [];
+    
+    // Higher threshold for CJK languages to reduce edge count
+    // CJK creates more nodes, so we need stricter filtering
+    const edgeThreshold = (currentLanguage === 'zh' || currentLanguage === 'ja' || currentLanguage === 'ko') ? 0.65 : 0.55;
+    
+    for (let i = 0; i < wordNetwork.nodes.length; i++) {
+      for (let j = i + 1; j < wordNetwork.nodes.length; j++) {
+        let node1 = wordNetwork.nodes[i];
+        let node2 = wordNetwork.nodes[j];
+        
+        // Calculate semantic similarity (cosine similarity)
+        let dotProduct = node1.semanticVector.x * node2.semanticVector.x +
+                        node1.semanticVector.y * node2.semanticVector.y +
+                        node1.semanticVector.z * node2.semanticVector.z;
+        
+        let mag1 = Math.sqrt(node1.semanticVector.x**2 + node1.semanticVector.y**2 + node1.semanticVector.z**2);
+        let mag2 = Math.sqrt(node2.semanticVector.x**2 + node2.semanticVector.y**2 + node2.semanticVector.z**2);
+        
+        let similarity = mag1 > 0 && mag2 > 0 ? dotProduct / (mag1 * mag2) : 0;
+        
+        // Check conceptual relationship - boost strength if conceptually related
+        let conceptualBonus = 0;
+        if (areConceptuallyRelated(node1.word, node2.word)) {
+          conceptualBonus = 0.3; // Strong bonus for conceptual relationships
+        }
+        
+        // Also check if words appear near each other in text (reduced weight)
+        // Find word positions - language-aware
+        let word1Index, word2Index;
+        if (currentLanguage === 'zh' || currentLanguage === 'ja' || currentLanguage === 'ko') {
+          // For CJK: direct indexOf (case-sensitive)
+          word1Index = text.indexOf(node1.word);
+          word2Index = text.indexOf(node2.word);
+        } else {
+          // For other languages: case-insensitive
+          word1Index = text.toLowerCase().indexOf(node1.word.toLowerCase());
+          word2Index = text.toLowerCase().indexOf(node2.word.toLowerCase());
+        }
+        let proximity = word1Index >= 0 && word2Index >= 0 ? 
+                       1 / (1 + Math.abs(word1Index - word2Index) / 50) : 0;
+        
+        // Create edge - prioritize conceptual and semantic relationships
+        // Reduced proximity weight, added conceptual bonus
+        let strength = similarity * 0.7 + proximity * 0.1 + conceptualBonus;
+        
+        // Store all edges (we'll filter later but ensure connectivity)
+        allEdges.push({
+          source: i,
+          target: j,
+          strength: strength,
+          cluster: getClusterName(node1, node2)
+        });
+      }
+    }
+    
+    // Sort edges by strength (strongest first)
+    allEdges.sort((a, b) => b.strength - a.strength);
+    
+    // Track which nodes are connected
+    let connectedNodes = new Set();
+    wordNetwork.edges = [];
+    
+    // First pass: add edges above threshold, ensuring all nodes get at least one connection
+    for (let edge of allEdges) {
+      let sourceConnected = connectedNodes.has(edge.source);
+      let targetConnected = connectedNodes.has(edge.target);
+      
+      // Add edge if:
+      // 1. It's above threshold, OR
+      // 2. One of the nodes is not yet connected (ensure connectivity)
+      if (edge.strength > edgeThreshold || !sourceConnected || !targetConnected) {
+        wordNetwork.edges.push(edge);
+        connectedNodes.add(edge.source);
+        connectedNodes.add(edge.target);
+      }
+    }
+    
+    // Ensure all nodes are connected (fallback: connect isolated nodes to their best match)
+    for (let i = 0; i < wordNetwork.nodes.length; i++) {
+      if (!connectedNodes.has(i)) {
+        // Find the best connection for this isolated node
+        let bestEdge = null;
+        let bestStrength = -Infinity;
+        
+        for (let edge of allEdges) {
+          if ((edge.source === i || edge.target === i) && edge.strength > bestStrength) {
+            bestEdge = edge;
+            bestStrength = edge.strength;
+          }
+        }
+        
+        // Add the best connection if found
+        if (bestEdge && !wordNetwork.edges.some(e => 
+          (e.source === bestEdge.source && e.target === bestEdge.target) ||
+          (e.source === bestEdge.target && e.target === bestEdge.source)
+        )) {
+          wordNetwork.edges.push(bestEdge);
+          connectedNodes.add(i);
+        }
+      }
+    }
+    
+    // Limit edges per node for CJK languages to prevent overload
+    // Keep only strongest connections per node, but ensure all nodes remain connected
+    if ((currentLanguage === 'zh' || currentLanguage === 'ja' || currentLanguage === 'ko') && wordNetwork.edges.length > 0) {
+      const maxEdgesPerNode = 8; // Maximum connections per node
+      let edgesByNode = {};
+      
+      // Group edges by source and target nodes
+      wordNetwork.edges.forEach(edge => {
+        if (!edgesByNode[edge.source]) {
+          edgesByNode[edge.source] = [];
+        }
+        if (!edgesByNode[edge.target]) {
+          edgesByNode[edge.target] = [];
+        }
+        edgesByNode[edge.source].push(edge);
+        // Also track reverse direction
+        edgesByNode[edge.target].push({
+          source: edge.target,
+          target: edge.source,
+          strength: edge.strength,
+          cluster: edge.cluster
+        });
+      });
+      
+      // Keep only top N strongest edges per node, but ensure connectivity
+      let filteredEdges = [];
+      let edgeSet = new Set(); // Track added edges to avoid duplicates
+      let nodeConnections = {}; // Track how many connections each node has
+      
+      // Initialize connection counts
+      for (let i = 0; i < wordNetwork.nodes.length; i++) {
+        nodeConnections[i] = 0;
+      }
+      
+      // Sort all edges by strength globally
+      let sortedEdges = [...wordNetwork.edges].sort((a, b) => b.strength - a.strength);
+      
+      // First pass: add edges ensuring each node gets at least one connection
+      for (let edge of sortedEdges) {
+        let edgeKey = `${edge.source}-${edge.target}`;
+        let reverseKey = `${edge.target}-${edge.source}`;
+        
+        if (edgeSet.has(edgeKey) || edgeSet.has(reverseKey)) continue;
+        
+        let sourceConnections = nodeConnections[edge.source] || 0;
+        let targetConnections = nodeConnections[edge.target] || 0;
+        
+        // Add edge if:
+        // 1. Both nodes need more connections (under limit), OR
+        // 2. At least one node has no connections yet (ensure connectivity)
+        if ((sourceConnections < maxEdgesPerNode && targetConnections < maxEdgesPerNode) ||
+            sourceConnections === 0 || targetConnections === 0) {
+          filteredEdges.push(edge);
+          edgeSet.add(edgeKey);
+          nodeConnections[edge.source] = (nodeConnections[edge.source] || 0) + 1;
+          nodeConnections[edge.target] = (nodeConnections[edge.target] || 0) + 1;
+        }
+      }
+      
+      // Second pass: ensure all nodes have at least one connection
+      for (let i = 0; i < wordNetwork.nodes.length; i++) {
+        if (nodeConnections[i] === 0) {
+          // Find best connection for this isolated node
+          let bestEdge = null;
+          let bestStrength = -Infinity;
+          
+          for (let edge of sortedEdges) {
+            if ((edge.source === i || edge.target === i) && edge.strength > bestStrength) {
+              let edgeKey = `${edge.source}-${edge.target}`;
+              let reverseKey = `${edge.target}-${edge.source}`;
+              if (!edgeSet.has(edgeKey) && !edgeSet.has(reverseKey)) {
+                bestEdge = edge;
+                bestStrength = edge.strength;
+              }
+            }
+          }
+          
+          if (bestEdge) {
+            filteredEdges.push(bestEdge);
+            let edgeKey = `${bestEdge.source}-${bestEdge.target}`;
+            edgeSet.add(edgeKey);
+            nodeConnections[bestEdge.source] = (nodeConnections[bestEdge.source] || 0) + 1;
+            nodeConnections[bestEdge.target] = (nodeConnections[bestEdge.target] || 0) + 1;
+          }
+        }
+      }
+      
+      wordNetwork.edges = filteredEdges;
+    }
+    
+    // Helper function to determine cluster name for edge
+    function getClusterName(node1, node2) {
+      // Check which cluster both nodes belong to
+      let max1 = Math.max(Math.abs(node1.semanticVector.x), Math.abs(node1.semanticVector.y), Math.abs(node1.semanticVector.z));
+      let max2 = Math.max(Math.abs(node2.semanticVector.x), Math.abs(node2.semanticVector.y), Math.abs(node2.semanticVector.z));
+      
+      if (Math.abs(node1.semanticVector.x) === max1 && Math.abs(node2.semanticVector.x) === max2) return 'language';
+      if (Math.abs(node1.semanticVector.y) === max1 && Math.abs(node2.semanticVector.y) === max2) return 'space';
+      if (Math.abs(node1.semanticVector.z) === max1 && Math.abs(node2.semanticVector.z) === max2) return 'latent';
+      return 'mixed';
+    }
+  }
+
+  // Visualize the network in 2D space with physics
+  function visualizeNetwork(p, network, mouseVelX, mouseVelY) {
+    // Physics constants - more active and dynamic
+    let springStrength = 0.02; // Increased spring strength for more active movement
+    let damping = 0.85; // Lower damping for more responsive, lively motion (more floating movement)
+    let returnStrength = 0.015; // Reduced return strength to allow more free floating movement
+    
+    // Convert mouse velocity to world coordinates (account for zoom)
+    let worldMouseVelX = (mouseVelX || 0) / viewZoom;
+    let worldMouseVelY = (mouseVelY || 0) / viewZoom;
+    let mouseInfluence = 0.05; // 5% influence from mouse movement (reduced impact)
+    
+    // Detect hover - check if mouse is over any node, or auto-highlight nodes
+    hoveredNode = null;
+    let mouseHoverDetected = false;
+    
+    if (!isDraggingNode && !isDragging) {
+      // Convert mouse to world coordinates
+      let worldX = (p.mouseX - p.width / 2 - viewOffsetX) / viewZoom;
+      let worldY = (p.mouseY - p.height / 2 - viewOffsetY) / viewZoom;
+      
+      let hoverRadius = 80; // How close mouse needs to be to hover
+      let closestDist = Infinity;
+      
+      for (let node of network.nodes) {
+        let dx = node.position.x - worldX;
+        let dy = node.position.y - worldY;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        
+        // Also consider text size for hover detection
+        let fontSize = 15 + node.frequency * 2;
+        let textWidth = fontSize * 0.6 * node.word.length;
+        let effectiveRadius = Math.max(hoverRadius, textWidth / 2 + 20);
+        
+        if (dist < effectiveRadius && dist < closestDist) {
+          closestDist = dist;
+          hoveredNode = node;
+          mouseHoverDetected = true;
+        }
+      }
+    }
+    
+    // Auto-highlight nodes automatically if no mouse hover detected
+    // Always cycle through nodes automatically (unless manually hovering)
+    if (!mouseHoverDetected && network.nodes.length > 0) {
+      // Cycle through nodes automatically - highlight each for 1 second
+      let highlightDuration = 60; // frames (1 second at 60fps)
+      autoHighlightTime++;
+      
+      // Move to next node when duration is reached
+      if (autoHighlightTime >= highlightDuration) {
+        autoHighlightTime = 0;
+        autoHighlightIndex = (autoHighlightIndex + 1) % network.nodes.length;
+      }
+      
+      // Set hovered node to the auto-highlighted one (always active)
+      hoveredNode = network.nodes[autoHighlightIndex];
+    } else if (mouseHoverDetected) {
+      // Pause auto-highlight when mouse hovers (so it doesn't jump)
+      // Don't reset time/index, just pause cycling
+      // Keep the manually hovered node highlighted
+    } else {
+      // If no nodes or other condition, ensure we have a hovered node for auto-highlight
+      if (network.nodes.length > 0 && !hoveredNode) {
+        hoveredNode = network.nodes[autoHighlightIndex];
+      }
+    }
+    
+    // Handle dragged node - position it directly at mouse
+    if (draggedNode) {
+      // Convert mouse screen coordinates to world coordinates
+      let worldX = (p.mouseX - p.width / 2 - viewOffsetX) / viewZoom;
+      let worldY = (p.mouseY - p.height / 2 - viewOffsetY) / viewZoom;
+      
+      // Position dragged node at mouse (with offset)
+      draggedNode.position.x = worldX - dragOffsetX;
+      draggedNode.position.y = worldY - dragOffsetY;
+      
+      // Reset velocity when dragging
+      draggedNode.velocity.x = 0;
+      draggedNode.velocity.y = 0;
+    }
+    
+    // Apply forces to nodes (2D physics)
+    for (let node of network.nodes) {
+      // Skip physics for dragged node (it's positioned directly)
+      if (node === draggedNode) continue;
+      
+      // Reset forces
+      let forceX = 0;
+      let forceY = 0;
+      
+      // Active floating movement - always active
+      // Use sine waves with different phases per node for organic movement
+      let floatSpeed = 0.008; // Much faster floating speed for more activity
+      let floatAmplitude = 1.0; // Much larger amplitude for more visible movement
+      let time = p.frameCount * floatSpeed;
+      
+      // Each node has unique phase based on its ID
+      let phaseX = node.id * 0.5;
+      let phaseY = node.id * 0.7 + Math.PI / 3; // Offset Y phase
+      
+      // Add floating force with multiple frequencies for more complex movement
+      forceX += Math.sin(time + phaseX) * floatAmplitude;
+      forceY += Math.cos(time + phaseY) * floatAmplitude;
+      // Add secondary oscillation for more dynamic movement
+      forceX += Math.sin(time * 1.5 + phaseX * 1.3) * floatAmplitude * 0.6;
+      forceY += Math.cos(time * 1.3 + phaseY * 1.5) * floatAmplitude * 0.6;
+      // Add tertiary oscillation for even more complex, organic movement
+      forceX += Math.sin(time * 2.2 + phaseX * 0.8) * floatAmplitude * 0.4;
+      forceY += Math.cos(time * 1.8 + phaseY * 0.9) * floatAmplitude * 0.4;
+      // Add quaternary oscillation for additional complexity
+      forceX += Math.sin(time * 3.1 + phaseX * 1.1) * floatAmplitude * 0.3;
+      forceY += Math.cos(time * 2.7 + phaseY * 1.2) * floatAmplitude * 0.3;
+      // Add subtle random drift for more organic feel - increased
+      let driftPhase = node.id * 0.3;
+      forceX += Math.sin(time * 0.4 + driftPhase) * floatAmplitude * 0.25;
+      forceY += Math.cos(time * 0.5 + driftPhase + Math.PI / 4) * floatAmplitude * 0.25;
+      // Add slow circular drift for continuous floating motion
+      let circularPhase = node.id * 0.4;
+      forceX += Math.sin(time * 0.3 + circularPhase) * floatAmplitude * 0.2;
+      forceY += Math.cos(time * 0.35 + circularPhase) * floatAmplitude * 0.2;
+      
+      // Apply mouse movement influence (20% of mouse velocity)
+      forceX += worldMouseVelX * mouseInfluence;
+      forceY += worldMouseVelY * mouseInfluence;
+      
+      // Collision avoidance - prevent word overlap
+      // Calculate minimum distance based on font sizes
+      let nodeFontSize = 15 + node.frequency * 2;
+      let collisionStrength = 0.1; // Increased strength for more active collisions
+      
+      for (let otherNode of network.nodes) {
+        if (otherNode.id === node.id) continue; // Skip self
+        
+        let otherFontSize = 15 + otherNode.frequency * 2;
+        
+        // Minimum distance based on both word sizes (approximate text width)
+        // Estimate text width: roughly 0.6 * fontSize * word.length
+        let nodeTextWidth = nodeFontSize * 0.6 * node.word.length;
+        let otherTextWidth = otherFontSize * 0.6 * otherNode.word.length;
+        let minDistance = (nodeTextWidth + otherTextWidth) / 2 + 20; // Add padding
+        
+        let dx = otherNode.position.x - node.position.x;
+        let dy = otherNode.position.y - node.position.y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist > 0 && dist < minDistance) {
+          // Repulsion force - stronger when closer
+          let overlap = minDistance - dist;
+          let repulsionForce = collisionStrength * overlap / dist;
+          forceX -= (dx / dist) * repulsionForce;
+          forceY -= (dy / dist) * repulsionForce;
+        }
+      }
+      
+      // Spring forces from edges
+      for (let edge of network.edges) {
+        let otherNode;
+        if (edge.source === node.id) {
+          otherNode = network.nodes[edge.target];
+        } else if (edge.target === node.id) {
+          otherNode = network.nodes[edge.source];
+        } else {
+          continue;
+        }
+        
+        let edgeDx = otherNode.position.x - node.position.x;
+        let edgeDy = otherNode.position.y - node.position.y;
+        let edgeDist = Math.sqrt(edgeDx * edgeDx + edgeDy * edgeDy);
+        
+        if (edgeDist > 0) {
+          // Calculate minimum distance for this edge pair
+          let otherFontSize = 15 + otherNode.frequency * 2;
+          let nodeTextWidth = nodeFontSize * 0.6 * node.word.length;
+          let otherTextWidth = otherFontSize * 0.6 * otherNode.word.length;
+          let edgeMinDistance = (nodeTextWidth + otherTextWidth) / 2 + 20;
+          
+          // Ideal distance based on edge strength - ensure minimum to prevent overlap
+          let idealDist = Math.max(edgeMinDistance, 250 + edge.strength * 400);
+          
+          // Increase spring strength if connected to dragged node for elastic pull
+          let currentSpringStrength = springStrength;
+          if (draggedNode && (otherNode === draggedNode || node === draggedNode)) {
+            currentSpringStrength = springStrength * 3; // Stronger pull when dragging
+          }
+          
+          let springForce = (edgeDist - idealDist) * currentSpringStrength * edge.strength;
+          
+          forceX += (edgeDx / edgeDist) * springForce;
+          forceY += (edgeDy / edgeDist) * springForce;
+        }
+      }
+      
+      // Return to base position (elastic anchor)
+      let returnDx = node.basePosition.x - node.position.x;
+      let returnDy = node.basePosition.y - node.position.y;
+      
+      forceX += returnDx * returnStrength;
+      forceY += returnDy * returnStrength;
+      
+      // Boundary forces - keep nodes within exact window bounds
+      // Account for view transform (pan and zoom) and font size
+      // Calculate text dimensions to keep entire word visible (reuse nodeFontSize from above)
+      let textWidth = nodeFontSize * 0.6 * node.word.length;
+      let textHeight = nodeFontSize;
+      
+      // Subtract half the text size from boundaries to keep words fully visible
+      // Also account for ticker - horizontal at bottom or vertical on right
+      const verticalLanguages = ['ja', 'zh', 'ko'];
+      const isVerticalTicker = verticalLanguages.includes(currentLanguage);
+      let topPadding = 10; // Just 10px from top edge
+      let tickerHeight = isVerticalTicker ? 0 : 60; // No bottom ticker for vertical
+      let tickerWidth = isVerticalTicker ? 60 : 0; // Right side ticker for vertical
+      let availableHeight = p.height - tickerHeight - topPadding;
+      let availableWidth = p.width - tickerWidth;
+      
+      let maxX = ((availableWidth / 2) - textWidth / 2) / viewZoom - viewOffsetX;
+      let minX = (-(availableWidth / 2) + textWidth / 2) / viewZoom - viewOffsetX;
+      let maxY = (topPadding + availableHeight / 2 - textHeight / 2) / viewZoom - viewOffsetY;
+      let minY = (topPadding - availableHeight / 2 + textHeight / 2) / viewZoom - viewOffsetY;
+      
+      let boundaryStrength = 0.04; // Slightly reduced to allow more movement near boundaries
+      
+      // Push back if outside bounds
+      if (node.position.x > maxX) {
+        forceX -= (node.position.x - maxX) * boundaryStrength;
+      } else if (node.position.x < minX) {
+        forceX += (minX - node.position.x) * boundaryStrength;
+      }
+      
+      if (node.position.y > maxY) {
+        forceY -= (node.position.y - maxY) * boundaryStrength;
+      } else if (node.position.y < minY) {
+        forceY += (minY - node.position.y) * boundaryStrength;
+      }
+      
+      // Update velocity
+      node.velocity.x += forceX;
+      node.velocity.y += forceY;
+      
+      // Apply damping
+      node.velocity.x *= damping;
+      node.velocity.y *= damping;
+      
+      // Update position
+      node.position.x += node.velocity.x;
+      node.position.y += node.velocity.y;
+      
+      // Clamp position to ensure it stays within bounds
+      node.position.x = Math.max(minX, Math.min(maxX, node.position.x));
+      node.position.y = Math.max(minY, Math.min(maxY, node.position.y));
+    }
+    
+    // Helper function to get color for cluster - softer pastel palette
+    function getClusterColor(cluster) {
+      switch(cluster) {
+        case 'language':
+          return [180, 200, 240]; // Soft pastel blue for language
+        case 'space':
+          return [240, 200, 180]; // Soft pastel peach for space
+        case 'latent':
+          return [200, 240, 200]; // Soft pastel green for latent
+        default:
+          return [200, 200, 200]; // Soft gray for mixed
+      }
+    }
+    
+    // Draw edges (connections between words) - 2D with pulsing effects
+    p.noFill();
+    
+    // Global pulse for edges - synchronized with network pulse (more pronounced)
+    let edgePulseTime = p.frameCount * 0.03; // Faster pulse for edges (doubled speed)
+    
+    // First pass: draw non-highlighted edges with pulsing
+    for (let edge of network.edges) {
+      let source = network.nodes[edge.source];
+      let target = network.nodes[edge.target];
+      
+      // Check if this edge is connected to hovered node
+      let isConnectedToHovered = hoveredNode && 
+        (source === hoveredNode || target === hoveredNode);
+      
+      if (!isConnectedToHovered) {
+        // Normal edge - more visible gray with more pronounced pulsing opacity
+        let baseOpacity = 60 + edge.strength * 90; // Range: 60-150 (much more visible than before)
+        let edgePulsePhase = (edge.source + edge.target) * 0.2; // Unique phase per edge
+        let pulseOpacity = baseOpacity * (0.7 + Math.sin(edgePulseTime * 1.2 + edgePulsePhase) * 0.3); // More pronounced pulsing (30% variation)
+        
+        // Use color scheme for edges
+        const colors = getColors();
+        p.stroke(colors.edgeDefault[0], colors.edgeDefault[1], colors.edgeDefault[2], pulseOpacity);
+        p.strokeWeight((0.8 + edge.strength * 1.2) * (0.8 + Math.sin(edgePulseTime * 1.3 + edgePulsePhase) * 0.2)); // More pronounced pulsing (20% variation)
+        p.line(source.position.x, source.position.y, target.position.x, target.position.y);
+      }
+    }
+    
+    // Second pass: draw highlighted edges (connected to hovered node) - LIT UP RELATIONSHIPS
+    if (hoveredNode) {
+      for (let edge of network.edges) {
+        let source = network.nodes[edge.source];
+        let target = network.nodes[edge.target];
+        
+        // Check if this edge is connected to hovered node
+        if (source === hoveredNode || target === hoveredNode) {
+          // Get color based on cluster of the connected node (not hovered one)
+          let connectedNode = source === hoveredNode ? target : source;
+          let color = getClusterColor(connectedNode.cluster);
+          
+          // Very strong, vibrant colors when lit - maximum visibility
+          let litColor = [
+            Math.min(255, color[0] * 1.8), // Very strong red component
+            Math.min(255, color[1] * 1.8), // Very strong green component
+            Math.min(255, color[2] * 1.8)  // Very strong blue component
+          ];
+          
+          // Maximum opacity for fully lit relationships
+          let baseOpacity = 220 + edge.strength * 35; // Range: 220-255 (fully lit)
+          
+          // Minimal pulsing - keep relationships consistently lit
+          let edgePulsePhase = (edge.source + edge.target) * 0.2;
+          let pulseOpacity = baseOpacity; // No pulsing - keep it bright and consistent
+          
+          // Draw glow effect first (behind) for extra visibility
+          p.stroke(litColor[0] * 0.6, litColor[1] * 0.6, litColor[2] * 0.6, pulseOpacity * 0.3);
+          p.strokeWeight((2.0 + edge.strength * 3.0));
+          p.line(source.position.x, source.position.y, target.position.x, target.position.y);
+          
+          // Draw main relationship line on top - thick and bright
+          p.stroke(litColor[0], litColor[1], litColor[2], pulseOpacity);
+          p.strokeWeight((1.5 + edge.strength * 2.5)); // Thick, visible lines for relationships
+          p.line(source.position.x, source.position.y, target.position.x, target.position.y);
+        }
+      }
+    }
+    
+    // Draw nodes as words - 2D rendering
+    p.textAlign(p.CENTER, p.CENTER);
+    p.textFont('monospace');
+    
+    // Find connected nodes if hovering
+    let connectedNodes = new Set();
+    if (hoveredNode) {
+      connectedNodes.add(hoveredNode);
+      for (let edge of network.edges) {
+        let source = network.nodes[edge.source];
+        let target = network.nodes[edge.target];
+        if (source === hoveredNode) {
+          connectedNodes.add(target);
+        } else if (target === hoveredNode) {
+          connectedNodes.add(source);
+        }
+      }
+    }
+    
+    // Helper function to get node color - more visible when lit
+    function getNodeColor(node) {
+      if (node === hoveredNode) {
+        // Highlighted node - brighter, more saturated color based on cluster
+        let color = getClusterColor(node.cluster);
+        // Increase saturation and brightness for more visibility
+        return [
+          Math.min(255, color[0] * 1.4), // Brighter red component
+          Math.min(255, color[1] * 1.4), // Brighter green component
+          Math.min(255, color[2] * 1.4)  // Brighter blue component
+        ];
+      } else if (connectedNodes.has(node)) {
+        // Connected node - more visible muted color based on cluster
+        let color = getClusterColor(node.cluster);
+        return [
+          color[0] * 0.8, // More visible than before
+          color[1] * 0.8,
+          color[2] * 0.8
+        ];
+      }
+      return null; // Default black
+    }
+    
+    // Global pulsing effect - makes network feel alive (more pronounced)
+    let pulseTime = p.frameCount * 0.04; // Faster pulse (doubled speed)
+    let globalPulse = 1.0 + Math.sin(pulseTime) * 0.15; // 15% size variation (almost doubled)
+    
+    for (let node of network.nodes) {
+      // Font size based on frequency - smaller font
+      let baseFontSize = 15 + node.frequency * 2;
+      
+      // Individual node pulsing - each node pulses at different phase (more pronounced)
+      let nodePulsePhase = node.id * 0.3; // Unique phase per node
+      let nodePulse = 1.0 + Math.sin(pulseTime * 1.5 + nodePulsePhase) * 0.12; // 12% individual pulse (more than doubled)
+      
+      // Combine global and individual pulsing
+      let fontSize = baseFontSize * globalPulse * nodePulse;
+      
+      // Determine if this node should be highlighted
+      let nodeColor = getNodeColor(node);
+      let isHighlighted = node === hoveredNode || connectedNodes.has(node);
+      
+      // Make highlighted nodes more prominent with larger size
+      if (node === hoveredNode) {
+        fontSize = fontSize * 1.5; // Much larger for highlighted node
+      } else if (connectedNodes.has(node)) {
+        fontSize = fontSize * 1.15; // Slightly larger for connected nodes
+      }
+      
+      // Pulsing opacity for nodes - more pronounced pulsing
+      let baseOpacity = isHighlighted ? 255 : 200; // Full opacity when highlighted
+      let opacityVariation = isHighlighted ? 20 : 50; // More opacity variation (increased from 30)
+      let opacityPulse = baseOpacity + Math.sin(pulseTime * 1.2 + nodePulsePhase) * opacityVariation; // Faster, more pronounced pulsing
+      
+      if (nodeColor) {
+        // Colored node (hovered or connected) - brighter and more visible
+        p.fill(nodeColor[0], nodeColor[1], nodeColor[2], opacityPulse);
+        if (node === hoveredNode) {
+          // Stronger stroke for highlighted node with more pulsing
+          p.stroke(0, opacityPulse * 0.8); // Dark stroke for contrast
+          p.strokeWeight(2.5 * (0.9 + Math.sin(pulseTime * 1.3 + nodePulsePhase) * 0.1)); // More pronounced stroke pulsing
+        } else {
+          // Connected nodes - softer stroke with more pulsing
+          p.stroke(100, opacityPulse * 0.6);
+          p.strokeWeight(1.5 * (0.85 + Math.sin(pulseTime * 1.2 + nodePulsePhase) * 0.15)); // More pronounced pulsing
+        }
+      } else {
+        // Normal node - use color scheme
+        const colors = getColors();
+        p.fill(colors.text[0], colors.text[1], colors.text[2], opacityPulse);
+        // Invert stroke for contrast
+        let strokeColor = darkMode ? [255, 255, 255] : [0, 0, 0];
+        p.stroke(strokeColor[0], strokeColor[1], strokeColor[2], opacityPulse * 0.8);
+        p.strokeWeight(2 * (0.85 + Math.sin(pulseTime * 1.2 + nodePulsePhase) * 0.15)); // More pronounced pulsing stroke weight
+      }
+      
+      p.textSize(fontSize);
+      
+      // Draw the word at node position
+      p.text(node.word, node.position.x, node.position.y);
+    }
+  }
+
+  p.mousePressed = function() {
+    // Check if home button was clicked first
+    if (checkHomeButtonClick(p, p.mouseX, p.mouseY)) {
+      return; // Don't process other clicks if home button was clicked
+    }
+    
+    // Check if dark mode toggle was clicked first
+    if (checkDarkModeToggleClick(p, p.mouseX, p.mouseY)) {
+      return; // Don't process other clicks if dark mode toggle was clicked
+    }
+    
+    // Check if language menu was clicked
+    if (checkLanguageMenuClick(p, p.mouseX, p.mouseY)) {
+      return; // Don't process other clicks if language menu was clicked
+    }
+    
+    // Check if credits were clicked (only on home page)
+    if (textTyped.length === 0 && checkCreditsClick(p, p.mouseX, p.mouseY)) {
+      return; // Don't process other clicks if credits were clicked
+    }
+    
+    // Store mouse position to detect clicks vs drags
+    mouseDownX = p.mouseX;
+    mouseDownY = p.mouseY;
+    clickedNode = null;
+    
+    // Check if clicking on a node first
+    if (wordNetwork.nodes.length > 0) {
+      // Convert mouse to world coordinates
+      let worldX = (p.mouseX - p.width / 2 - viewOffsetX) / viewZoom;
+      let worldY = (p.mouseY - p.height / 2 - viewOffsetY) / viewZoom;
+      
+      // Find closest node to mouse
+      let closestNode = null;
+      let closestDist = Infinity;
+      let clickRadius = 100; // How close you need to click to grab a node
+      
+      for (let node of wordNetwork.nodes) {
+        let dx = node.position.x - worldX;
+        let dy = node.position.y - worldY;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < clickRadius && dist < closestDist) {
+          closestDist = dist;
+          closestNode = node;
+        }
+      }
+      
+      // Store clicked node for potential click detection
+      clickedNode = closestNode;
+      
+      // If clicking on a node, start dragging it
+      if (closestNode) {
+        isDraggingNode = true;
+        draggedNode = closestNode;
+        dragOffsetX = closestNode.position.x - worldX;
+        dragOffsetY = closestNode.position.y - worldY;
+        return; // Don't pan if dragging a node
+      }
+    }
+    
+    // Otherwise, start pan drag
+    isDragging = true;
+    lastMouseX = p.mouseX;
+    lastMouseY = p.mouseY;
+  };
+  
+  p.mouseDragged = function() {
+    if (isDraggingNode && draggedNode) {
+      // Dragging is handled in visualizeNetwork function
+      // Just update last mouse position
+      lastMouseX = p.mouseX;
+      lastMouseY = p.mouseY;
+    } else if (isDragging) {
+      // Calculate pan delta based on mouse movement
+      let deltaX = p.mouseX - lastMouseX;
+      let deltaY = p.mouseY - lastMouseY;
+      
+      // Update view offset (pan)
+      viewOffsetX += deltaX / viewZoom;
+      viewOffsetY += deltaY / viewZoom;
+      
+      // Update last mouse position
+      lastMouseX = p.mouseX;
+      lastMouseY = p.mouseY;
+    }
+  };
+  
+  p.mouseReleased = function() {
+    // Check if this was a click (not a drag) on a node
+    let mouseMoved = Math.abs(p.mouseX - mouseDownX) > 5 || Math.abs(p.mouseY - mouseDownY) > 5;
+    
+    // If clicked on a node without dragging, trigger generation based on that word
+    if (!mouseMoved && clickedNode && isDraggingNode) {
+      // This was a click, not a drag - trigger generation
+      triggerTextGenerationWithWord(clickedNode.word);
+      // Reset dragging state
+      isDraggingNode = false;
+      draggedNode = null;
+      clickedNode = null;
+      return;
+    }
+    
+    // Stop dragging node
+    if (isDraggingNode && draggedNode) {
+      // Give the node a small velocity for smooth release
+      draggedNode.velocity.x *= 0.3;
+      draggedNode.velocity.y *= 0.3;
+      isDraggingNode = false;
+      draggedNode = null;
+    }
+    
+    // Stop pan drag
+    isDragging = false;
+    clickedNode = null;
+  };
+  
+  p.mouseWheel = function(event) {
+    // Zoom with mouse wheel
+    let zoomFactor = 1 + event.delta * 0.001;
+    viewZoom *= zoomFactor;
+    viewZoom = Math.max(0.1, Math.min(5.0, viewZoom)); // Limit zoom range
+    return false; // Prevent default scrolling
+  };
+
+  // Old rendering code removed - network visualization handles rendering now
+
+  p.keyReleased = function() {
+    // export png
+    if (p.keyCode === p.CONTROL || p.keyCode === 91) {
+      p.saveCanvas('semantic-tensegrities-' + Date.now(), 'png');
+    }
+    // new random layout
+    if (p.keyCode === p.ALT || p.keyCode === 18) {
+      actRandomSeed++;
+    }
+  };
+
+  // Function to trigger text generation
+  function triggerTextGeneration() {
+    if (!isLoading) {
+      isLoading = true;
+      
+      // Get prompts in the current language
+      const prompts = getGenerationPrompts();
+      
+      // Randomly select a prompt for variety
+      const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+      chat(randomPrompt);
+    }
+  }
+
+  // Function to trigger text generation based on a clicked word
+  function triggerTextGenerationWithWord(word) {
+    if (!isLoading && word) {
+      // Stop current voice/audio and disable auto-generation
+      stopCurrentVoice();
+      autoGenerationEnabled = false; // Disable automatic generation cycle
+      
+      isLoading = true;
+      
+      // Create a prompt that incorporates the clicked word in the current language
+      const wordPrompts = {
+        en: `Write a concise text (5-7 sentences) that explores the concept of "${word}" in relation to computational linguistics, semantic tensegrity, language processing, and how meaning emerges from structural relationships. Be technical yet poetic, philosophical and insightful. Connect "${word}" to probability distributions, vector spaces, language models, or other computational linguistic concepts.`,
+        es: `Escribe un texto conciso (5-7 oraciones) que explore el concepto de "${word}" en relación con la lingüística computacional, la tensegridad semántica, el procesamiento del lenguaje y cómo el significado emerge de las relaciones estructurales. Sé técnico pero poético, filosófico e inteligente. Conecta "${word}" con distribuciones de probabilidad, espacios vectoriales, modelos de lenguaje u otros conceptos lingüísticos computacionales.`,
+        fr: `Écrivez un texte concis (5-7 phrases) qui explore le concept de "${word}" en relation avec la linguistique computationnelle, la tensegrité sémantique, le traitement du langage et comment le sens émerge des relations structurelles. Soyez technique mais poétique, philosophique et perspicace. Connectez "${word}" aux distributions de probabilité, espaces vectoriels, modèles de langage ou autres concepts linguistiques computationnels.`,
+        de: `Schreiben Sie einen prägnanten Text (5-7 Sätze), der das Konzept von "${word}" in Bezug auf Computerlinguistik, semantische Tensegrität, Sprachverarbeitung und wie Bedeutung aus strukturellen Beziehungen entsteht, erkundet. Seien Sie technisch, aber poetisch, philosophisch und aufschlussreich. Verbinden Sie "${word}" mit Wahrscheinlichkeitsverteilungen, Vektorräumen, Sprachmodellen oder anderen computerlinguistischen Konzepten.`,
+        it: `Scrivi un testo conciso (5-7 frasi) che esplora il concetto di "${word}" in relazione alla linguistica computazionale, alla tensegrità semantica, all'elaborazione del linguaggio e come il significato emerge dalle relazioni strutturali. Sii tecnico ma poetico, filosofico e perspicace. Collega "${word}" a distribuzioni di probabilità, spazi vettoriali, modelli linguistici o altri concetti linguistici computazionali.`,
+        pt: `Escreva um texto conciso (5-7 frases) que explore o conceito de "${word}" em relação à linguística computacional, tensegridade semântica, processamento de linguagem e como o significado emerge de relacionamentos estruturais. Seja técnico mas poético, filosófico e perspicaz. Conecte "${word}" a distribuições de probabilidade, espaços vetoriais, modelos de linguagem ou outros conceitos linguísticos computacionais.`,
+        ja: `"${word}"の概念を計算言語学、意味的テンセグリティ、言語処理、そして意味が構造的関係からどのように生まれるかに関連して探求する簡潔なテキスト（5-7文）を書いてください。技術的でありながら詩的で、哲学的で洞察力のあるものにしてください。"${word}"を確率分布、ベクトル空間、言語モデル、または他の計算言語学的概念に接続してください。`,
+        zh: `写一篇简洁的文本（5-7句话），探索"${word}"这一概念与计算语言学、语义张拉整体、语言处理以及意义如何从结构关系中产生的关联。要技术性但诗意、哲学性和有洞察力。将"${word}"与概率分布、向量空间、语言模型或其他计算语言学概念联系起来。`,
+        ko: `"${word}"의 개념을 계산 언어학, 의미론적 텐세그리티, 언어 처리, 그리고 의미가 구조적 관계에서 어떻게 나타나는지와 관련하여 탐구하는 간결한 텍스트(5-7문장)를 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요. "${word}"를 확률 분포, 벡터 공간, 언어 모델 또는 다른 계산 언어학적 개념과 연결하세요.`,
+        ar: `اكتب نصاً موجزاً (5-7 جمل) يستكشف مفهوم "${word}" فيما يتعلق باللسانيات الحسابية والتوتر الدلالي ومعالجة اللغة وكيف ينشأ المعنى من العلاقات البنيوية. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً. اربط "${word}" بتوزيعات الاحتمال أو المسافات المتجهة أو نماذج اللغة أو مفاهيم لسانيات حسابية أخرى.`,
+        tr: `"${word}" kavramını hesaplamalı dilbilim, semantik tensegrite, dil işleme ve anlamın yapısal ilişkilerden nasıl ortaya çıktığıyla ilgili olarak keşfeden kısa bir metin (5-7 cümle) yazın. Teknik ama şiirsel, felsefi ve içgörülü olun. "${word}"'i olasılık dağılımları, vektör uzayları, dil modelleri veya diğer hesaplamalı dilbilim kavramlarıyla bağlayın.`
+      };
+      
+      const prompt = wordPrompts[currentLanguage] || wordPrompts['en'];
+      chat(prompt);
+    }
+  }
+
+  p.keyPressed = function() {
+    // Start generation with spacebar - then continues automatically via voice
+    if (p.keyCode === 32) { // Spacebar
+      // Reset system to show loading animation in selected language
+      // Stop current voice/audio
+      stopCurrentVoice();
+      
+      // Clear current text and network
+      textTyped = '';
+      currentTextBeingRead = '';
+      wordNetwork.nodes = [];
+      wordNetwork.edges = [];
+      wordNetwork.needsUpdate = false;
+      
+      // Reset to show loading animation
+      isFirstGeneration = true;
+      isLoading = false; // Will be set to true by triggerTextGeneration
+      
+      // Reset view/zoom
+      viewOffsetX = 0;
+      viewOffsetY = 0;
+      viewZoom = 1.0;
+      needsAutoZoom = false;
+      tickerOffset = 0;
+      
+      // Re-enable auto-generation when spacebar is pressed
+      autoGenerationEnabled = true;
+      
+      // Start heartbeat sound on first spacebar press
+      if (!heartbeatInterval) {
+        createHeartbeatSound();
+      } else {
+        // Resume audio context if already started
+        resumeAudioContext();
+      }
+      
+      // Start generation - will continue automatically when voice finishes reading
+      triggerTextGeneration();
+    }
+  };
+ 
+  // Function to stop current voice/audio playback
+  function stopCurrentVoice() {
+    // Stop OpenAI TTS audio
+    if (currentUtterance && audioContext) {
+      try {
+        currentUtterance.stop();
+      } catch (e) {
+        // Source might already be stopped
+      }
+      currentUtterance = null;
+    }
+    // Stop browser speech synthesis
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    isVoiceSpeaking = false;
+  }
+
+  // Function to read text using OpenAI TTS API (triggers next generation when finished)
+  async function readText(text) {
+    if (!openai) return;
+    
+    try {
+      // Stop any current speech
+      stopCurrentVoice();
+      
+      // Clean up text for reading (remove extra newlines, trim)
+      let cleanText = text.replace(/\n+/g, ' ').trim();
+      if (cleanText.length === 0) return;
+      
+      // Set current text being read
+      currentTextBeingRead = text;
+      
+      // Generate speech using OpenAI TTS
+      const mp3 = await openai.audio.speech.create({
+        model: "tts-1", // Use OpenAI TTS model
+        voice: "alloy", // Natural-sounding voice
+        input: cleanText,
+      });
+      
+      // Get audio buffer
+      const buffer = await mp3.arrayBuffer();
+      
+      // Play audio using Web Audio API
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      // Resume audio context if suspended
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+      
+      // Decode and play audio
+      const audioBuffer = await audioContext.decodeAudioData(buffer);
+      const source = audioContext.createBufferSource();
+      const gainNode = audioContext.createGain();
+      
+      source.buffer = audioBuffer;
+      source.playbackRate.value = 1.0; // Normal speech rate
+      gainNode.gain.value = 0.8; // Volume
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Store reference to stop if needed
+      currentUtterance = source;
+      
+      // Mark voice as speaking and start ticker based on language direction
+      isVoiceSpeaking = true;
+      const rtlLanguages = ['ar'];
+      const verticalLanguages = ['ja', 'zh', 'ko'];
+      const isRTL = rtlLanguages.includes(currentLanguage);
+      const isVertical = verticalLanguages.includes(currentLanguage);
+      
+      // Initialize ticker offset based on language type
+      const padding = 20;
+      const fontSize = 14;
+      
+      if (isVertical) {
+        // Vertical: start from bottom (positive offset, will decrease to move up)
+        const estimatedTextHeight = cleanText.length * fontSize * 1.2; // Rough estimate
+        tickerOffset = (p.height || window.innerHeight); // Start from bottom
+      } else if (isRTL) {
+        // RTL horizontal: start from left (negative offset)
+        const estimatedTextWidth = cleanText.length * fontSize * 0.6;
+        tickerOffset = -(estimatedTextWidth + padding * 2);
+      } else {
+        // LTR horizontal: start from right (positive offset)
+        tickerOffset = (canvasWidth || window.innerWidth);
+      }
+      
+      source.start(0);
+      
+      // Trigger next generation when text finishes being read (only if auto-generation is enabled)
+      source.onended = () => {
+        currentUtterance = null;
+        isVoiceSpeaking = false; // Voice stopped speaking
+        // Trigger next generation after reading is complete (only if auto-generation is enabled)
+        if (autoGenerationEnabled && textTyped === currentTextBeingRead && textTyped.length > 0) {
+          // Small delay before triggering next generation
+          setTimeout(() => {
+            if (autoGenerationEnabled && textTyped === currentTextBeingRead && !isLoading) {
+              console.log('Text finished reading, triggering next generation...');
+              triggerTextGeneration();
+            }
+          }, 1000); // 1 second pause before next generation
+        }
+      };
+      
+    } catch (err) {
+      console.warn('Could not generate speech with OpenAI TTS:', err);
+      // Fallback to browser speech synthesis if OpenAI TTS fails
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        let utterance = new SpeechSynthesisUtterance(text.replace(/\n+/g, ' ').trim());
+        utterance.rate = 1.0; // Normal speech rate
+        utterance.volume = 0.8;
+        
+        // Mark voice as speaking and start ticker based on language direction
+        isVoiceSpeaking = true;
+        const rtlLanguages = ['ar'];
+        const isRTL = rtlLanguages.includes(currentLanguage);
+        // For RTL: start from left (negative), for LTR: start from right (positive)
+        tickerOffset = isRTL ? -(canvasWidth || window.innerWidth) : (canvasWidth || window.innerWidth);
+        
+        // Trigger next generation when finished reading (only if auto-generation is enabled)
+        utterance.onend = () => {
+          isVoiceSpeaking = false; // Voice stopped speaking
+          if (autoGenerationEnabled && textTyped === currentTextBeingRead && textTyped.length > 0) {
+            setTimeout(() => {
+              if (autoGenerationEnabled && textTyped === currentTextBeingRead && !isLoading) {
+                console.log('Text finished reading (fallback), triggering next generation...');
+                triggerTextGeneration();
+              }
+            }, 1000); // 1 second pause before next generation
+          }
+        };
+        
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+  }
+
+  async function chat(prompt) {
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o", // Using latest realtime/fast model
+        temperature: 1.0,
+        messages: [
+          { 
+            "role": "system", 
+            "content": getSystemPrompt()
+          },
+          { "role": "user", "content": prompt }
+        ]
+      });
+
+      // Stop any current voice reading from previous text
+      if (currentUtterance && audioContext) {
+        try {
+          currentUtterance.stop();
+        } catch (e) {
+          // Source might already be stopped
+        }
+        currentUtterance = null;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      
+      // Store generated text from realtime model - used by both network and ticker
+      textTyped = completion.choices[0].message.content;
+      actRandomSeed = p.floor(p.random(1000)); // New random seed for new composition
+      // Mark network for update (will use textTyped)
+      wordNetwork.needsUpdate = true;
+      tickerOffset = 0; // Reset ticker for new text (will use textTyped)
+      isLoading = false;
+      
+      // Mark first generation as complete
+      if (isFirstGeneration) {
+        isFirstGeneration = false;
+      }
+      
+      // Read the generated text using OpenAI TTS (model's voice) - triggers next generation when finished
+      if (textTyped && textTyped.length > 0) {
+        console.log('Text generated, starting voice reading (will trigger next generation when finished)...');
+        // Ensure audio context is ready before reading
+        if (!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        readText(textTyped).catch(err => {
+          console.warn('Error reading text with OpenAI TTS:', err);
+        });
+      }
+    } catch (err) {
+      console.error("An error occurred in the chat function:", err);
+      textTyped = "Error generating text. Please try again.\n";
+      isLoading = false;
+    }
+  }
+
+  // Function to draw dark mode toggle in top left
+  function drawDarkModeToggle(p) {
+    const colors = getColors();
+    const buttonSize = Math.min(28, Math.max(24, p.width * 0.03)); // Smaller adaptive size
+    const buttonX = 20;
+    const buttonY = 20;
+    
+    p.push();
+    
+    // Toggle button background - lighter (reduced opacity)
+    p.fill(colors.uiBackground[0], colors.uiBackground[1], colors.uiBackground[2], 150); // Lighter opacity
+    p.stroke(colors.uiBorder[0], colors.uiBorder[1], colors.uiBorder[2], 120); // Lighter border
+    p.strokeWeight(0.5); // Thinner border
+    p.rect(buttonX, buttonY, buttonSize, buttonSize);
+    
+    // Toggle icon (sun/moon) - smaller and lighter
+    p.textAlign(p.CENTER, p.CENTER);
+    const iconSize = Math.max(12, buttonSize * 0.5); // Smaller icon
+    p.textFont('monospace', iconSize);
+    p.fill(colors.uiText[0], colors.uiText[1], colors.uiText[2], 180); // Lighter icon
+    p.noStroke();
+    p.text(darkMode ? '🌙' : '☀️', buttonX + buttonSize / 2, buttonY + buttonSize / 2);
+    
+    p.pop();
+  }
+  
+  // Function to draw home button (only visible when network is shown)
+  function drawHomeButton(p) {
+    const colors = getColors();
+    const buttonWidth = Math.min(60, Math.max(50, p.width * 0.06)); // Smaller adaptive width
+    const buttonHeight = Math.min(28, Math.max(24, p.width * 0.03)); // Smaller adaptive height
+    const buttonX = p.width - buttonWidth - 20; // Top right
+    const buttonY = 20; // Top right
+    
+    p.push();
+    
+    // Button background - lighter (reduced opacity)
+    p.fill(colors.uiBackground[0], colors.uiBackground[1], colors.uiBackground[2], 150); // Lighter opacity
+    p.stroke(colors.uiBorder[0], colors.uiBorder[1], colors.uiBorder[2], 120); // Lighter border
+    p.strokeWeight(0.5); // Thinner border
+    p.rect(buttonX, buttonY, buttonWidth, buttonHeight);
+    
+    // Button text - smaller font size and lighter
+    p.textAlign(p.CENTER, p.CENTER);
+    const buttonFontSize = Math.max(8, Math.min(11, p.width * 0.012)); // Smaller font
+    p.textFont('monospace', buttonFontSize);
+    p.fill(colors.uiText[0], colors.uiText[1], colors.uiText[2], 180); // Lighter text
+    p.noStroke();
+    p.text(t('home'), buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
+    
+    p.pop();
+  }
+  
+  // Function to draw language menu in top right
+  function drawLanguageMenu(p) {
+    // Only show on landing page
+    if (textTyped.length > 0) {
+      return;
+    }
+    
+    const colors = getColors();
+    const menuWidth = Math.min(140, p.width * 0.18); // Smaller adaptive width
+    const menuX = p.width - menuWidth - 20; // Top right
+    const buttonHeight = 24; // Smaller button height
+    const dropdownButtonHeight = 28; // Smaller dropdown button height
+    const buttonY = 20; // Top right
+    
+    p.push();
+    
+    // Dropdown button (always visible)
+    const currentLang = languages.find(l => l.code === currentLanguage) || languages[0];
+    
+    // Button background - lighter (reduced opacity)
+    p.fill(colors.uiBackground[0], colors.uiBackground[1], colors.uiBackground[2], 150); // Lighter opacity
+    p.stroke(colors.uiBorder[0], colors.uiBorder[1], colors.uiBorder[2], 120); // Lighter border
+    p.strokeWeight(0.5); // Thinner border
+    p.rect(menuX, buttonY, menuWidth, dropdownButtonHeight);
+    
+    // Button text - smaller adaptive font size
+    p.textAlign(p.LEFT, p.CENTER);
+    const buttonFontSize = Math.max(8, Math.min(11, p.width * 0.012)); // Smaller font
+    p.textFont('monospace', buttonFontSize);
+    p.fill(colors.uiText[0], colors.uiText[1], colors.uiText[2], 180); // Lighter text
+    p.noStroke();
+    p.text(t('language') + ': ' + currentLang.name, menuX + 8, buttonY + dropdownButtonHeight / 2);
+    
+    // Dropdown arrow - smaller
+    p.textAlign(p.RIGHT, p.CENTER);
+    p.textFont('monospace', buttonFontSize);
+    p.text(showLanguageMenu ? '▲' : '▼', menuX + menuWidth - 8, buttonY + dropdownButtonHeight / 2);
+    
+    // Dropdown menu (only if open)
+    if (showLanguageMenu) {
+      const dropdownY = buttonY + dropdownButtonHeight;
+      const dropdownHeight = languages.length * buttonHeight + 8;
+      
+      // Dropdown background - lighter
+      p.fill(colors.uiBackground[0], colors.uiBackground[1], colors.uiBackground[2], 180); // Lighter
+      p.stroke(colors.uiBorder[0], colors.uiBorder[1], colors.uiBorder[2], 120); // Lighter border
+      p.strokeWeight(0.5); // Thinner border
+      p.rect(menuX, dropdownY, menuWidth, dropdownHeight);
+      
+      // Language options
+      let yPos = dropdownY + 4;
+      for (let i = 0; i < languages.length; i++) {
+        const lang = languages[i];
+        const isSelected = lang.code === currentLanguage;
+        
+        // Option background - lighter
+        if (isSelected) {
+          p.fill(colors.uiSelected[0], colors.uiSelected[1], colors.uiSelected[2], 150); // Lighter selected
+        } else {
+          p.fill(colors.uiBackground[0], colors.uiBackground[1], colors.uiBackground[2], 120); // Lighter unselected
+        }
+        p.stroke(colors.uiBorder[0], colors.uiBorder[1], colors.uiBorder[2], 100); // Lighter border
+        p.strokeWeight(0.5); // Thinner border
+        p.rect(menuX + 4, yPos, menuWidth - 8, buttonHeight - 2);
+        
+        // Option text - smaller adaptive font size
+        p.textAlign(p.LEFT, p.CENTER);
+        const optionFontSize = Math.max(7, Math.min(10, p.width * 0.011)); // Smaller font
+        p.textFont('monospace', optionFontSize);
+        if (isSelected) {
+          p.fill(colors.uiTextSelected[0], colors.uiTextSelected[1], colors.uiTextSelected[2], 200); // Slightly lighter
+        } else {
+          p.fill(colors.uiText[0], colors.uiText[1], colors.uiText[2], 160); // Lighter text
+        }
+        p.noStroke();
+        p.text(lang.name, menuX + 10, yPos + buttonHeight / 2);
+        
+        yPos += buttonHeight;
+      }
+    }
+    
+    p.pop();
+  }
+
+  // Function to check if dark mode toggle is clicked
+  function checkDarkModeToggleClick(p, mouseX, mouseY) {
+    const buttonSize = Math.min(28, Math.max(24, p.width * 0.03)); // Smaller adaptive button size
+    const buttonX = 20;
+    const buttonY = 20;
+    
+    if (mouseX >= buttonX && mouseX <= buttonX + buttonSize &&
+        mouseY >= buttonY && mouseY <= buttonY + buttonSize) {
+      darkMode = !darkMode;
+      return true;
+    }
+    return false;
+  }
+  
+  // Function to check if home button is clicked
+  function checkHomeButtonClick(p, mouseX, mouseY) {
+    // Only check if network is visible
+    if (textTyped.length === 0) {
+      return false;
+    }
+    
+    const buttonWidth = Math.min(60, Math.max(50, p.width * 0.06)); // Smaller adaptive width
+    const buttonHeight = Math.min(28, Math.max(24, p.width * 0.03)); // Smaller adaptive height
+    const buttonX = p.width - buttonWidth - 20; // Top right
+    const buttonY = 20; // Top right
+    
+    if (mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
+        mouseY >= buttonY && mouseY <= buttonY + buttonHeight) {
+      resetToLandingPage();
+      return true;
+    }
+    return false;
+  }
+  
+  // Function to reset to landing page
+  function resetToLandingPage() {
+    // Stop current voice/audio
+    stopCurrentVoice();
+    
+    // Stop heartbeat sound
+    if (heartbeatInterval) {
+      clearInterval(heartbeatInterval);
+      heartbeatInterval = null;
+    }
+    
+    // Stop any ongoing generation
+    isLoading = false;
+    
+    // Clear current text and network
+    textTyped = '';
+    currentTextBeingRead = '';
+    wordNetwork.nodes = [];
+    wordNetwork.edges = [];
+    wordNetwork.needsUpdate = false;
+    
+    // Reset to show loading animation
+    isFirstGeneration = true;
+    
+    // Reset view/zoom
+    viewOffsetX = 0;
+    viewOffsetY = 0;
+    viewZoom = 1.0;
+    needsAutoZoom = false;
+    tickerOffset = 0;
+    
+    // Disable auto-generation (user needs to press spacebar to start)
+    autoGenerationEnabled = false;
+  }
+  
+  // Function to check if language menu button is clicked
+  function checkLanguageMenuClick(p, mouseX, mouseY) {
+    // Only handle clicks on landing page
+    if (textTyped.length > 0) {
+      return false;
+    }
+    
+    const menuWidth = Math.min(140, p.width * 0.18); // Smaller adaptive width
+    const menuX = p.width - menuWidth - 20; // Top right
+    const buttonHeight = 24; // Smaller button height
+    const dropdownButtonHeight = 28; // Smaller dropdown button height
+    const buttonY = 20; // Top right
+    
+    // Check if click is on dropdown button
+    if (mouseX >= menuX && mouseX <= menuX + menuWidth && 
+        mouseY >= buttonY && mouseY <= buttonY + dropdownButtonHeight) {
+      // Toggle dropdown
+      showLanguageMenu = !showLanguageMenu;
+      return true;
+    }
+    
+    // Check if click is on dropdown menu items (only if dropdown is open)
+    if (showLanguageMenu) {
+      const dropdownY = buttonY + dropdownButtonHeight;
+      const dropdownHeight = languages.length * buttonHeight + 10;
+      
+      if (mouseX >= menuX && mouseX <= menuX + menuWidth && 
+          mouseY >= dropdownY && mouseY <= dropdownY + dropdownHeight) {
+        
+        // Check which language option was clicked
+        let yPos = dropdownY + 5;
+        for (let i = 0; i < languages.length; i++) {
+          if (mouseY >= yPos && mouseY <= yPos + buttonHeight - 2) {
+            currentLanguage = languages[i].code;
+            showLanguageMenu = false; // Close dropdown after selection
+            return true;
+          }
+          yPos += buttonHeight;
+        }
+        return true; // Clicked in dropdown area but not on an option
+      }
+      
+      // If clicking outside dropdown area, close it
+      const totalMenuHeight = dropdownButtonHeight + dropdownHeight;
+      if (!(mouseX >= menuX && mouseX <= menuX + menuWidth && 
+            mouseY >= buttonY && mouseY <= buttonY + totalMenuHeight)) {
+        showLanguageMenu = false;
+      }
+    }
+    
+    return false;
+  }
+  
+  // Function to check if credits are clicked
+  function checkCreditsClick(p, mouseX, mouseY) {
+    // Only check if on home page
+    if (textTyped.length > 0) {
+      return false;
+    }
+    
+    // Calculate credits text position (centered, near bottom)
+    // In displayInstructions, we translate to (p.width/2, p.height/2) and draw at (0, creditsY)
+    // So the actual screen position is (p.width/2, p.height/2 + creditsY)
+    const baseFontSize = Math.min(32, p.width / 20);
+    const creditsFontSize = Math.max(8, baseFontSize * 0.25);
+    const creditsYRelative = p.height / 2 - 30; // Relative to center
+    const creditsText = 'Concept and development by Marlon Barrios Solano';
+    
+    // Estimate text width
+    p.textFont('monospace', creditsFontSize);
+    const textWidth = p.textWidth(creditsText);
+    const textHeight = creditsFontSize;
+    
+    // Calculate actual screen positions (accounting for translation to center)
+    const creditsXScreen = p.width / 2;
+    const creditsYScreen = p.height / 2 + creditsYRelative;
+    
+    // Check if click is within credits text bounds
+    if (mouseX >= creditsXScreen - textWidth / 2 - 10 && 
+        mouseX <= creditsXScreen + textWidth / 2 + 10 &&
+        mouseY >= creditsYScreen - textHeight / 2 - 5 && 
+        mouseY <= creditsYScreen + textHeight / 2 + 5) {
+      // Open link in new tab
+      window.open('https://marlonbarrios.github.io/', '_blank');
+      return true;
+    }
+    return false;
+  }
+
+  // Display initial instructions (before spacebar is pressed) - centered
+  function displayInstructions(p) {
+    const colors = getColors();
+    
+    p.push();
+    p.translate(p.width / 2, p.height / 2);
+    p.textAlign(p.CENTER, p.CENTER);
+    
+    // Adaptive font sizes based on screen size
+    const baseFontSize = Math.min(32, p.width / 20);
+    const titleFontSize = Math.max(20, baseFontSize);
+    const mainFontSize = Math.max(12, baseFontSize * 0.5);
+    const secondaryFontSize = Math.max(10, baseFontSize * 0.35);
+    const tertiaryFontSize = Math.max(9, baseFontSize * 0.3);
+    
+    // Title
+    p.textFont('monospace', titleFontSize);
+    p.fill(colors.text[0], colors.text[1], colors.text[2]);
+    p.text(t('title'), 0, -120);
+    
+    // Main instructions
+    p.textFont('monospace', mainFontSize);
+    p.fill(colors.textSecondary[0], colors.textSecondary[1], colors.textSecondary[2], colors.textSecondary[3] || 180);
+    p.text(t('pressSpacebar'), 0, -40);
+    
+    // Secondary instructions
+    p.textFont('monospace', secondaryFontSize);
+    p.fill(colors.textTertiary[0], colors.textTertiary[1], colors.textTertiary[2], colors.textTertiary[3] || 140);
+    p.text(t('autoGeneration'), 0, 0);
+    
+    p.textFont('monospace', tertiaryFontSize);
+    p.fill(colors.textQuaternary[0], colors.textQuaternary[1], colors.textQuaternary[2], colors.textQuaternary[3] || 100);
+    p.text(t('autoRead'), 0, 25);
+    p.text(t('panZoom'), 0, 50);
+    p.text(t('hoverWords'), 0, 65);
+    p.text(t('clickWords'), 0, 80);
+    
+    // Credits at the bottom (clickable link)
+    const creditsFontSize = Math.max(8, baseFontSize * 0.25);
+    p.textFont('monospace', creditsFontSize);
+    const creditsText = 'Concept and development by Marlon Barrios Solano';
+    
+    // Check if mouse is hovering over credits (for visual feedback)
+    const creditsY = p.height / 2 - 30;
+    const textWidth = p.textWidth(creditsText);
+    const textHeight = creditsFontSize;
+    const creditsX = 0; // Already translated to center
+    const mouseXLocal = p.mouseX - p.width / 2;
+    const mouseYLocal = p.mouseY - p.height / 2;
+    const isHovering = mouseXLocal >= creditsX - textWidth / 2 - 10 && 
+                       mouseXLocal <= creditsX + textWidth / 2 + 10 &&
+                       mouseYLocal >= creditsY - textHeight / 2 - 5 && 
+                       mouseYLocal <= creditsY + textHeight / 2 + 5;
+    
+    // Make credits slightly brighter and underlined when hovering
+    if (isHovering) {
+      p.fill(colors.textSecondary[0], colors.textSecondary[1], colors.textSecondary[2], colors.textSecondary[3] || 200);
+      p.cursor('pointer');
+    } else {
+      p.fill(colors.textQuaternary[0], colors.textQuaternary[1], colors.textQuaternary[2], colors.textQuaternary[3] || 100);
+    }
+    
+    p.text(creditsText, 0, creditsY);
+    
+    // Draw underline for link appearance
+    p.stroke(colors.textQuaternary[0], colors.textQuaternary[1], colors.textQuaternary[2], isHovering ? 150 : 80);
+    p.strokeWeight(0.5);
+    p.line(-textWidth / 2, creditsY + 3, textWidth / 2, creditsY + 3);
+    p.noStroke();
+    
+    // Powered by OpenAI Realtime model
+    const poweredByText = 'Powered by OpenAI Realtime model';
+    const poweredByY = creditsY + creditsFontSize + 8;
+    p.fill(colors.textQuaternary[0], colors.textQuaternary[1], colors.textQuaternary[2], colors.textQuaternary[3] || 70);
+    p.text(poweredByText, 0, poweredByY);
+    
+    p.pop();
+    
+    // Draw dark mode toggle (top left) and language menu (top right)
+    drawDarkModeToggle(p);
+    drawLanguageMenu(p);
+  }
+
+  function displayLoader(p, wordNetwork) {
+  // Home page / Landing page animation (2D)
+  let time = p.frameCount * 0.02;
+  
+  // Center the view
+  p.push();
+  p.translate(p.width / 2, p.height / 2);
+  
+  // Home page theme words - representing latent space concepts (2D positions)
+  // Use translated words based on current language
+  let homeWords = [
+    { word: t('wordLanguage'), cluster: 'language', x: -150, y: 0 },
+    { word: t('wordSpace'), cluster: 'space', x: 0, y: 150 },
+    { word: t('wordLatent'), cluster: 'latent', x: 150, y: 0 },
+    { word: t('wordNetwork'), cluster: 'latent', x: 0, y: -150 },
+    { word: t('wordSemantic'), cluster: 'language', x: -100, y: 100 },
+    { word: t('wordDimension'), cluster: 'space', x: 100, y: 100 },
+    { word: t('wordEmbedding'), cluster: 'latent', x: -100, y: -100 },
+    { word: t('wordVector'), cluster: 'latent', x: 100, y: -100 },
+    { word: t('wordMeaning'), cluster: 'language', x: 0, y: 0 },
+    { word: t('wordText'), cluster: 'language', x: -200, y: 0 },
+    { word: t('wordNavigation'), cluster: 'space', x: 200, y: 0 },
+    { word: t('wordTechnology'), cluster: 'latent', x: 0, y: 0 }
+  ];
+  
+  p.textAlign(p.CENTER, p.CENTER);
+  
+  // Draw connections between home words (representing semantic relationships)
+  const colors = getColors();
+  p.stroke(colors.text[0], colors.text[1], colors.text[2], 30);
+  p.strokeWeight(0.5);
+  for (let i = 0; i < homeWords.length; i++) {
+    for (let j = i + 1; j < homeWords.length; j++) {
+      // Connect words from same cluster or nearby words
+      let dist = Math.sqrt(
+        Math.pow(homeWords[i].x - homeWords[j].x, 2) +
+        Math.pow(homeWords[i].y - homeWords[j].y, 2)
+      );
+      
+      if (homeWords[i].cluster === homeWords[j].cluster || dist < 200) {
+        // Animate connection opacity
+        let connectionOpacity = 20 + p.sin(time * 2 + i + j) * 20;
+        p.stroke(colors.text[0], colors.text[1], colors.text[2], connectionOpacity);
+        
+        p.line(homeWords[i].x, homeWords[i].y, homeWords[j].x, homeWords[j].y);
+      }
+    }
+  }
+  
+  // Draw home page words with animation
+  p.noStroke();
+  for (let i = 0; i < homeWords.length; i++) {
+    let word = homeWords[i];
+    
+    // Animate position - gentle floating
+    let animX = word.x + p.sin(time * 1.5 + i * 0.5) * 20;
+    let animY = word.y + p.cos(time * 1.8 + i * 0.5) * 20;
+    
+    // Pulse size and opacity (50% of original)
+    let fontSize = 16 + p.sin(time * 2 + i * 0.4) * 4;
+    let opacity = 120 + p.sin(time * 3 + i * 0.3) * 135;
+    
+    p.textFont('monospace', fontSize);
+    p.fill(colors.text[0], colors.text[1], colors.text[2], opacity);
+    p.text(word.word, animX, animY);
+  }
+  
+  // Central title/loading text
+  p.textFont('monospace', 24);
+  p.fill(colors.text[0], colors.text[1], colors.text[2], 180 + p.sin(time * 4) * 75);
+  p.text(t('title'), 0, -250);
+  
+  p.textFont('monospace', 14);
+  p.fill(colors.text[0], colors.text[1], colors.text[2], 100 + p.sin(time * 5) * 100);
+  p.text(t('generating'), 0, 250);
+
+  p.pop();
+  }
+};
+
+function onReady() {
+  openai = new OpenAI({
+    apiKey: openAIKey,
+    dangerouslyAllowBrowser: true
+  });
+
+  const mainElt = document.querySelector('main');
+  new p5(sketch, mainElt);
+}
+
+// Start the sketch when DOM is ready
+if (document.readyState === 'complete') {
+  onReady();
+} else {
+  document.addEventListener("DOMContentLoaded", onReady);
+}
