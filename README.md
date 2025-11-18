@@ -1,5 +1,7 @@
 # Semantic Tensegrities
 
+**An Speculative Theory of Synthetic Meaning**
+
 A generative installation exploring computational linguistics, semantic relationships, and the concept of semantic tensegrity - how meaning emerges from the structural tension and compression between words, concepts, and relationships.
 
 Powered by OpenAI Realtime model (GPT-4o) and OpenAI TTS, designed in p5.js.
@@ -21,12 +23,13 @@ The installation generates texts about computational linguistics, probability di
 ## Features
 
 ### Multi-Language Support
-- **11 Languages Available**: English, Spanish, French, German, Italian, Portuguese, Japanese, Chinese, Korean, Arabic, Turkish
+- **13 Languages Available**: English, Spanish, French, German, Italian, Portuguese, Japanese, Chinese, Korean, Arabic, Turkish, Croatian, Serbian
 - **Language Menu**: Dropdown menu on the landing page (top right) to select your preferred language
 - **Fully Translated Interface**: All UI elements, instructions, and generated content adapt to the selected language
-- **Language-Aware Network**: Word extraction and visualization work correctly for all languages, including CJK characters, Arabic, and Turkish
+- **Language-Aware Network**: Word extraction and visualization work correctly for all languages, including CJK characters, Arabic, Cyrillic, and Turkish
 - **Language-Aware Ticker**: Ticker direction adapts to language (LTR for most, RTL for Arabic, vertical for CJK languages)
 - **Language-Aware System Prompts**: System prompts reflect on grammatical structures, morphological systems, and writing systems specific to each language
+- **Mobile-Adapted Instructions**: Instructions automatically adapt for mobile devices (tap instead of click, pinch to zoom, etc.)
 
 ### Text Generation
 - **Automatic Generation Cycle**: Once started, the system automatically generates new texts when the previous one finishes being read
@@ -42,12 +45,17 @@ The installation generates texts about computational linguistics, probability di
 - **Interactive Exploration**: Hover over nodes to see relationships, click and drag to explore the network
 - **Semantic Clustering**: Words are positioned based on their semantic relationships (language, space, latent dimensions)
 - **Ensured Connectivity**: All nodes are guaranteed to be connected in the network visualization
+- **Collapse Animation**: Clicking a word triggers a playful collapse animation where all words converge to a point
+- **Network Birth**: New networks emerge from the center with a gradual, organic birth animation
+- **Thinking Indicator**: A floating "thinking" word appears when spacebar is pressed, pulsating throughout the experience
 
 ### Audio Experience
 - **OpenAI Text-to-Speech**: Generated texts are read aloud using OpenAI's TTS API with natural-sounding voices
 - **Heartbeat Drone**: Heartbeat sound activated only when spacebar is pressed, creating an ambient atmosphere
 - **Bouncing Sound**: Sound effect plays when the network first appears
+- **Collapse Sound**: "Whoosh" sound effect plays when words collapse
 - **Automatic Reading**: Text is automatically read when generated, synchronized with the ticker display
+- **Single Voice Playback**: System ensures only one voice plays at a time, preventing overlapping audio
 - **Sound Control**: All sounds stop when home button is pressed or system is reset
 
 ### Visual Elements
@@ -62,8 +70,11 @@ The installation generates texts about computational linguistics, probability di
 
 ### Interaction
 - **Spacebar**: Press spacebar to start/reset the system and begin automatic generation cycle (also activates heartbeat sound)
-- **Word Clicking**: Click on any word in the network to generate new text based on that concept (stops auto-generation)
-- **Network Navigation**: Click and drag to pan, scroll to zoom, hover to see relationships
+- **Mobile**: Tap anywhere on the landing page to start on mobile devices
+- **Word Clicking**: Click on any word in the network to generate new text based on that concept (stops auto-generation and triggers collapse animation)
+- **Network Navigation**: 
+  - **Desktop**: Click and drag to pan, scroll to zoom, hover to see relationships
+  - **Mobile**: Drag to pan, pinch to zoom, tap words to see relationships
 - **Language Selection**: Use the dropdown menu on the landing page (top right) to select your language
 - **Home Button**: Click the home button (top right, when network is visible) to return to landing page and stop all generation/sound
 - **Dark/Light Mode**: Toggle between color schemes using the button in the top left
@@ -141,19 +152,24 @@ npm run dev
 - Physics simulation creates organic movement and interaction
 
 ### Language Support
-- **Latin Scripts**: English, Spanish, French, German, Italian, Portuguese use Unicode word patterns
+- **Latin Scripts**: English, Spanish, French, German, Italian, Portuguese, Croatian use Unicode word patterns
+- **Cyrillic Scripts**: Serbian uses Cyrillic script with proper character handling
 - **CJK Scripts**: Japanese, Chinese, and Korean use character-based extraction with optimized handling to prevent system overload
 - **RTL Scripts**: Arabic uses right-to-left text direction with appropriate ticker scrolling
 - **Agglutinative Languages**: Turkish support with proper word boundary detection
 - **Stop Words**: Language-specific stop word filtering for cleaner visualizations
 - **Frequency Calculation**: Accurate word frequency counting for all language types
 - **CJK Optimization**: Limited node and edge counts for CJK languages to maintain browser performance
+- **Mobile Detection**: Automatic detection of mobile devices with adapted instructions and interactions
 
 ### Audio System
 - Heartbeat sound uses Web Audio API with sine wave oscillators
 - OpenAI TTS provides natural-sounding voice synthesis
 - Audio context management ensures proper playback on user interaction
 - Automatic audio cleanup when new generation starts
+- Voice playback protection prevents simultaneous voice playback
+- Proper cleanup and disconnection of audio sources when stopping
+- Error handling for audio playback failures
 
 ## Customization
 

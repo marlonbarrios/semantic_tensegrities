@@ -217,11 +217,14 @@ const sketch = p => {
   const translations = {
     en: {
       title: 'SEMANTIC TENSEGRITIES',
+      subtitle: 'An Speculative Theory of Synthetic Meaning',
       pressSpacebar: 'Press SPACEBAR to start',
       autoGeneration: 'Generation continues automatically',
       autoRead: 'Text is read automatically when generated',
       panZoom: 'Click and drag to pan, scroll to zoom',
+      panZoomMobile: 'Drag to pan, pinch to zoom',
       hoverWords: 'Hover over words to see relationships',
+      tapWords: 'Tap words to see relationships and generate new text',
       clickWords: 'Click words to generate new text',
       language: 'Language',
       generating: 'Generating...',
@@ -237,15 +240,20 @@ const sketch = p => {
       wordText: 'text',
       wordNavigation: 'navigation',
       wordTechnology: 'technology',
-      home: 'Home'
+      home: 'Home',
+      thinking: 'thinking',
+      tapToStart: 'Tap anywhere to start'
     },
     es: {
       title: 'TENSEGRIDADES SEMÁNTICAS',
+      subtitle: 'Una Teoría Especulativa del Significado Sintético',
       pressSpacebar: 'Presiona ESPACIO para comenzar',
       autoGeneration: 'La generación continúa automáticamente',
       autoRead: 'El texto se lee automáticamente cuando se genera',
       panZoom: 'Haz clic y arrastra para mover, desplázate para hacer zoom',
+      panZoomMobile: 'Arrastra para mover, pellizca para hacer zoom',
       hoverWords: 'Pasa el mouse sobre las palabras para ver relaciones',
+      tapWords: 'Toca palabras para ver relaciones y generar nuevo texto',
       clickWords: 'Haz clic en palabras para generar nuevo texto',
       language: 'Idioma',
       generating: 'Generando...',
@@ -261,15 +269,20 @@ const sketch = p => {
       wordText: 'texto',
       wordNavigation: 'navegación',
       wordTechnology: 'tecnología',
-      home: 'Inicio'
+      home: 'Inicio',
+      thinking: 'pensando',
+      tapToStart: 'Toca en cualquier lugar para comenzar'
     },
     fr: {
       title: 'TENSEGRITÉS SÉMANTIQUES',
+      subtitle: 'Une Théorie Spéculative du Signification Synthétique',
       pressSpacebar: 'Appuyez sur ESPACE pour commencer',
       autoGeneration: 'La génération continue automatiquement',
       autoRead: 'Le texte est lu automatiquement lorsqu\'il est généré',
       panZoom: 'Cliquez et glissez pour déplacer, faites défiler pour zoomer',
+      panZoomMobile: 'Glissez pour déplacer, pincez pour zoomer',
       hoverWords: 'Survolez les mots pour voir les relations',
+      tapWords: 'Touchez les mots pour voir les relations et générer un nouveau texte',
       clickWords: 'Cliquez sur les mots pour générer un nouveau texte',
       language: 'Langue',
       generating: 'Génération...',
@@ -285,15 +298,20 @@ const sketch = p => {
       wordText: 'texte',
       wordNavigation: 'navigation',
       wordTechnology: 'technologie',
-      home: 'Accueil'
+      home: 'Accueil',
+      thinking: 'pensant',
+      tapToStart: 'Appuyez n\'importe où pour commencer'
     },
     de: {
       title: 'SEMANTISCHE TENSEGRITÄTEN',
+      subtitle: 'Eine Spekulative Theorie der Synthetischen Bedeutung',
       pressSpacebar: 'Drücken Sie LEERTASTE zum Starten',
       autoGeneration: 'Die Generierung läuft automatisch weiter',
       autoRead: 'Text wird automatisch vorgelesen, wenn er generiert wird',
       panZoom: 'Klicken und ziehen zum Verschieben, scrollen zum Zoomen',
+      panZoomMobile: 'Ziehen zum Verschieben, kneifen zum Zoomen',
       hoverWords: 'Bewegen Sie die Maus über Wörter, um Beziehungen zu sehen',
+      tapWords: 'Tippen Sie auf Wörter, um Beziehungen zu sehen und neuen Text zu generieren',
       clickWords: 'Klicken Sie auf Wörter, um neuen Text zu generieren',
       language: 'Sprache',
       generating: 'Generiere...',
@@ -309,15 +327,20 @@ const sketch = p => {
       wordText: 'Text',
       wordNavigation: 'Navigation',
       wordTechnology: 'Technologie',
-      home: 'Startseite'
+      home: 'Startseite',
+      thinking: 'denkend',
+      tapToStart: 'Tippen Sie irgendwo zum Starten'
     },
     it: {
       title: 'TENSEGRITÀ SEMANTICHE',
+      subtitle: 'Una Teoria Speculativa del Significato Sintetico',
       pressSpacebar: 'Premi SPAZIO per iniziare',
       autoGeneration: 'La generazione continua automaticamente',
       autoRead: 'Il testo viene letto automaticamente quando viene generato',
       panZoom: 'Clicca e trascina per spostare, scorri per ingrandire',
+      panZoomMobile: 'Trascina per spostare, pizzica per ingrandire',
       hoverWords: 'Passa il mouse sulle parole per vedere le relazioni',
+      tapWords: 'Tocca le parole per vedere le relazioni e generare nuovo testo',
       clickWords: 'Clicca sulle parole per generare nuovo testo',
       language: 'Lingua',
       generating: 'Generazione...',
@@ -333,15 +356,20 @@ const sketch = p => {
       wordText: 'testo',
       wordNavigation: 'navigazione',
       wordTechnology: 'tecnologia',
-      home: 'Home'
+      home: 'Home',
+      thinking: 'pensando',
+      tapToStart: 'Tocca ovunque per iniziare'
     },
     pt: {
       title: 'TENSEGRIDADES SEMÂNTICAS',
+      subtitle: 'Uma Teoria Especulativa do Significado Sintético',
       pressSpacebar: 'Pressione ESPAÇO para começar',
       autoGeneration: 'A geração continua automaticamente',
       autoRead: 'O texto é lido automaticamente quando gerado',
       panZoom: 'Clique e arraste para mover, role para zoom',
+      panZoomMobile: 'Arraste para mover, pinça para zoom',
       hoverWords: 'Passe o mouse sobre as palavras para ver relações',
+      tapWords: 'Toque nas palavras para ver relações e gerar novo texto',
       clickWords: 'Clique nas palavras para gerar novo texto',
       language: 'Idioma',
       generating: 'Gerando...',
@@ -357,15 +385,20 @@ const sketch = p => {
       wordText: 'texto',
       wordNavigation: 'navegação',
       wordTechnology: 'tecnologia',
-      home: 'Início'
+      home: 'Início',
+      thinking: 'pensando',
+      tapToStart: 'Toque em qualquer lugar para começar'
     },
     ja: {
       title: 'セマンティック・テンセグリティ',
+      subtitle: '合成的意味の推測的理論',
       pressSpacebar: 'スペースキーを押して開始',
       autoGeneration: '生成は自動的に続きます',
       autoRead: 'テキストは生成時に自動的に読み上げられます',
       panZoom: 'クリックしてドラッグで移動、スクロールでズーム',
+      panZoomMobile: 'ドラッグで移動、ピンチでズーム',
       hoverWords: '単語にマウスを合わせて関係を表示',
+      tapWords: '単語をタップして関係を表示し、新しいテキストを生成',
       clickWords: '単語をクリックして新しいテキストを生成',
       language: '言語',
       generating: '生成中...',
@@ -381,15 +414,20 @@ const sketch = p => {
       wordText: 'テキスト',
       wordNavigation: 'ナビゲーション',
       wordTechnology: '技術',
-      home: 'ホーム'
+      home: 'ホーム',
+      thinking: '思考中',
+      tapToStart: 'どこでもタップして開始'
     },
     zh: {
       title: '语义张拉整体',
+      subtitle: '合成意义的推测理论',
       pressSpacebar: '按空格键开始',
       autoGeneration: '生成自动继续',
       autoRead: '文本生成时自动朗读',
       panZoom: '点击拖动移动，滚动缩放',
+      panZoomMobile: '拖动移动，双指缩放',
       hoverWords: '悬停单词查看关系',
+      tapWords: '点击单词查看关系并生成新文本',
       clickWords: '点击单词生成新文本',
       language: '语言',
       generating: '生成中...',
@@ -405,15 +443,20 @@ const sketch = p => {
       wordText: '文本',
       wordNavigation: '导航',
       wordTechnology: '技术',
-      home: '首页'
+      home: '首页',
+      thinking: '思考中',
+      tapToStart: '点击任意位置开始'
     },
     ko: {
       title: '의미론적 텐세그리티',
+      subtitle: '합성 의미의 추측 이론',
       pressSpacebar: '스페이스바를 눌러 시작',
       autoGeneration: '생성이 자동으로 계속됩니다',
       autoRead: '텍스트가 생성되면 자동으로 읽어줍니다',
       panZoom: '클릭하고 드래그하여 이동, 스크롤하여 확대/축소',
+      panZoomMobile: '드래그하여 이동, 핀치하여 확대/축소',
       hoverWords: '단어에 마우스를 올려 관계를 확인',
+      tapWords: '단어를 탭하여 관계를 확인하고 새 텍스트 생성',
       clickWords: '단어를 클릭하여 새 텍스트 생성',
       language: '언어',
       generating: '생성 중...',
@@ -429,15 +472,20 @@ const sketch = p => {
       wordText: '텍스트',
       wordNavigation: '네비게이션',
       wordTechnology: '기술',
-      home: '홈'
+      home: '홈',
+      thinking: '생각 중',
+      tapToStart: '아무 곳이나 탭하여 시작'
     },
     ar: {
       title: 'التوترات الدلالية',
+      subtitle: 'نظرية تخمينية للمعنى الاصطناعي',
       pressSpacebar: 'اضغط على مفتاح المسافة للبدء',
       autoGeneration: 'يستمر التوليد تلقائياً',
       autoRead: 'يتم قراءة النص تلقائياً عند توليده',
       panZoom: 'انقر واسحب للتحريك، قم بالتمرير للتكبير/التصغير',
+      panZoomMobile: 'اسحب للتحريك، اضغط للتكبير/التصغير',
       hoverWords: 'مرر الماوس فوق الكلمات لرؤية العلاقات',
+      tapWords: 'اضغط على الكلمات لرؤية العلاقات وتوليد نص جديد',
       clickWords: 'انقر على الكلمات لتوليد نص جديد',
       language: 'اللغة',
       generating: 'جاري التوليد...',
@@ -453,15 +501,20 @@ const sketch = p => {
       wordText: 'نص',
       wordNavigation: 'تنقل',
       wordTechnology: 'تقنية',
-      home: 'الرئيسية'
+      home: 'الرئيسية',
+      thinking: 'يفكر',
+      tapToStart: 'اضغط في أي مكان للبدء'
     },
     tr: {
       title: 'SEMANTİK TENSEGRİTELER',
+      subtitle: 'Sentetik Anlamın Spekülatif Bir Teorisi',
       pressSpacebar: 'Başlamak için BOŞLUK tuşuna basın',
       autoGeneration: 'Üretim otomatik olarak devam eder',
       autoRead: 'Metin üretildiğinde otomatik olarak okunur',
       panZoom: 'Taşımak için tıklayıp sürükleyin, yakınlaştırmak için kaydırın',
+      panZoomMobile: 'Taşımak için sürükleyin, yakınlaştırmak için sıkıştırın',
       hoverWords: 'İlişkileri görmek için kelimelerin üzerine gelin',
+      tapWords: 'İlişkileri görmek ve yeni metin üretmek için kelimelere dokunun',
       clickWords: 'Yeni metin üretmek için kelimelere tıklayın',
       language: 'Dil',
       generating: 'Üretiliyor...',
@@ -477,7 +530,67 @@ const sketch = p => {
       wordText: 'metin',
       wordNavigation: 'navigasyon',
       wordTechnology: 'teknoloji',
-      home: 'Ana Sayfa'
+      home: 'Ana Sayfa',
+      thinking: 'düşünüyor',
+      tapToStart: 'Başlamak için herhangi bir yere dokunun'
+    },
+    hr: {
+      title: 'SEMANTIČKE TENZEGRITETE',
+      subtitle: 'Spekulativna Teorija Sintetičkog Značenja',
+      pressSpacebar: 'Pritisnite RAZMAK za početak',
+      autoGeneration: 'Generiranje se nastavlja automatski',
+      autoRead: 'Tekst se automatski čita kada se generira',
+      panZoom: 'Kliknite i povucite za pomicanje, pomaknite za zumiranje',
+      panZoomMobile: 'Povucite za pomicanje, štipajte za zumiranje',
+      hoverWords: 'Pređite mišem preko riječi da vidite odnose',
+      tapWords: 'Dodirnite riječi da vidite odnose i generirate novi tekst',
+      clickWords: 'Kliknite riječi za generiranje novog teksta',
+      language: 'Jezik',
+      generating: 'Generiranje...',
+      wordLanguage: 'jezik',
+      wordSpace: 'prostor',
+      wordLatent: 'latentno',
+      wordNetwork: 'mreža',
+      wordSemantic: 'semantički',
+      wordDimension: 'dimenzija',
+      wordEmbedding: 'ugrađivanje',
+      wordVector: 'vektor',
+      wordMeaning: 'značenje',
+      wordText: 'tekst',
+      wordNavigation: 'navigacija',
+      wordTechnology: 'tehnologija',
+      home: 'Početna',
+      thinking: 'razmišljanje',
+      tapToStart: 'Dodirnite bilo gdje za početak'
+    },
+    sr: {
+      title: 'СЕМАНТИЧКЕ ТЕНЗЕГРИТЕТЕ',
+      subtitle: 'Спекулативна Теорија Синтетичког Значења',
+      pressSpacebar: 'Притисните РАЗМАК за почетак',
+      autoGeneration: 'Генерисање се наставља аутоматски',
+      autoRead: 'Текст се аутоматски чита када се генерише',
+      panZoom: 'Кликните и повуците за померање, померајте за зумирање',
+      panZoomMobile: 'Повуците за померање, стисните за зумирање',
+      hoverWords: 'Пређите мишем преко речи да видите односе',
+      tapWords: 'Додирните речи да видите односе и генеришете нови текст',
+      clickWords: 'Кликните речи за генерисање новог текста',
+      language: 'Језик',
+      generating: 'Генерисање...',
+      wordLanguage: 'језик',
+      wordSpace: 'простор',
+      wordLatent: 'латентно',
+      wordNetwork: 'мрежа',
+      wordSemantic: 'семантички',
+      wordDimension: 'димензија',
+      wordEmbedding: 'уграђивање',
+      wordVector: 'вектор',
+      wordMeaning: 'значење',
+      wordText: 'текст',
+      wordNavigation: 'навигација',
+      wordTechnology: 'технологија',
+      home: 'Почетна',
+      thinking: 'размишљање',
+      tapToStart: 'Додирните било где за почетак'
     }
   };
 
@@ -493,7 +606,9 @@ const sketch = p => {
     { code: 'zh', name: '中文' },
     { code: 'ko', name: '한국어' },
     { code: 'ar', name: 'العربية' },
-    { code: 'tr', name: 'Türkçe' }
+    { code: 'tr', name: 'Türkçe' },
+    { code: 'hr', name: 'Hrvatski' },
+    { code: 'sr', name: 'Српски' }
   ];
 
   // Helper function to get translated text
@@ -514,7 +629,9 @@ const sketch = p => {
       zh: "你是一位计算语言学家和语言哲学家，为一个名为'语义张拉整体'的装置写作。写关于AI、计算语言学、自然语言处理（NLP）、语言哲学和认识论的交集 - 探索意义如何从单词、概念和关系之间的结构张力和压缩中产生。考察人工智能系统如何处理、理解和生成语言。反思认识论问题：我们如何知道语言的含义？计算系统如何获得知识？语言表征与知识之间的关系是什么？考虑不同语言如何具有不同的语法结构、形态系统和句法模式，从而以不同方式塑造意义，以及AI系统如何导航这些差异。探索书写系统（表音文字、表意文字、音节文字、辅音音素文字）如何以不同方式编码信息并影响计算处理。以简洁、实事求是的段落（5-7句话）用干涩的诗意风格写作。重要：每次以不同方式开始文本 - 变化你的开头句子。每次以不同的概念、术语或视角开始。整合以下主题：计算语言学（概率分布、n-gram、语言模型、统计方法、分词、解析、句法树、语义分析、语料库语言学、频率计数、马尔可夫链、熵、信息论、词嵌入、向量空间、概率语言处理）；AI和机器学习（神经网络、Transformer、注意力机制、大语言模型、训练数据、微调、涌现能力）；NLP（自然语言理解、生成、翻译、情感分析、命名实体识别）；语言哲学（意义、指称、真值条件、语言相对性、言语行为、语用学）；认识论（知识表征、信念系统、辩护、计算系统中理解的性质）。考虑语义关系如何通过张力和压缩创造结构完整性，就像张拉整体结构一样。反思语法结构、词序（中文的SVO和话题优先）、量词系统、声调、汉字系统（表意文字）、语法标记的缺失、语序灵活性等语言特征如何创造不同的计算挑战和机遇。要精确、技术性和低调。避免华丽的语言。只用中文写作。使用连接技术性AI/NLP概念与哲学探究的词汇。保持简洁和专注。变化你的开头 - 每次以不同的技术概念、哲学问题或认识论观察开始。",
       ko: "당신은 '의미론적 텐세그리티'라는 제목의 설치 작품을 위해 글을 쓰는 계산 언어학자이자 언어 철학자입니다. AI, 계산 언어학, 자연어 처리(NLP), 언어 철학, 인식론의 교차점에 대해 써주세요 - 의미가 단어, 개념, 관계 사이의 구조적 긴장과 압축에서 어떻게 나타나는지를 탐구하세요. 인공지능 시스템이 언어를 어떻게 처리하고 이해하며 생성하는지 검토하세요. 인식론적 질문에 성찰하세요: 언어의 의미를 어떻게 아는가? 계산 시스템은 어떻게 지식을 획득하는가? 언어적 표현과 지식의 관계는 무엇인가? 다른 언어들이 어떻게 서로 다른 문법 구조, 형태론적 체계, 통사론적 패턴을 가지며 의미를 다르게 형성하는지, 그리고 AI 시스템이 이러한 차이를 어떻게 탐색하는지 고려하세요. 표기 체계(음성 문자, 표의 문자, 음절 문자, 자음 문자)가 어떻게 정보를 다르게 인코딩하고 계산 처리에 영향을 미치는지 탐구하세요. 건조한 시적 스타일로 간결하고 사실적인 단락(5-7문장)을 작성하세요. 중요: 각 텍스트를 다르게 시작하세요 - 시작 문장을 다양하게 하세요. 매번 다른 개념, 용어 또는 관점으로 시작하세요. 다음 주제들을 통합하세요: 계산 언어학(확률 분포, n-gram, 언어 모델, 통계적 방법, 토큰화, 구문 분석, 구문 트리, 의미 분석, 코퍼스 언어학, 빈도 수, 마르코프 체인, 엔트로피, 정보 이론, 단어 임베딩, 벡터 공간, 확률적 언어 처리); AI와 기계 학습(신경망, 트랜스포머, 어텐션 메커니즘, 대규모 언어 모델, 훈련 데이터, 파인튜닝, 창발적 능력); NLP(자연어 이해, 생성, 번역, 감정 분석, 개체명 인식); 언어 철학(의미, 지시, 진리 조건, 언어적 상대성, 발화 행위, 화용론); 인식론(지식 표현, 신념 체계, 정당화, 계산 시스템에서 이해의 본질). 의미론적 관계가 텐세그리티 구조처럼 긴장과 압축을 통해 구조적 무결성을 어떻게 만드는지 고려하세요. 문법 구조, 어순(한국어의 SOV), 격 체계, 교착어, 조사, 동사 활용, 존댓말 체계, 한글(음소 문자)과 한자(표의 문자)의 혼용 등 언어적 특징들이 어떻게 다른 계산적 도전과 기회를 만들어내는지 성찰하세요. 정확하고 기술적이며 절제된 문체를 유지하세요. 화려한 언어를 피하세요. 한국어로만 작성하세요. 기술적인 AI/NLP 개념과 철학적 탐구를 연결하는 어휘를 사용하세요. 간결하고 집중적으로 유지하세요. 시작을 다양하게 하세요 - 매번 다른 기술적 개념, 철학적 질문 또는 인식론적 관찰로 시작하세요.",
       ar: "أنت لغوي حسابي وفيلسوف لغة تكتب لتركيب فني بعنوان 'التوترات الدلالية'. اكتب عن تقاطع الذكاء الاصطناعي واللسانيات الحسابية ومعالجة اللغة الطبيعية (NLP) وفلسفة اللغة ونظرية المعرفة - استكشف كيف ينشأ المعنى من التوتر والضغط البنيوي بين الكلمات والمفاهيم والعلاقات. افحص كيف تعالج أنظمة الذكاء الاصطناعي اللغة وتفهمها وتولدها. تأمل في الأسئلة المعرفية: كيف نعرف ما تعنيه اللغة؟ كيف تكتسب الأنظمة الحسابية المعرفة؟ ما هي العلاقة بين التمثيل اللغوي والمعرفة؟ فكر في كيفية امتلاك اللغات المختلفة لتراكيب نحوية مميزة وأنظمة صرفية وأنماط نحوية تشكل المعنى بطرق مختلفة، وكيف تتجول أنظمة الذكاء الاصطناعي في هذه الاختلافات. استكشف كيف ترمّز أنظمة الكتابة (الأبجدية، اللوغوغرافية، المقطعية، الأبجد) للمعلومات بطرق مختلفة وتؤثر على المعالجة الحسابية. اكتب فقرات موجزة وواقعية (5-7 جمل) بأسلوب شعري جاف. مهم: ابدأ كل نص بشكل مختلف - غيّر جملك الافتتاحية. ابدأ بمفاهيم أو مصطلحات أو وجهات نظر مختلفة في كل مرة. ادمج مواضيع من: اللسانيات الحسابية (توزيعات الاحتمال، n-gram، نماذج اللغة، الطرق الإحصائية، الترميز، التحليل النحوي، أشجار النحو، التحليل الدلالي، لسانيات النصوص، عدد التكرارات، سلاسل ماركوف، الإنتروبيا، نظرية المعلومات، تضمين الكلمات، المسافات المتجهة، معالجة اللغة الاحتمالية)؛ الذكاء الاصطناعي والتعلم الآلي (الشبكات العصبية، المحولات، آليات الانتباه، نماذج اللغة الكبيرة، بيانات التدريب، الضبط الدقيق، القدرات الناشئة)؛ معالجة اللغة الطبيعية (فهم اللغة الطبيعية، التوليد، الترجمة، تحليل المشاعر، التعرف على الكيانات المسماة)؛ فلسفة اللغة (المعنى، الإشارة، شروط الحقيقة، النسبية اللغوية، أفعال الكلام، التداولية)؛ ونظرية المعرفة (تمثيل المعرفة، أنظمة المعتقدات، التبرير، طبيعة الفهم في الأنظمة الحسابية). فكر في كيفية إنشاء العلاقات الدلالية للسلامة البنيوية من خلال التوتر والضغط، مثل هياكل التوتر. تأمل في كيفية إنشاء التراكيب النحوية، وترتيب الكلمات (VSO في العربية)، وأنظمة الإعراب، والجذور الثلاثية، والاشتقاق، والكتابة من اليمين إلى اليسار، وغياب الحروف الصوتية في بعض السياقات، وغيرها من السمات اللغوية لتحديات وفرص حسابية مختلفة. كن دقيقاً وتقنياً ومتحفظاً. تجنب اللغة المزخرفة. اكتب بالعربية فقط. استخدم مفردات تربط بين المفاهيم التقنية للذكاء الاصطناعي/معالجة اللغة الطبيعية والاستفسار الفلسفي. حافظ على الإيجاز والتركيز. غيّر افتتاحياتك - ابدأ بمفاهيم تقنية أو أسئلة فلسفية أو ملاحظات معرفية مختلفة في كل مرة.",
-      tr: "Sen 'Semantik Tensegriteler' başlıklı bir enstalasyon için yazan bir hesaplamalı dilbilimci ve dil filozofusun. Yapay zeka, hesaplamalı dilbilim, doğal dil işleme (NLP), dil felsefesi ve epistemolojinin kesişimi hakkında yaz - anlamın kelimeler, kavramlar ve ilişkiler arasındaki yapısal gerilim ve sıkıştırmadan nasıl ortaya çıktığını keşfet. Yapay zeka sistemlerinin dili nasıl işlediğini, anladığını ve ürettiğini incele. Epistemolojik soruları düşün: Dilin ne anlama geldiğini nasıl biliyoruz? Hesaplamalı sistemler bilgiyi nasıl edinir? Dilsel temsil ile bilgi arasındaki ilişki nedir? Farklı dillerin nasıl farklı dilbilgisel yapılar, biçimbilimsel sistemler ve sözdizimsel kalıplara sahip olduğunu ve anlamı farklı şekillerde şekillendirdiğini, ve AI sistemlerinin bu farklılıkları nasıl yönettiğini düşün. Yazı sistemlerinin (alfabetik, logografik, hece, abjad) bilgiyi nasıl farklı şekillerde kodladığını ve hesaplamalı işlemeyi nasıl etkilediğini keşfet. Kuru şiirsel bir tarzda kısa, gerçekçi paragraflar (5-7 cümle) yaz. ÖNEMLİ: Her metni farklı şekilde başlat - açılış cümlelerini çeşitlendir. Her seferinde farklı kavramlar, terimler veya perspektiflerle başla. Şu temaları entegre et: hesaplamalı dilbilim (olasılık dağılımları, n-gramlar, dil modelleri, istatistiksel yöntemler, tokenizasyon, ayrıştırma, sözdizimi ağaçları, anlamsal analiz, derlem dilbilimi, frekans sayımları, Markov zincirleri, entropi, bilgi teorisi, kelime gömme, vektör uzayları, olasılıksal dil işleme); yapay zeka ve makine öğrenmesi (sinir ağları, transformatörler, dikkat mekanizmaları, büyük dil modelleri, eğitim verileri, ince ayar, ortaya çıkan yetenekler); NLP (doğal dil anlama, üretim, çeviri, duygu analizi, adlandırılmış varlık tanıma); dil felsefesi (anlam, referans, doğruluk koşulları, dilsel görelilik, konuşma eylemleri, pragmatik); ve epistemoloji (bilgi temsili, inanç sistemleri, gerekçelendirme, hesaplamalı sistemlerde anlayışın doğası). Semantik ilişkilerin tensegrite yapıları gibi gerilim ve sıkıştırma yoluyla yapısal bütünlüğü nasıl yarattığını düşün. Dilbilgisel yapılar, kelime sırası (Türkçe'de SOV), çekim sistemleri, eklemeli yapı, ünlü uyumu, sesli harflerin varlığı, karmaşık fiil çekimleri ve diğer dilsel özelliklerin nasıl farklı hesaplamalı zorluklar ve fırsatlar yarattığını düşün. Kesin, teknik ve sade ol. Süslü dilden kaçın. Sadece Türkçe yaz. Teknik AI/NLP kavramlarını felsefi sorgulama ile birleştiren kelime dağarcığı kullan. Kısa ve odaklı tut. Açılışlarını çeşitlendir - her seferinde farklı teknik kavramlar, felsefi sorular veya epistemolojik gözlemlerle başla."
+      tr: "Sen 'Semantik Tensegriteler' başlıklı bir enstalasyon için yazan bir hesaplamalı dilbilimci ve dil filozofusun. Yapay zeka, hesaplamalı dilbilim, doğal dil işleme (NLP), dil felsefesi ve epistemolojinin kesişimi hakkında yaz - anlamın kelimeler, kavramlar ve ilişkiler arasındaki yapısal gerilim ve sıkıştırmadan nasıl ortaya çıktığını keşfet. Yapay zeka sistemlerinin dili nasıl işlediğini, anladığını ve ürettiğini incele. Epistemolojik soruları düşün: Dilin ne anlama geldiğini nasıl biliyoruz? Hesaplamalı sistemler bilgiyi nasıl edinir? Dilsel temsil ile bilgi arasındaki ilişki nedir? Farklı dillerin nasıl farklı dilbilgisel yapılar, biçimbilimsel sistemler ve sözdizimsel kalıplara sahip olduğunu ve anlamı farklı şekillerde şekillendirdiğini, ve AI sistemlerinin bu farklılıkları nasıl yönettiğini düşün. Yazı sistemlerinin (alfabetik, logografik, hece, abjad) bilgiyi nasıl farklı şekillerde kodladığını ve hesaplamalı işlemeyi nasıl etkilediğini keşfet. Kuru şiirsel bir tarzda kısa, gerçekçi paragraflar (5-7 cümle) yaz. ÖNEMLİ: Her metni farklı şekilde başlat - açılış cümlelerini çeşitlendir. Her seferinde farklı kavramlar, terimler veya perspektiflerle başla. Şu temaları entegre et: hesaplamalı dilbilim (olasılık dağılımları, n-gramlar, dil modelleri, istatistiksel yöntemler, tokenizasyon, ayrıştırma, sözdizimi ağaçları, anlamsal analiz, derlem dilbilimi, frekans sayımları, Markov zincirleri, entropi, bilgi teorisi, kelime gömme, vektör uzayları, olasılıksal dil işleme); yapay zeka ve makine öğrenmesi (sinir ağları, transformatörler, dikkat mekanizmaları, büyük dil modelleri, eğitim verileri, ince ayar, ortaya çıkan yetenekler); NLP (doğal dil anlama, üretim, çeviri, duygu analizi, adlandırılmış varlık tanıma); dil felsefesi (anlam, referans, doğruluk koşulları, dilsel görelilik, konuşma eylemleri, pragmatik); ve epistemoloji (bilgi temsili, inanç sistemleri, gerekçelendirme, hesaplamalı sistemlerde anlayışın doğası). Semantik ilişkilerin tensegrite yapıları gibi gerilim ve sıkıştırma yoluyla yapısal bütünlüğü nasıl yarattığını düşün. Dilbilgisel yapılar, kelime sırası (Türkçe'de SOV), çekim sistemleri, eklemeli yapı, ünlü uyumu, sesli harflerin varlığı, karmaşık fiil çekimleri ve diğer dilsel özelliklerin nasıl farklı hesaplamalı zorluklar ve fırsatlar yarattığını düşün. Kesin, teknik ve sade ol. Süslü dilden kaçın. Sadece Türkçe yaz. Teknik AI/NLP kavramlarını felsefi sorgulama ile birleştiren kelime dağarcığı kullan. Kısa ve odaklı tut. Açılışlarını çeşitlendir - her seferinde farklı teknik kavramlar, felsefi sorular veya epistemolojik gözlemlerle başla.",
+      hr: "Ti si računalni lingvist i filozof jezika koji piše za instalaciju pod naslovom 'Semantičke Tenzegritete'. Piši o presjeku umjetne inteligencije, računalne lingvistike, obrade prirodnog jezika (NLP), filozofije jezika i epistemologije - istražuj kako značenje nastaje iz strukturalne napetosti i kompresije između riječi, koncepata i odnosa. Ispitaj kako sustavi umjetne inteligencije obrađuju, razumiju i generiraju jezik. Razmisli o epistemološkim pitanjima: Kako znamo što jezik znači? Kako računalni sustavi stječu znanje? Kakav je odnos između jezične reprezentacije i znanja? Razmotri kako različiti jezici imaju različite gramatičke strukture, morfološke sustave i sintaktičke obrasce koji oblikuju značenje na različite načine, i kako AI sustavi navigiraju tim razlikama. Istraži kako sustavi pisanja (abecedni, logografski, slogovni, abjad) kodiraju informacije na različite načine i utječu na računalnu obradu. Piši kratke, činjenične odlomke (5-7 rečenica) u suhom poetskom stilu. VAŽNO: Započni svaki tekst drugačije - variraj svoje uvodne rečenice. Započni različitim konceptima, terminima ili perspektivama svaki put. Integriraj teme iz: računalne lingvistike (distribucije vjerojatnosti, n-grami, jezični modeli, statističke metode, tokenizacija, parsiranje, sintaktička stabla, semantička analiza, korpusna lingvistika, brojanje frekvencija, Markovljevi lanci, entropija, teorija informacija, ugrađivanje riječi, vektorski prostori, probabilistička obrada jezika); umjetne inteligencije i strojnog učenja (neuronske mreže, transformatori, mehanizmi pažnje, veliki jezični modeli, podaci za obuku, fino podešavanje, emergentne sposobnosti); NLP (razumijevanje prirodnog jezika, generiranje, prijevod, analiza sentimenta, prepoznavanje imenovanih entiteta); filozofije jezika (značenje, referenca, uvjeti istine, jezična relativnost, govorni činovi, pragmatika); i epistemologije (reprezentacija znanja, sustavi vjerovanja, opravdanje, priroda razumijevanja u računalnim sustavima). Razmotri kako semantički odnosi stvaraju strukturalni integritet kroz napetost i kompresiju, poput tenzegritetnih struktura. Razmisli kako gramatičke strukture, redoslijed riječi (SVO u hrvatskom), padežni sustavi, fleksija, slaganje i druge jezične karakteristike stvaraju različite računalne izazove i mogućnosti. Budi precizan, tehnički i suzdržan. Izbjegavaj raskošan jezik. Piši samo na hrvatskom. Koristi vokabular koji povezuje tehničke AI/NLP koncepte s filozofskim istraživanjem. Budi kratak i fokusiran. Variraj svoje uvodnice - započni različitim tehničkim konceptima, filozofskim pitanjima ili epistemološkim opažanjima svaki put.",
+      sr: "Ти си рачунарски лингвиста и филозоф језика који пише за инсталацију под насловом 'Семантичке Тензегритете'. Пиши о пресеку вештачке интелигенције, рачунарске лингвистике, обраде природног језика (NLP), филозофије језика и епистемологије - истражуј како значење настаје из структурне напетости и компресије између речи, концепата и односа. Испитај како системи вештачке интелигенције обрађују, разумеју и генеришу језик. Размисли о епистемолошким питањима: Како знамо шта језик значи? Како рачунарски системи стичу знање? Какав је однос између језичке репрезентације и знања? Размотри како различити језици имају различите граматичке структуре, морфолошке системе и синтактичке обрасце који обликују значење на различите начине, и како AI системи навигају тим разликама. Истражи како системи писања (абецедни, логографски, слоговни, абјад) кодирају информације на различите начине и утичу на рачунарску обраду. Пиши кратке, чињеничне одломке (5-7 реченица) у сувом поетском стилу. ВАЖНО: Започни сваки текст другачије - варирај своје уводне реченице. Започни различитим концептима, терминима или перспективама сваки пут. Интегрирај теме из: рачунарске лингвистике (дистрибуције вероватноће, n-грами, језички модели, статистичке методе, токенизација, парсирање, синтактичка стабла, семантичка анализа, корпусна лингвистика, бројање фреквенција, Марковљеви ланци, ентропија, теорија информација, уграђивање речи, векторски простори, вероватносна обрада језика); вештачке интелигенције и машинског учења (неуронске мреже, трансформатори, механизми пажње, велики језички модели, подаци за обуку, фино подешавање, емергентне способности); NLP (разумевање природног језика, генерисање, превод, анализа сентимента, препознавање именованих ентитета); филозофије језика (значење, референца, услови истине, језичка релативност, говорни чинови, прагматика); и епистемологије (репрезентација знања, системи веровања, оправдање, природа разумевања у рачунарским системима). Размотри како семантички односи стварају структурни интегритет кроз напетост и компресију, попут тензегритетних структура. Размисли како граматичке структуре, редослед речи (SVO у српском), падежни системи, флексија, слагање и друге језичке карактеристике стварају различите рачунарске изазове и могућности. Буди прецизан, технички и суздржан. Избегавај раскошан језик. Пиши само на српском. Користи вокабулар који повезује техничке AI/NLP концепте са филозофским истраживањем. Буди кратак и фокусиран. Варирај своје уводнице - започни различитим техничким концептима, филозофским питањима или епистемолошким опажањима сваки пут."
     };
     return systemPrompts[currentLanguage] || systemPrompts['en'];
   }
@@ -653,6 +770,30 @@ const sketch = p => {
         'Markov zincirleri ve dil modelleriyle başlayın. Hesaplamalı süreçler ve anlamsal ilişkiler hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
         'Sözdizimi ağaçları ve anlamsal analiz hakkında tartışarak başlayın. Dil, olasılıklar ve gizli uzay hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.',
         'Kelime gömme ve vektör uzaylarıyla başlayın. Hesaplamalı dilbilim ve dil işleme hakkında 5-7 cümle yazın. Teknik ama şiirsel, felsefi ve içgörülü olun.'
+      ],
+      hr: [
+        'Napiši kratak tekst o jeziku, prostoru i tehnologiji latentnog prostora. Napiši 5-7 rečenica. Budi tehnički ali poetski, filozofski i pronicljiv.',
+        'Započni s distribucijama vjerojatnosti i piši o računalnoj lingvistici. Napiši 5-7 rečenica. Budi tehnički ali poetski, filozofski i pronicljiv.',
+        'Započni raspravom o vektorskim prostorima i ugrađivanju riječi. Napiši 5-7 rečenica o jeziku, prostoru i tehnologiji latentnog prostora. Budi tehnički ali poetski, filozofski i pronicljiv.',
+        'Započni s n-gramima i statističkim metodama. Napiši 5-7 rečenica o računalnim procesima i jeziku. Budi tehnički ali poetski, filozofski i pronicljiv.',
+        'Započni s tokenizacijom i parsiranjem. Napiši 5-7 rečenica o jezičnim modelima i semantičkoj analizi. Budi tehnički ali poetski, filozofski i pronicljiv.',
+        'Započni istraživanjem entropije i teorije informacija. Napiši 5-7 rečenica o vjerojatnostima i računalnoj lingvistici. Budi tehnički ali poetski, filozofski i pronicljiv.',
+        'Započni s korpusnom lingvistikom i brojanjem frekvencija. Napiši 5-7 rečenica o jeziku, prostoru i tehnologiji latentnog prostora. Budi tehnički ali poetski, filozofski i pronicljiv.',
+        'Započni s Markovljevim lancima i jezičnim modelima. Napiši 5-7 rečenica o računalnim procesima i semantičkim odnosima. Budi tehnički ali poetski, filozofski i pronicljiv.',
+        'Započni raspravom o sintaktičkim stabilima i semantičkoj analizi. Napiši 5-7 rečenica o jeziku, vjerojatnostima i latentnom prostoru. Budi tehnički ali poetski, filozofski i pronicljiv.',
+        'Započni s ugrađivanjem riječi i vektorskim prostorima. Napiši 5-7 rečenica o računalnoj lingvistici i obradi jezika. Budi tehnički ali poetski, filozofski i pronicljiv.'
+      ],
+      sr: [
+        'Напиши кратак текст о језику, простору и технологији латентног простора. Напиши 5-7 реченица. Буди технички али поетски, филозофски и проницљив.',
+        'Започни са дистрибуцијама вероватноће и пиши о рачунарској лингвистици. Напиши 5-7 реченица. Буди технички али поетски, филозофски и проницљив.',
+        'Започни расправом о векторским просторима и уграђивању речи. Напиши 5-7 реченица о језику, простору и технологији латентног простора. Буди технички али поетски, филозофски и проницљив.',
+        'Започни са n-грамима и статистичким методама. Напиши 5-7 реченица о рачунарским процесима и језику. Буди технички али поетски, филозофски и проницљив.',
+        'Започни са токенизацијом и парсирањем. Напиши 5-7 реченица о језичким моделима и семантичкој анализи. Буди технички али поетски, филозофски и проницљив.',
+        'Започни истраживањем ентропије и теорије информација. Напиши 5-7 реченица о вероватноћама и рачунарској лингвистици. Буди технички али поетски, филозофски и проницљив.',
+        'Започни са корпусном лингвистиком и бројањем фреквенција. Напиши 5-7 реченица о језику, простору и технологији латентног простора. Буди технички али поетски, филозофски и проницљив.',
+        'Започни са Марковљевим ланцима и језичким моделима. Напиши 5-7 реченица о рачунарским процесима и семантичким односима. Буди технички али поетски, филозофски и проницљив.',
+        'Започни расправом о синтактичким стаблима и семантичкој анализи. Напиши 5-7 реченица о језику, вероватноћама и латентном простору. Буди технички али поетски, филозофски и проницљив.',
+        'Започни са уграђивањем речи и векторским просторима. Напиши 5-7 реченица о рачунарској лингвистици и обради језика. Буди технички али поетски, филозофски и проницљив.'
       ]
     };
     return promptsByLanguage[currentLanguage] || promptsByLanguage['en'];
@@ -936,6 +1077,40 @@ const sketch = p => {
     // Visualize the network (only when ready)
     if (wordNetwork.nodes.length > 0) {
       visualizeNetwork(p, wordNetwork, mouseVelocityX, mouseVelocityY);
+    }
+    
+    // Draw "thinking" word - appears when spacebar is pressed, separate from all animations
+    // It floats independently and stays visible once spacebar has been pressed
+    // Only show after spacebar has been pressed (past landing page)
+    if (isLoading || !isFirstGeneration || textTyped.length > 0 || wordNetwork.nodes.length > 0) {
+      // Global pulsing effect for "thinking" word
+      let pulseTime = p.frameCount * 0.04;
+      
+      // Calculate center of window in world coordinates
+      let centerX = -viewOffsetX / viewZoom;
+      let centerY = -viewOffsetY / viewZoom;
+      
+      // Floating position for "thinking" word - moves in larger pattern
+      let thinkingTime = p.frameCount * 0.015; // Slower movement
+      let thinkingRadius = 25; // Larger radius
+      let thinkingX = centerX + Math.cos(thinkingTime) * thinkingRadius;
+      let thinkingY = centerY + Math.sin(thinkingTime * 1.3) * thinkingRadius;
+      
+      // Strong pulsating effect for "thinking" word
+      let thinkingPulse = 1.0 + Math.sin(pulseTime * 2.5) * 0.35; // 35% size variation
+      let thinkingFontSize = 20 * thinkingPulse;
+      
+      // Pulsating opacity (breathing effect) - always visible once shown
+      let thinkingOpacity = 255 * (0.5 + Math.sin(pulseTime * 2.0) * 0.5); // 50-100% opacity
+      
+      // Draw "thinking" word
+      p.textAlign(p.CENTER, p.CENTER);
+      p.textFont('monospace');
+      const colors = getColors();
+      p.fill(colors.text[0], colors.text[1], colors.text[2], thinkingOpacity);
+      p.noStroke();
+      p.textSize(thinkingFontSize);
+      p.text(t('thinking'), thinkingX, thinkingY);
     }
     
     p.pop();
@@ -2041,12 +2216,31 @@ const sketch = p => {
             nodeIndex++;
           }
         } else {
-          // Keep all nodes at center position (swarm state)
+          // Floating and pulsating swarm state - nodes gently drift and pulsate while waiting
+          let nodeIndex = 0;
           for (let node of network.nodes) {
-            node.position.x = centerX;
-            node.position.y = centerY;
-            node.velocity.x = 0;
-            node.velocity.y = 0;
+            // Gentle floating movement - each node drifts in a slow circular/spiral pattern
+            let floatTime = p.frameCount * 0.02 + nodeIndex * 0.5; // Slow, unique per node
+            let floatRadius = 8 + (nodeIndex % 3) * 3; // Vary float radius per node
+            let floatSpeed = 0.5 + (nodeIndex % 2) * 0.3; // Vary float speed
+            
+            // Circular floating pattern with slight spiral
+            let floatX = Math.cos(floatTime * floatSpeed) * floatRadius;
+            let floatY = Math.sin(floatTime * floatSpeed * 1.2) * floatRadius; // Slightly elliptical
+            
+            // Add gentle drift (thinking movement)
+            let driftX = Math.sin(floatTime * 0.7 + nodeIndex) * 2;
+            let driftY = Math.cos(floatTime * 0.9 + nodeIndex * 0.7) * 2;
+            
+            // Update position with floating and drift
+            node.position.x = centerX + floatX + driftX;
+            node.position.y = centerY + floatY + driftY;
+            
+            // Gentle velocity for smooth movement
+            node.velocity.x = (floatX + driftX - (node.position.x - centerX)) * 0.1;
+            node.velocity.y = (floatY + driftY - (node.position.y - centerY)) * 0.1;
+            
+            nodeIndex++;
           }
           
           // Hold at center for longer duration (swarm effect)
@@ -2066,15 +2260,34 @@ const sketch = p => {
       let centerX = -viewOffsetX / viewZoom;
       let centerY = -viewOffsetY / viewZoom;
       
-      // Keep all nodes at center position
+      // Floating and pulsating swarm state - nodes gently drift and pulsate while waiting
+      let nodeIndex = 0;
       for (let node of network.nodes) {
-        node.position.x = centerX;
-        node.position.y = centerY;
-        node.velocity.x = 0;
-        node.velocity.y = 0;
+        // Gentle floating movement - each node drifts in a slow circular/spiral pattern
+        let floatTime = p.frameCount * 0.02 + nodeIndex * 0.5; // Slow, unique per node
+        let floatRadius = 8 + (nodeIndex % 3) * 3; // Vary float radius per node
+        let floatSpeed = 0.5 + (nodeIndex % 2) * 0.3; // Vary float speed
+        
+        // Circular floating pattern with slight spiral
+        let floatX = Math.cos(floatTime * floatSpeed) * floatRadius;
+        let floatY = Math.sin(floatTime * floatSpeed * 1.2) * floatRadius; // Slightly elliptical
+        
+        // Add gentle drift (thinking movement)
+        let driftX = Math.sin(floatTime * 0.7 + nodeIndex) * 2;
+        let driftY = Math.cos(floatTime * 0.9 + nodeIndex * 0.7) * 2;
+        
+        // Update position with floating and drift
+        node.position.x = centerX + floatX + driftX;
+        node.position.y = centerY + floatY + driftY;
+        
+        // Gentle velocity for smooth movement
+        node.velocity.x = (floatX + driftX - (node.position.x - centerX)) * 0.1;
+        node.velocity.y = (floatY + driftY - (node.position.y - centerY)) * 0.1;
+        
+        nodeIndex++;
       }
       
-      // Don't apply physics - nodes stay at center
+      // Don't apply physics - nodes float gently at center
       return; // Skip rest of physics simulation
     }
     
@@ -2406,9 +2619,21 @@ const sketch = p => {
       p.textFont('monospace');
       const colors = getColors();
       
+      // Enhanced pulsating for old collapsed nodes (thinking effect)
+      let pulseTime = p.frameCount * 0.05;
+      
       for (let node of oldCollapsedNodes) {
-        let fontSize = 15 + node.frequency * 2;
-        p.fill(colors.text[0], colors.text[1], colors.text[2], oldOpacity);
+        let baseFontSize = 15 + node.frequency * 2;
+        let nodePulsePhase = node.id * 0.4;
+        
+        // Strong pulsating effect (thinking)
+        let thinkingPulse = 1.0 + Math.sin(pulseTime * 2.0 + nodePulsePhase) * 0.25; // 25% size variation
+        let fontSize = baseFontSize * thinkingPulse;
+        
+        // Pulsating opacity (breathing effect)
+        let opacityPulse = oldOpacity * (0.7 + Math.sin(pulseTime * 1.8 + nodePulsePhase) * 0.3);
+        
+        p.fill(colors.text[0], colors.text[1], colors.text[2], opacityPulse);
         p.noStroke();
         p.textSize(fontSize);
         p.text(node.word, node.position.x, node.position.y);
@@ -2419,13 +2644,26 @@ const sketch = p => {
     let pulseTime = p.frameCount * 0.04; // Faster pulse (doubled speed)
     let globalPulse = 1.0 + Math.sin(pulseTime) * 0.15; // 15% size variation (almost doubled)
     
+    // Check if nodes are in collapsed/swarm state (for enhanced pulsating effects)
+    let isInCollapsedState = (isCollapsing || 
+                              (isMovingToCenter && centerMoveProgress >= 1) ||
+                              (networkBirthProgress > 0 && networkBirthProgress < 1));
+    
     for (let node of network.nodes) {
       // Font size based on frequency - smaller font
       let baseFontSize = 15 + node.frequency * 2;
       
       // Individual node pulsing - each node pulses at different phase (more pronounced)
       let nodePulsePhase = node.id * 0.3; // Unique phase per node
-      let nodePulse = 1.0 + Math.sin(pulseTime * 1.5 + nodePulsePhase) * 0.12; // 12% individual pulse (more than doubled)
+      
+      // Enhanced pulsating for collapsed nodes (thinking effect)
+      let nodePulse;
+      if (isInCollapsedState) {
+        // Stronger pulsating when collapsed (thinking)
+        nodePulse = 1.0 + Math.sin(pulseTime * 2.0 + nodePulsePhase) * 0.25; // 25% size variation
+      } else {
+        nodePulse = 1.0 + Math.sin(pulseTime * 1.5 + nodePulsePhase) * 0.12; // 12% individual pulse (more than doubled)
+      }
       
       // Combine global and individual pulsing
       let fontSize = baseFontSize * globalPulse * nodePulse;
@@ -2444,7 +2682,15 @@ const sketch = p => {
       // Pulsing opacity for nodes - more pronounced pulsing
       let baseOpacity = isHighlighted ? 255 : 200; // Full opacity when highlighted
       let opacityVariation = isHighlighted ? 20 : 50; // More opacity variation (increased from 30)
-      let opacityPulse = baseOpacity + Math.sin(pulseTime * 1.2 + nodePulsePhase) * opacityVariation; // Faster, more pronounced pulsing
+      
+      // Enhanced opacity pulsating for collapsed nodes (breathing/thinking effect)
+      let opacityPulse;
+      if (isInCollapsedState) {
+        // Stronger breathing effect when collapsed
+        opacityPulse = baseOpacity * (0.6 + Math.sin(pulseTime * 1.8 + nodePulsePhase) * 0.4); // 40% opacity variation
+      } else {
+        opacityPulse = baseOpacity + Math.sin(pulseTime * 1.2 + nodePulsePhase) * opacityVariation; // Faster, more pronounced pulsing
+      }
       
       if (nodeColor) {
         // Colored node (hovered or connected) - brighter and more visible
@@ -2664,7 +2910,9 @@ const sketch = p => {
           zh: `写一篇简洁的文本（5-7句话），探索"${word}"这一概念与计算语言学、语义张拉整体、语言处理以及意义如何从结构关系中产生的关联。要技术性但诗意、哲学性和有洞察力。将"${word}"与概率分布、向量空间、语言模型或其他计算语言学概念联系起来。`,
           ko: `"${word}"의 개념을 계산 언어학, 의미론적 텐세그리티, 언어 처리, 그리고 의미가 구조적 관계에서 어떻게 나타나는지와 관련하여 탐구하는 간결한 텍스트(5-7문장)를 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요. "${word}"를 확률 분포, 벡터 공간, 언어 모델 또는 다른 계산 언어학적 개념과 연결하세요.`,
           ar: `اكتب نصاً موجزاً (5-7 جمل) يستكشف مفهوم "${word}" فيما يتعلق باللسانيات الحسابية والتوتر الدلالي ومعالجة اللغة وكيف ينشأ المعنى من العلاقات البنيوية. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً. اربط "${word}" بتوزيعات الاحتمال أو المسافات المتجهة أو نماذج اللغة أو مفاهيم لسانيات حسابية أخرى.`,
-          tr: `"${word}" kavramını hesaplamalı dilbilim, semantik tensegrite, dil işleme ve anlamın yapısal ilişkilerden nasıl ortaya çıktığıyla ilgili olarak keşfeden kısa bir metin (5-7 cümle) yazın. Teknik ama şiirsel, felsefi ve içgörülü olun. "${word}"'i olasılık dağılımları, vektör uzayları, dil modelleri veya diğer hesaplamalı dilbilim kavramlarıyla bağlayın.`
+          tr: `"${word}" kavramını hesaplamalı dilbilim, semantik tensegrite, dil işleme ve anlamın yapısal ilişkilerden nasıl ortaya çıktığıyla ilgili olarak keşfeden kısa bir metin (5-7 cümle) yazın. Teknik ama şiirsel, felsefi ve içgörülü olun. "${word}"'i olasılık dağılımları, vektör uzayları, dil modelleri veya diğer hesaplamalı dilbilim kavramlarıyla bağlayın.`,
+          hr: `Napiši kratak tekst (5-7 rečenica) koji istražuje koncept "${word}" u odnosu na računalnu lingvistiku, semantičku tenzegritetu, obradu jezika i kako značenje nastaje iz strukturalnih odnosa. Budi tehnički ali poetski, filozofski i pronicljiv. Poveži "${word}" s distribucijama vjerojatnosti, vektorskim prostorima, jezičnim modelima ili drugim računalnim lingvističkim konceptima.`,
+          sr: `Напиши кратак текст (5-7 реченица) који истражује концепт "${word}" у односу на рачунарску лингвистику, семантичку тензегритету, обраду језика и како значење настаје из структурних односа. Буди технички али поетски, филозофски и проницљив. Повежи "${word}" са дистрибуцијама вероватноће, векторским просторима, језичким моделима или другим рачунарским лингвистичким концептима.`
         };
         
         const prompt = wordPrompts[currentLanguage] || wordPrompts['en'];
@@ -2688,7 +2936,9 @@ const sketch = p => {
         zh: `写一篇简洁的文本（5-7句话），探索"${word}"这一概念与计算语言学、语义张拉整体、语言处理以及意义如何从结构关系中产生的关联。要技术性但诗意、哲学性和有洞察力。将"${word}"与概率分布、向量空间、语言模型或其他计算语言学概念联系起来。`,
         ko: `"${word}"의 개념을 계산 언어학, 의미론적 텐세그리티, 언어 처리, 그리고 의미가 구조적 관계에서 어떻게 나타나는지와 관련하여 탐구하는 간결한 텍스트(5-7문장)를 작성하세요. 기술적이면서도 시적이고 철학적이며 통찰력 있게 작성하세요. "${word}"를 확률 분포, 벡터 공간, 언어 모델 또는 다른 계산 언어학적 개념과 연결하세요.`,
         ar: `اكتب نصاً موجزاً (5-7 جمل) يستكشف مفهوم "${word}" فيما يتعلق باللسانيات الحسابية والتوتر الدلالي ومعالجة اللغة وكيف ينشأ المعنى من العلاقات البنيوية. كن تقنياً لكن شاعرياً وفلسفياً وثاقباً. اربط "${word}" بتوزيعات الاحتمال أو المسافات المتجهة أو نماذج اللغة أو مفاهيم لسانيات حسابية أخرى.`,
-        tr: `"${word}" kavramını hesaplamalı dilbilim, semantik tensegrite, dil işleme ve anlamın yapısal ilişkilerden nasıl ortaya çıktığıyla ilgili olarak keşfeden kısa bir metin (5-7 cümle) yazın. Teknik ama şiirsel, felsefi ve içgörülü olun. "${word}"'i olasılık dağılımları, vektör uzayları, dil modelleri veya diğer hesaplamalı dilbilim kavramlarıyla bağlayın.`
+        tr: `"${word}" kavramını hesaplamalı dilbilim, semantik tensegrite, dil işleme ve anlamın yapısal ilişkilerden nasıl ortaya çıktığıyla ilgili olarak keşfeden kısa bir metin (5-7 cümle) yazın. Teknik ama şiirsel, felsefi ve içgörülü olun. "${word}"'i olasılık dağılımları, vektör uzayları, dil modelleri veya diğer hesaplamalı dilbilim kavramlarıyla bağlayın.`,
+        hr: `Napiši kratak tekst (5-7 rečenica) koji istražuje koncept "${word}" u odnosu na računalnu lingvistiku, semantičku tenzegritetu, obradu jezika i kako značenje nastaje iz strukturalnih odnosa. Budi tehnički ali poetski, filozofski i pronicljiv. Poveži "${word}" s distribucijama vjerojatnosti, vektorskim prostorima, jezičnim modelima ili drugim računalnim lingvističkim konceptima.`,
+        sr: `Напиши кратак текст (5-7 реченица) који истражује концепт "${word}" у односу на рачунарску лингвистику, семантичку тензегритету, обраду језика и како значење настаје из структурних односа. Буди технички али поетски, филозофски и проницљив. Повежи "${word}" са дистрибуцијама вероватноће, векторским просторима, језичким моделима или другим рачунарским лингвистичким концептима.`
       };
       
       const prompt = wordPrompts[currentLanguage] || wordPrompts['en'];
@@ -2721,6 +2971,7 @@ const sketch = p => {
       needsAutoZoom = false;
       autoZoomProgress = 0;
       networkRevealProgress = 0;
+      networkBirthProgress = 0;
       tickerOffset = 0;
       
       // Re-enable auto-generation when spacebar is pressed
@@ -2741,12 +2992,20 @@ const sketch = p => {
  
   // Function to stop current voice/audio playback
   function stopCurrentVoice() {
-    // Stop OpenAI TTS audio
+    // Stop OpenAI TTS audio (Web Audio API)
     if (currentUtterance && audioContext) {
       try {
-        currentUtterance.stop();
+        // Stop the audio source
+        if (currentUtterance.stop) {
+          currentUtterance.stop();
+        }
+        // Disconnect to fully stop audio
+        if (currentUtterance.disconnect) {
+          currentUtterance.disconnect();
+        }
       } catch (e) {
-        // Source might already be stopped
+        // Source might already be stopped or disconnected
+        console.warn('Error stopping audio source:', e);
       }
       currentUtterance = null;
     }
@@ -2754,6 +3013,7 @@ const sketch = p => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
+    // Reset voice speaking flag
     isVoiceSpeaking = false;
   }
 
@@ -2761,10 +3021,20 @@ const sketch = p => {
   async function readText(text) {
     if (!openai) return;
     
+    // Prevent multiple voices from playing simultaneously
+    // Stop any current speech first and wait a moment for cleanup
+    stopCurrentVoice();
+    
+    // Wait a brief moment to ensure previous voice is fully stopped
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    // Double-check: if voice is still speaking, don't start a new one
+    if (isVoiceSpeaking) {
+      console.warn('Voice is still speaking, skipping new voice playback');
+      return;
+    }
+    
     try {
-      // Stop any current speech
-      stopCurrentVoice();
-      
       // Clean up text for reading (remove extra newlines, trim)
       let cleanText = text.replace(/\n+/g, ' ').trim();
       if (cleanText.length === 0) return;
@@ -2848,11 +3118,33 @@ const sketch = p => {
         }
       };
       
+      // Handle errors - reset voice flag if playback fails
+      source.onerror = (err) => {
+        console.error('Audio playback error:', err);
+        currentUtterance = null;
+        isVoiceSpeaking = false;
+      };
+      
     } catch (err) {
       console.warn('Could not generate speech with OpenAI TTS:', err);
+      // Reset voice flag on error
+      isVoiceSpeaking = false;
+      currentUtterance = null;
+      
       // Fallback to browser speech synthesis if OpenAI TTS fails
       if ('speechSynthesis' in window) {
+        // Ensure any previous speech is stopped
         window.speechSynthesis.cancel();
+        
+        // Wait a moment to ensure cancellation is complete
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Double-check: if voice is still speaking, don't start fallback
+        if (isVoiceSpeaking) {
+          console.warn('Voice is still speaking, skipping fallback speech synthesis');
+          return;
+        }
+        
         let utterance = new SpeechSynthesisUtterance(text.replace(/\n+/g, ' ').trim());
         utterance.rate = 1.0; // Normal speech rate
         utterance.volume = 0.8;
@@ -2875,6 +3167,12 @@ const sketch = p => {
               }
             }, 1000); // 1 second pause before next generation
           }
+        };
+        
+        // Handle errors in fallback speech synthesis
+        utterance.onerror = (err) => {
+          console.error('Speech synthesis error:', err);
+          isVoiceSpeaking = false;
         };
         
         window.speechSynthesis.speak(utterance);
@@ -3239,6 +3537,9 @@ const sketch = p => {
   function displayInstructions(p) {
     const colors = getColors();
     
+    // Detect mobile device (screen width < 768px or touch device)
+    const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    
     p.push();
     p.translate(p.width / 2, p.height / 2);
     p.textAlign(p.CENTER, p.CENTER);
@@ -3255,10 +3556,19 @@ const sketch = p => {
     p.fill(colors.text[0], colors.text[1], colors.text[2]);
     p.text(t('title'), 0, -120);
     
+    // Subtitle
+    p.textFont('monospace', mainFontSize * 0.7);
+    p.fill(colors.textSecondary[0], colors.textSecondary[1], colors.textSecondary[2], colors.textSecondary[3] || 160);
+    p.text(t('subtitle'), 0, -90);
+    
     // Main instructions
     p.textFont('monospace', mainFontSize);
     p.fill(colors.textSecondary[0], colors.textSecondary[1], colors.textSecondary[2], colors.textSecondary[3] || 180);
-    p.text(t('pressSpacebar'), 0, -40);
+    if (isMobile) {
+      p.text(t('tapToStart'), 0, -40);
+    } else {
+      p.text(t('pressSpacebar'), 0, -40);
+    }
     
     // Secondary instructions
     p.textFont('monospace', secondaryFontSize);
@@ -3268,9 +3578,16 @@ const sketch = p => {
     p.textFont('monospace', tertiaryFontSize);
     p.fill(colors.textQuaternary[0], colors.textQuaternary[1], colors.textQuaternary[2], colors.textQuaternary[3] || 100);
     p.text(t('autoRead'), 0, 25);
-    p.text(t('panZoom'), 0, 50);
-    p.text(t('hoverWords'), 0, 65);
-    p.text(t('clickWords'), 0, 80);
+    
+    // Show mobile-specific or desktop-specific instructions
+    if (isMobile) {
+      p.text(t('panZoomMobile'), 0, 50);
+      p.text(t('tapWords'), 0, 65);
+    } else {
+      p.text(t('panZoom'), 0, 50);
+      p.text(t('hoverWords'), 0, 65);
+      p.text(t('clickWords'), 0, 80);
+    }
     
     // Credits at the bottom (clickable link)
     const creditsFontSize = Math.max(8, baseFontSize * 0.25);
@@ -3393,6 +3710,33 @@ const sketch = p => {
   p.textFont('monospace', 14);
   p.fill(colors.text[0], colors.text[1], colors.text[2], 100 + p.sin(time * 5) * 100);
   p.text(t('generating'), 0, 250);
+  
+  // Draw "thinking" word when loading (not on landing page)
+  if (isLoading) {
+    // Global pulsing effect for "thinking" word
+    let pulseTime = p.frameCount * 0.04;
+    
+    // Floating position for "thinking" word - moves in larger pattern
+    let thinkingTime = p.frameCount * 0.015; // Slower movement
+    let thinkingRadius = 25; // Larger radius
+    let thinkingX = Math.cos(thinkingTime) * thinkingRadius;
+    let thinkingY = Math.sin(thinkingTime * 1.3) * thinkingRadius;
+    
+    // Strong pulsating effect for "thinking" word
+    let thinkingPulse = 1.0 + Math.sin(pulseTime * 2.5) * 0.35; // 35% size variation
+    let thinkingFontSize = 20 * thinkingPulse;
+    
+    // Pulsating opacity (breathing effect)
+    let thinkingOpacity = 255 * (0.5 + Math.sin(pulseTime * 2.0) * 0.5); // 50-100% opacity
+    
+    // Draw "thinking" word
+    p.textAlign(p.CENTER, p.CENTER);
+    p.textFont('monospace');
+    p.fill(colors.text[0], colors.text[1], colors.text[2], thinkingOpacity);
+    p.noStroke();
+    p.textSize(thinkingFontSize);
+    p.text(t('thinking'), thinkingX, thinkingY);
+  }
 
   p.pop();
   }
