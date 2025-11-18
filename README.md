@@ -23,12 +23,14 @@ The installation generates texts about computational linguistics, probability di
 ## Features
 
 ### Multi-Language Support
-- **13 Languages Available**: English, Spanish, French, German, Italian, Portuguese, Japanese, Chinese, Korean, Arabic, Turkish, Croatian, Serbian
+- **30 Languages Available**: English, Spanish, French, German, Italian, Portuguese, Japanese, Chinese, Korean, Arabic, Turkish, Croatian, Serbian, Russian, Hindi, Dutch, Polish, Swedish, Norwegian, Danish, Finnish, Greek, Hebrew, Vietnamese, Indonesian, Thai, Czech, Romanian, Hungarian, Bulgarian
 - **Language Menu**: Dropdown menu on the landing page (top right) to select your preferred language
-- **Fully Translated Interface**: All UI elements, instructions, and generated content adapt to the selected language
+- **Fully Translated Interface**: All UI elements, instructions, loading animations, and generated content adapt to the selected language
 - **Language-Aware Network**: Word extraction and visualization work correctly for all languages, including CJK characters, Arabic, Cyrillic, and Turkish
 - **Language-Aware Ticker**: Ticker direction adapts to language (LTR for most, RTL for Arabic, vertical for CJK languages)
 - **Language-Aware System Prompts**: System prompts reflect on grammatical structures, morphological systems, and writing systems specific to each language
+- **Language-Specific Generation**: Text generation uses native system prompts and generation prompts for each language, ensuring culturally and linguistically appropriate content
+- **Loading Animation**: Animated loading words appear in the selected language during text generation
 - **Mobile-Adapted Instructions**: Instructions automatically adapt for mobile devices (tap instead of click, pinch to zoom, etc.)
 
 ### Text Generation
@@ -50,20 +52,23 @@ The installation generates texts about computational linguistics, probability di
 - **Thinking Indicator**: A floating "thinking" word appears when spacebar is pressed, pulsating throughout the experience
 
 ### Audio Experience
-- **OpenAI Text-to-Speech**: Generated texts are read aloud using OpenAI's TTS API with natural-sounding voices
+- **OpenAI Text-to-Speech**: Generated texts are read aloud using OpenAI's TTS API with natural-sounding voices (tts-1-hd model)
+- **Voice Selection**: Dropdown menu to select from available OpenAI TTS voices (alloy, echo, fable, onyx, nova, shimmer)
 - **Heartbeat Drone**: Heartbeat sound activated only when spacebar is pressed, creating an ambient atmosphere
 - **Bouncing Sound**: Sound effect plays when the network first appears
 - **Collapse Sound**: "Whoosh" sound effect plays when words collapse
 - **Automatic Reading**: Text is automatically read when generated, synchronized with the ticker display
 - **Single Voice Playback**: System ensures only one voice plays at a time, preventing overlapping audio
+- **Sound Toggle**: Icon button to mute/unmute all sounds
 - **Sound Control**: All sounds stop when home button is pressed or system is reset
 
 ### Visual Elements
 - **Ticker Display**: Scrolling text shows the text being spoken (only visible when voice is active)
   - Horizontal scrolling (right to left) for most languages
-  - Right-to-left scrolling for Arabic
+  - Right-to-left scrolling for Arabic and Hebrew
   - Vertical scrolling (bottom to top) for Japanese, Chinese, and Korean
-- **Loading Animation**: Animated word network appears during first text generation in the selected language
+- **Loading Animation**: Animated word network appears during first text generation with words in the selected language (language, space, latent, network, semantic, dimension, embedding, vector, meaning, text, navigation, technology)
+- **Membrane**: Organic, pulsing membrane surrounds the network visualization, creating a boundary that breathes with the semantic structure
 - **Auto-Zoom**: Network automatically zooms to fit the screen when first generated
 - **Dark/Light Mode**: Toggle between light and dark color schemes (top left button)
 - **Smooth Transitions**: Seamless transitions between generations
@@ -76,6 +81,8 @@ The installation generates texts about computational linguistics, probability di
   - **Desktop**: Click and drag to pan, scroll to zoom, hover to see relationships
   - **Mobile**: Drag to pan, pinch to zoom, tap words to see relationships
 - **Language Selection**: Use the dropdown menu on the landing page (top right) to select your language
+- **Voice Selection**: Use the voice dropdown menu (next to language menu, top right) to select your preferred TTS voice
+- **Sound Toggle**: Click the sound icon button (top right) to mute/unmute all sounds
 - **Home Button**: Click the home button (top right, when network is visible) to return to landing page and stop all generation/sound
 - **Dark/Light Mode**: Toggle between color schemes using the button in the top left
 
@@ -152,15 +159,18 @@ npm run dev
 - Physics simulation creates organic movement and interaction
 
 ### Language Support
-- **Latin Scripts**: English, Spanish, French, German, Italian, Portuguese, Croatian use Unicode word patterns
-- **Cyrillic Scripts**: Serbian uses Cyrillic script with proper character handling
+- **30 Languages**: Full support for English, Spanish, French, German, Italian, Portuguese, Japanese, Chinese, Korean, Arabic, Turkish, Croatian, Serbian, Russian, Hindi, Dutch, Polish, Swedish, Norwegian, Danish, Finnish, Greek, Hebrew, Vietnamese, Indonesian, Thai, Czech, Romanian, Hungarian, Bulgarian
+- **Latin Scripts**: English, Spanish, French, German, Italian, Portuguese, Croatian, Dutch, Polish, Swedish, Norwegian, Danish, Finnish, Czech, Romanian, Hungarian, Vietnamese, Indonesian use Unicode word patterns
+- **Cyrillic Scripts**: Serbian, Russian, Bulgarian use Cyrillic script with proper character handling
 - **CJK Scripts**: Japanese, Chinese, and Korean use character-based extraction with optimized handling to prevent system overload
-- **RTL Scripts**: Arabic uses right-to-left text direction with appropriate ticker scrolling
-- **Agglutinative Languages**: Turkish support with proper word boundary detection
+- **RTL Scripts**: Arabic, Hebrew use right-to-left text direction with appropriate ticker scrolling
+- **Complex Scripts**: Hindi, Thai use proper character handling for complex writing systems
+- **Agglutinative Languages**: Turkish, Finnish, Hungarian support with proper word boundary detection
 - **Stop Words**: Language-specific stop word filtering for cleaner visualizations
 - **Frequency Calculation**: Accurate word frequency counting for all language types
 - **CJK Optimization**: Limited node and edge counts for CJK languages to maintain browser performance
 - **Mobile Detection**: Automatic detection of mobile devices with adapted instructions and interactions
+- **Complete Translations**: All 30 languages have full UI translations, system prompts, and generation prompts for native-language text generation
 
 ### Audio System
 - Heartbeat sound uses Web Audio API with sine wave oscillators
