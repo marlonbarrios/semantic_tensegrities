@@ -6,6 +6,12 @@ Powered by OpenAI Realtime model (GPT-4o) and OpenAI TTS, designed in p5.js.
 
 Concept and development by [Marlon Barrios Solano](https://marlonbarrios.github.io/)
 
+## 🌐 Live App
+
+**Experience the installation:** [https://semantic-tensegrities.vercel.app/](https://semantic-tensegrities.vercel.app/)
+
+The live application is hosted on Vercel and ready to use. Simply visit the link above to start exploring semantic relationships through interactive network visualizations.
+
 ## Concept
 
 **Semantic Tensegrities** is an interactive installation that visualizes language as a network of semantic relationships. The work explores how meaning emerges from the structural tension and compression between words, concepts, and relationships - similar to how tensegrity structures maintain integrity through balanced forces.
