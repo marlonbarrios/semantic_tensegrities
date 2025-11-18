@@ -44,6 +44,7 @@ var animationStartFrame = 0;
 const sketch = p => {
   // Function to create heartbeat sound
   async function createHeartbeatSound() {
+    if (soundMuted) return; // Don't create if muted
     try {
       // Ensure audio context is ready (required for mobile)
       const ready = await ensureAudioContextReady();
@@ -52,7 +53,7 @@ const sketch = p => {
       // Create gain node for volume control
       if (!heartbeatGainNode) {
         heartbeatGainNode = audioContext.createGain();
-        heartbeatGainNode.gain.value = 0.5; // Increased volume for audibility
+        heartbeatGainNode.gain.value = soundMuted ? 0 : 0.5; // Set volume based on mute state
         heartbeatGainNode.connect(audioContext.destination);
       }
       
@@ -93,10 +94,12 @@ const sketch = p => {
       
       // Audio context should already be ready from ensureAudioContextReady
       // Play heartbeat immediately, then repeat every second (60 BPM)
-      playHeartbeat();
+      if (!soundMuted) {
+        playHeartbeat();
+      }
       if (heartbeatInterval) clearInterval(heartbeatInterval);
       heartbeatInterval = setInterval(() => {
-        if (audioContext && audioContext.state === 'running') {
+        if (audioContext && audioContext.state === 'running' && !soundMuted) {
           playHeartbeat();
         }
       }, 1000);
@@ -146,6 +149,7 @@ const sketch = p => {
   
   // Function to create a bouncing sound when network appears
   async function playBouncingSound() {
+    if (soundMuted) return; // Don't play if muted
     try {
       // Ensure audio context is ready before playing sound
       const ready = await ensureAudioContextReady();
@@ -178,6 +182,7 @@ const sketch = p => {
 
   // Function to create a collapse sound when word is clicked
   async function playCollapseSound() {
+    if (soundMuted) return; // Don't play if muted
     try {
       // Ensure audio context is ready before playing sound
       const ready = await ensureAudioContextReady();
@@ -872,6 +877,7 @@ const sketch = p => {
   let currentLanguage = 'en'; // Current language code
   let showLanguageMenu = false; // Whether to show language menu
   let darkMode = false; // Dark mode toggle
+  let soundMuted = false; // Sound toggle
   let isCollapsing = false; // Whether network is collapsing
   let collapseTarget = null; // Target node position for collapse
   let collapseProgress = 0; // Progress of collapse animation (0 to 1)
@@ -1159,6 +1165,9 @@ const sketch = p => {
     
     // Draw dark mode toggle (always visible)
     drawDarkModeToggle(p);
+    
+    // Draw sound toggle (always visible)
+    drawSoundToggle(p);
     
     // Draw home button (only when network is visible)
     if (textTyped.length > 0) {
@@ -2541,6 +2550,139 @@ const sketch = p => {
       }
     }
     
+    // Draw membrane around network (organic boundary)
+    if (network.nodes.length > 0 && !isCollapsing && !isMovingToCenter) { // Show when network is stable
+      // Calculate convex hull around all nodes
+      let points = network.nodes.map(node => ({ x: node.position.x, y: node.position.y }));
+      
+      // Simple convex hull algorithm (Graham scan simplified)
+      function getConvexHull(points) {
+        if (points.length < 3) return points;
+        
+        // Find bottom-most point (or leftmost in case of tie)
+        let start = points[0];
+        let startIdx = 0;
+        for (let i = 1; i < points.length; i++) {
+          if (points[i].y < start.y || (points[i].y === start.y && points[i].x < start.x)) {
+            start = points[i];
+            startIdx = i;
+          }
+        }
+        
+        // Sort points by polar angle with respect to start point
+        let sorted = points.map((p, i) => ({ ...p, idx: i }));
+        sorted.splice(startIdx, 1);
+        
+        sorted.sort((a, b) => {
+          let angleA = Math.atan2(a.y - start.y, a.x - start.x);
+          let angleB = Math.atan2(b.y - start.y, b.x - start.x);
+          if (Math.abs(angleA - angleB) < 0.001) {
+            // If angles are equal, sort by distance
+            let distA = (a.x - start.x) ** 2 + (a.y - start.y) ** 2;
+            let distB = (b.x - start.x) ** 2 + (b.y - start.y) ** 2;
+            return distA - distB;
+          }
+          return angleA - angleB;
+        });
+        
+        // Build hull using Graham scan
+        let hull = [start];
+        for (let point of sorted) {
+          while (hull.length > 1) {
+            let p1 = hull[hull.length - 2];
+            let p2 = hull[hull.length - 1];
+            let p3 = point;
+            
+            // Cross product to determine turn direction
+            let cross = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
+            if (cross <= 0) {
+              hull.pop();
+            } else {
+              break;
+            }
+          }
+          hull.push(point);
+        }
+        
+        return hull;
+      }
+      
+      let hull = getConvexHull(points);
+      
+      if (hull.length >= 3) {
+        // Add padding to membrane (expand outward from nodes)
+        let padding = 50; // Increased padding for more visible membrane
+        let expandedHull = hull.map((p, i) => {
+          // Calculate center of hull
+          let centerX = hull.reduce((sum, pt) => sum + pt.x, 0) / hull.length;
+          let centerY = hull.reduce((sum, pt) => sum + pt.y, 0) / hull.length;
+          
+          // Expand point outward from center
+          let dx = p.x - centerX;
+          let dy = p.y - centerY;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > 0) {
+            return {
+              x: p.x + (dx / dist) * padding,
+              y: p.y + (dy / dist) * padding
+            };
+          }
+          return p;
+        });
+        
+        // Create smooth membrane with pulsing effect
+        let membraneTime = p.frameCount * 0.02;
+        let membranePulse = 1.0 + Math.sin(membraneTime) * 0.15; // 15% pulsing
+        
+        // Draw membrane with organic, flowing appearance
+        const colors = getColors();
+        
+        // Create smooth membrane points with wave effect
+        let membranePoints = expandedHull.map((p1, i) => {
+          let p2 = expandedHull[(i + 1) % expandedHull.length];
+          let waveOffset = Math.sin(membraneTime * 2 + i * 0.5) * 3 * membranePulse; // Increased wave
+          let angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+          let perpX = Math.cos(angle + Math.PI / 2) * waveOffset;
+          let perpY = Math.sin(angle + Math.PI / 2) * waveOffset;
+          return { x: p1.x + perpX, y: p1.y + perpY };
+        });
+        
+        // Use brighter color for membrane visibility
+        // Make it more visible by using a semi-transparent version of text color
+        let membraneColor = darkMode 
+          ? [200, 200, 220] // Light blue-gray for dark mode
+          : [60, 60, 80];   // Dark blue-gray for light mode
+        
+        // Outer glow layer (very transparent)
+        p.noStroke();
+        p.fill(membraneColor[0], membraneColor[1], membraneColor[2], 20);
+        p.beginShape();
+        for (let i = 0; i < membranePoints.length; i++) {
+          p.vertex(membranePoints[i].x, membranePoints[i].y);
+        }
+        p.endShape(p.CLOSE);
+        
+        // Main membrane layer (transparent, pulsing)
+        let membraneOpacity = 40 + Math.sin(membraneTime * 1.5) * 15; // Transparent (25-55 opacity)
+        p.fill(membraneColor[0], membraneColor[1], membraneColor[2], membraneOpacity);
+        p.beginShape();
+        for (let i = 0; i < membranePoints.length; i++) {
+          p.vertex(membranePoints[i].x, membranePoints[i].y);
+        }
+        p.endShape(p.CLOSE);
+        
+        // Membrane outline (subtle, pulsing)
+        p.stroke(membraneColor[0], membraneColor[1], membraneColor[2], 80 + Math.sin(membraneTime * 1.2) * 20);
+        p.strokeWeight(2.0); // Thinner stroke
+        p.noFill();
+        p.beginShape();
+        for (let i = 0; i < membranePoints.length; i++) {
+          p.vertex(membranePoints[i].x, membranePoints[i].y);
+        }
+        p.endShape(p.CLOSE);
+      }
+    }
+    
     // Draw edges (connections between words) - 2D with pulsing effects
     p.noFill();
     
@@ -2774,6 +2916,11 @@ const sketch = p => {
       return; // Don't process other clicks if dark mode toggle was clicked
     }
     
+    // Check if sound toggle was clicked
+    if (checkSoundToggleClick(p, p.mouseX, p.mouseY)) {
+      return; // Don't process other clicks if sound toggle was clicked
+    }
+    
     // Check if language menu was clicked
     if (checkLanguageMenuClick(p, p.mouseX, p.mouseY)) {
       return; // Don't process other clicks if language menu was clicked
@@ -2914,6 +3061,7 @@ const sketch = p => {
     // p5.js automatically sets mouseX/mouseY from touch coordinates
     if (checkHomeButtonClick(p, p.mouseX, p.mouseY) ||
         checkDarkModeToggleClick(p, p.mouseX, p.mouseY) ||
+        checkSoundToggleClick(p, p.mouseX, p.mouseY) ||
         checkLanguageMenuClick(p, p.mouseX, p.mouseY) ||
         checkCreditsClick(p, p.mouseX, p.mouseY)) {
       return false; // Button was clicked, let UI handle it
@@ -3647,6 +3795,70 @@ const sketch = p => {
     if (mouseX >= buttonX && mouseX <= buttonX + buttonSize &&
         mouseY >= buttonY && mouseY <= buttonY + buttonSize) {
       darkMode = !darkMode;
+      return true;
+    }
+    return false;
+  }
+  
+  // Function to draw sound toggle button
+  function drawSoundToggle(p) {
+    const colors = getColors();
+    const buttonSize = Math.min(28, Math.max(24, p.width * 0.03)); // Same size as dark mode toggle
+    const buttonX = 20;
+    const buttonY = 20 + buttonSize + 10; // Below dark mode toggle
+    
+    p.push();
+    
+    // Toggle button background - lighter (reduced opacity)
+    p.fill(colors.uiBackground[0], colors.uiBackground[1], colors.uiBackground[2], 150);
+    p.stroke(colors.uiBorder[0], colors.uiBorder[1], colors.uiBorder[2], 120);
+    p.strokeWeight(0.5);
+    p.rect(buttonX, buttonY, buttonSize, buttonSize);
+    
+    // Toggle icon (sound/mute) - smaller and lighter
+    p.textAlign(p.CENTER, p.CENTER);
+    const iconSize = Math.max(12, buttonSize * 0.5);
+    p.textFont('monospace', iconSize);
+    p.fill(colors.uiText[0], colors.uiText[1], colors.uiText[2], 180);
+    p.noStroke();
+    // Use sound icon when unmuted, mute icon when muted
+    p.text(soundMuted ? '🔇' : '🔊', buttonX + buttonSize / 2, buttonY + buttonSize / 2);
+    
+    p.pop();
+  }
+  
+  // Function to check if sound toggle was clicked
+  function checkSoundToggleClick(p, mouseX, mouseY) {
+    const buttonSize = Math.min(28, Math.max(24, p.width * 0.03));
+    const buttonX = 20;
+    const buttonY = 20 + buttonSize + 10; // Below dark mode toggle
+    
+    if (mouseX >= buttonX && mouseX <= buttonX + buttonSize &&
+        mouseY >= buttonY && mouseY <= buttonY + buttonSize) {
+      soundMuted = !soundMuted;
+      
+      // Toggle heartbeat sound
+      if (soundMuted) {
+        // Mute: stop heartbeat
+        if (heartbeatInterval) {
+          clearInterval(heartbeatInterval);
+          heartbeatInterval = null;
+        }
+        // Stop heartbeat gain node
+        if (heartbeatGainNode) {
+          heartbeatGainNode.gain.value = 0;
+        }
+      } else {
+        // Unmute: start heartbeat if it was playing before
+        if (!heartbeatInterval && textTyped.length > 0) {
+          createHeartbeatSound();
+        }
+        // Restore heartbeat gain
+        if (heartbeatGainNode) {
+          heartbeatGainNode.gain.value = 0.5;
+        }
+      }
+      
       return true;
     }
     return false;
