@@ -2742,6 +2742,17 @@ const sketch = p => {
       return; // Don't process other clicks if credits were clicked
     }
     
+    // Mobile: tap anywhere on landing page to start
+    if (textTyped.length === 0 && !isLoading) {
+      const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+      if (isMobile) {
+        // Don't trigger if clicking on UI elements (already checked above)
+        // Trigger text generation
+        triggerTextGeneration();
+        return;
+      }
+    }
+    
     // Store mouse position to detect clicks vs drags
     mouseDownX = p.mouseX;
     mouseDownY = p.mouseY;
@@ -2844,6 +2855,47 @@ const sketch = p => {
     viewZoom *= zoomFactor;
     viewZoom = Math.max(0.1, Math.min(5.0, viewZoom)); // Limit zoom range
     return false; // Prevent default scrolling
+  };
+  
+  // Handle touch events for mobile devices
+  p.touchStarted = function() {
+    // On landing page, tap anywhere to start
+    if (textTyped.length === 0 && !isLoading) {
+      const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+      if (isMobile) {
+        // p5.js automatically sets mouseX/mouseY from touch coordinates
+        // Check if touching UI elements first
+        if (checkHomeButtonClick(p, p.mouseX, p.mouseY) ||
+            checkDarkModeToggleClick(p, p.mouseX, p.mouseY) ||
+            checkLanguageMenuClick(p, p.mouseX, p.mouseY) ||
+            checkCreditsClick(p, p.mouseX, p.mouseY)) {
+          return false; // Let UI handle the touch
+        }
+        // Trigger text generation
+        triggerTextGeneration();
+        return false; // Prevent default scrolling
+      }
+    }
+    // For other cases, let mousePressed handle it
+    return false;
+  };
+  
+  // Prevent default touch behavior on landing page to avoid scrolling/zooming
+  p.touchMoved = function() {
+    // Only prevent default on landing page
+    if (textTyped.length === 0) {
+      return false; // Prevent default scrolling on landing page
+    }
+    // Allow normal touch behavior when network is visible (for panning)
+    return true;
+  };
+  
+  p.touchEnded = function() {
+    // Only prevent default on landing page
+    if (textTyped.length === 0) {
+      return false; // Prevent default on landing page
+    }
+    return true;
   };
 
   // Old rendering code removed - network visualization handles rendering now
