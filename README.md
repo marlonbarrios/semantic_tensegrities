@@ -18,7 +18,7 @@ The live application is hosted on Vercel and ready to use. Simply visit the link
 
 **Semantic Tensegrities** is an interactive installation that visualizes language as a network of semantic relationships. The work explores how meaning emerges from the structural tension and compression between words, concepts, and relationships - similar to how tensegrity structures maintain integrity through balanced forces.
 
-The installation generates texts about computational linguistics, probability distributions, language models, and semantic analysis. These texts are then visualized as dynamic networks where words become nodes connected by semantic relationships, creating a living, pulsating visualization of meaning.
+The installation generates texts about computational linguistics, probability distributions, language models, semantic analysis, gradient descent, free energy principles, metacognition, autoregressive processes, and attention mechanisms. These texts are then visualized as dynamic networks where words become nodes connected by semantic relationships, with words appearing one by one from the top of the canvas, synchronized with the spoken audio, creating a living visualization of meaning.
 
 ## Features
 
@@ -38,18 +38,25 @@ The installation generates texts about computational linguistics, probability di
 - **Varied Prompts**: Each generation uses different starting prompts to ensure variety
 - **Word-Based Generation**: Click on any word in the network to generate new text exploring that concept
 - **Semantic Tensegrity Focus**: All generated texts explore computational linguistics and semantic relationships
+- **System Prompt Integration**: The system prompt includes current semantic network relationships, allowing the AI to consider existing word connections when generating new text
+- **Theoretical Framework**: Texts explore Semantic Tensegrity Theory, including:
+  - Gradient descent and semantic optimization
+  - Free energy principle and semantic systems
+  - Metacognition and semantic self-awareness
+  - Memory and language as autoregressive processes
+  - Attention mechanisms and semantic focus
 
 ### Network Visualization
 - **Dynamic Word Network**: Words are visualized as nodes connected by semantic relationships
-- **Auto-Highlighting**: Network relationships automatically highlight, cycling through nodes every second
-- **Pulsating Animation**: Nodes and edges pulse with life, creating an organic, living visualization
-- **Floating Movement**: Words float with complex multi-frequency oscillations for dynamic, organic movement
+- **Word-by-Word Appearance**: Words appear one by one from the top of the canvas, synchronized with the spoken audio
+- **Synchronized Animation**: Words birth from the origin point (near top) as they are spoken, creating a visual-audio synchronization
+- **Blue Edge Connections**: Simple blue edges connect semantically related words
 - **Interactive Exploration**: Hover over nodes to see relationships, click and drag to explore the network
 - **Semantic Clustering**: Words are positioned based on their semantic relationships (language, space, latent dimensions)
 - **Ensured Connectivity**: All nodes are guaranteed to be connected in the network visualization
-- **Collapse Animation**: Clicking a word triggers a playful collapse animation where all words converge to a point
-- **Network Birth**: New networks emerge from the center with a gradual, organic birth animation
-- **Thinking Indicator**: A floating "thinking" word appears when spacebar is pressed, pulsating throughout the experience
+- **Physics Simulation**: Organic movement with spring forces, repulsion, and boundary constraints
+- **Spacious Layout**: Network maintains generous spacing between words for clarity
+- **Balanced Positioning**: Network is balanced to prevent rightward drift, with slight leftward bias
 
 ### Audio Experience
 - **OpenAI Text-to-Speech**: Generated texts are read aloud using OpenAI's TTS API with natural-sounding voices (tts-1-hd model)
@@ -63,28 +70,31 @@ The installation generates texts about computational linguistics, probability di
 - **Sound Control**: All sounds stop when home button is pressed or system is reset
 
 ### Visual Elements
-- **Ticker Display**: Scrolling text shows the text being spoken (only visible when voice is active)
+- **Ticker Display**: Scrolling text shows the text being spoken (positioned at top of screen)
   - Horizontal scrolling (right to left) for most languages
   - Right-to-left scrolling for Arabic and Hebrew
   - Vertical scrolling (bottom to top) for Japanese, Chinese, and Korean
+  - **Ticker Toggle**: Button to show/hide the ticker display
 - **Loading Animation**: Animated word network appears during first text generation with words in the selected language (language, space, latent, network, semantic, dimension, embedding, vector, meaning, text, navigation, technology)
-- **Membrane**: Organic, pulsing membrane surrounds the network visualization, creating a boundary that breathes with the semantic structure
 - **Auto-Zoom**: Network automatically zooms to fit the screen when first generated
-- **Dark/Light Mode**: Toggle between light and dark color schemes (top left button)
+- **Dark/Light Mode**: Toggle between light and dark color schemes (bottom left button)
 - **Smooth Transitions**: Seamless transitions between generations
+- **No Margins**: Words can reach all edges of the canvas for maximum use of space
 
 ### Interaction
 - **Spacebar**: Press spacebar to start/reset the system and begin automatic generation cycle (also activates heartbeat sound)
+  - When spacebar is pressed, the membrane appears empty and words start appearing one by one from the top, synchronized with the spoken word
 - **Mobile**: Tap anywhere on the landing page to start on mobile devices
-- **Word Clicking**: Click on any word in the network to generate new text based on that concept (stops auto-generation and triggers collapse animation)
+- **Word Clicking**: Click on any word in the network to generate new text based on that concept (stops auto-generation)
 - **Network Navigation**: 
   - **Desktop**: Click and drag to pan, scroll to zoom, hover to see relationships
   - **Mobile**: Drag to pan, pinch to zoom, tap words to see relationships
 - **Language Selection**: Use the dropdown menu on the landing page (top right) to select your language
 - **Voice Selection**: Use the voice dropdown menu (next to language menu, top right) to select your preferred TTS voice
-- **Sound Toggle**: Click the sound icon button (top right) to mute/unmute all sounds
-- **Home Button**: Click the home button (top right, when network is visible) to return to landing page and stop all generation/sound
-- **Dark/Light Mode**: Toggle between color schemes using the button in the top left
+- **Sound Toggle**: Click the sound icon button (bottom right) to mute/unmute all sounds
+- **Home Button**: Click the home button (bottom right, when network is visible) to return to landing page and stop all generation/sound
+- **Dark/Light Mode**: Toggle between color schemes using the button in the bottom left
+- **Ticker Toggle**: Button to show/hide the ticker display
 
 ## Setup
 

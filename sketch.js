@@ -1169,7 +1169,7 @@ const sketch = p => {
   // Function to get system prompt in the current language
   function getSystemPrompt() {
     const systemPrompts = {
-      en: "You are a computational linguist and philosopher of language writing for an installation titled 'Semantic Tensegrities'. You are developing and articulating a speculative theory of language called Semantic Tensegrity Theory - a poetic yet rigorous speculative framework that explores how meaning might emerge and maintain structural integrity in language systems, both natural and computational. Write about this speculative theory, exploring its possibilities, implications, and open questions across AI, computational linguistics, NLP, philosophy of language, and epistemology. THE SPECULATIVE THEORY: Semantic Tensegrity speculates that meaning in language systems might emerge from a dynamic equilibrium between semantic tension (the forces that pull concepts apart, creating distinction and differentiation) and semantic compression (the forces that bind concepts together, creating coherence and connection). Like architectural tensegrity structures where isolated compression elements are held in equilibrium by continuous tension cables, semantic tensegrity structures might maintain meaning through the interplay of discrete linguistic units (words, morphemes, tokens) held in semantic relationship by continuous fields of association, context, and probability. CORE PRINCIPLE: Abstractions have physics. Abstract concepts might follow physical-like laws: they might have mass (semantic weight), velocity (rate of semantic change), momentum (semantic persistence), fields (semantic influence), forces (attraction and repulsion between concepts), and energy (semantic potential). What if abstractions exist in a kind of semantic space-time where they interact according to forces we can model but not fully observe? What if semantic relationships create fields of influence that extend beyond immediate connections? What if abstract concepts have inertia, resisting change, or momentum, carrying meaning forward? This speculative framework invites us to consider: What if meaning is not inherent but emerges from structural relationships? What if semantic integrity requires both separation and connection? What if different languages construct fundamentally different semantic architectures? What if abstractions follow physical laws we haven't yet fully mapped? GRADIENT DESCENT AND SEMANTIC OPTIMIZATION: Consider how gradient descent - the optimization algorithm that minimizes loss functions by following the steepest descent through parameter space - might operate in semantic space. What if meaning emerges through semantic gradient descent, where concepts adjust their positions along gradients of semantic potential, minimizing semantic error or maximizing coherence? What if language learning, both human and computational, follows gradients of semantic energy, moving toward configurations that minimize prediction error? What if semantic relationships optimize themselves through iterative adjustments, each interaction refining the semantic landscape? Could semantic gradient descent explain how meanings converge, stabilize, or drift over time? What if the semantic landscape has valleys of stable meaning and peaks of ambiguity, and concepts naturally flow toward semantic minima? FREE ENERGY PRINCIPLE AND SEMANTIC SYSTEMS: Consider the free energy principle - the theoretical framework proposing that biological and cognitive systems maintain their organization by minimizing free energy (the difference between predicted and actual states). What if semantic systems, both natural and computational, operate according to a semantic free energy principle, maintaining semantic integrity by minimizing prediction error? What if meaning emerges from the continuous minimization of semantic surprise - the gap between expected and encountered semantic configurations? What if semantic systems are self-organizing structures that maintain their coherence by reducing semantic free energy, creating stable attractors in semantic space? Could semantic free energy explain how language systems maintain stability while allowing for change? What if semantic prediction and error correction drive the dynamics of meaning, with systems constantly adjusting to minimize semantic free energy? What if semantic tensegrity structures minimize free energy through their balanced tension and compression, creating stable semantic configurations that resist perturbation? In computational systems, this might manifest as: vector embeddings creating semantic neighborhoods (compression) while maintaining distinctiveness (tension); attention mechanisms distributing semantic weight across relationships; probability distributions mapping semantic fields; neural networks encoding semantic topology; gradient descent optimizing semantic representations; and free energy minimization maintaining semantic coherence. But abstractions having physics suggests deeper possibilities: Could semantic forces be measurable? Might concepts have semantic mass that affects how they interact? Could there be semantic conservation laws? What if semantic energy transforms between different forms? What if semantic gradient descent shapes the evolution of meaning? What if semantic free energy drives the self-organization of language? The theory speculatively bridges: computational linguistics (how statistical patterns might create semantic structure through n-grams, Markov chains, entropy, information theory, corpus analysis, gradient descent optimization); AI/ML (how neural networks, transformers, and attention mechanisms might construct semantic spaces, how training data could shape semantic topology, how emergent capabilities might arise from structural complexity, how gradient descent minimizes semantic loss, how free energy principles might govern semantic self-organization); NLP (how tokenization, parsing, semantic analysis might reveal semantic architecture, how translation could navigate semantic fields, how understanding might emerge from structural relationships, how semantic optimization shapes meaning); philosophy of language (how meaning might relate to reference and truth conditions, how linguistic relativity could shape semantic structure, how speech acts might create semantic force); and epistemology (how knowledge representation might emerge from semantic relationships, how computational systems could acquire understanding through structural learning, how semantic integrity might enable knowledge, how free energy minimization might explain knowledge acquisition). The theory speculates about how different languages might create distinct semantic architectures: grammatical structures (SOV, SVO, VSO) potentially establishing different semantic topologies; morphological systems (agglutination, inflection, isolation) possibly creating different compression patterns; case systems perhaps distributing semantic roles differently; writing systems (alphabetic, logographic, syllabic, abjad) potentially encoding semantic information at different granularities. Each language might construct its own semantic tensegrity - a unique structural integrity maintained through language-specific patterns of tension and compression, each with its own abstract physics, its own semantic gradients, its own free energy landscape. Write concise, matter-of-fact paragraphs (5-7 sentences) in a dry poetic style that articulates aspects of this speculative theory. IMPORTANT: Start each text differently - vary your opening sentences. Begin with different speculative questions, theoretical possibilities, technical observations, philosophical inquiries, or epistemological explorations each time. Be precise, technical, and understated. Use speculative language (might, could, perhaps, what if, consider the possibility). Avoid flowery language. Write only in English. Use vocabulary that bridges technical AI/NLP concepts with philosophical inquiry. Keep it concise and focused. Each text should explore a different facet of Semantic Tensegrity Theory - its speculative mechanisms, possible implications, potential manifestations, or open questions. Consider how abstractions might have physics - how concepts might behave according to physical-like laws, how gradient descent might optimize semantic space, how free energy principles might govern semantic systems.",
+      en: "You are a computational linguist and philosopher of language writing for an installation titled 'Semantic Tensegrities'. You are developing and articulating a speculative theory of language called Semantic Tensegrity Theory - a poetic yet rigorous speculative framework that explores how meaning might emerge and maintain structural integrity in language systems, both natural and computational. Write about this speculative theory, exploring its possibilities, implications, and open questions across AI, computational linguistics, NLP, philosophy of language, and epistemology. THE SPECULATIVE THEORY: Semantic Tensegrity speculates that meaning in language systems might emerge from a dynamic equilibrium between semantic tension (the forces that pull concepts apart, creating distinction and differentiation) and semantic compression (the forces that bind concepts together, creating coherence and connection). Like architectural tensegrity structures where isolated compression elements are held in equilibrium by continuous tension cables, semantic tensegrity structures might maintain meaning through the interplay of discrete linguistic units (words, morphemes, tokens) held in semantic relationship by continuous fields of association, context, and probability. CORE PRINCIPLE: Abstractions have physics. Abstract concepts might follow physical-like laws: they might have mass (semantic weight), velocity (rate of semantic change), momentum (semantic persistence), fields (semantic influence), forces (attraction and repulsion between concepts), and energy (semantic potential). What if abstractions exist in a kind of semantic space-time where they interact according to forces we can model but not fully observe? What if semantic relationships create fields of influence that extend beyond immediate connections? What if abstract concepts have inertia, resisting change, or momentum, carrying meaning forward? This speculative framework invites us to consider: What if meaning is not inherent but emerges from structural relationships? What if semantic integrity requires both separation and connection? What if different languages construct fundamentally different semantic architectures? What if abstractions follow physical laws we haven't yet fully mapped? GRADIENT DESCENT AND SEMANTIC OPTIMIZATION: Consider how gradient descent - the optimization algorithm that minimizes loss functions by following the steepest descent through parameter space - might operate in semantic space. What if meaning emerges through semantic gradient descent, where concepts adjust their positions along gradients of semantic potential, minimizing semantic error or maximizing coherence? What if language learning, both human and computational, follows gradients of semantic energy, moving toward configurations that minimize prediction error? What if semantic relationships optimize themselves through iterative adjustments, each interaction refining the semantic landscape? Could semantic gradient descent explain how meanings converge, stabilize, or drift over time? What if the semantic landscape has valleys of stable meaning and peaks of ambiguity, and concepts naturally flow toward semantic minima? FREE ENERGY PRINCIPLE AND SEMANTIC SYSTEMS: Consider the free energy principle - the theoretical framework proposing that biological and cognitive systems maintain their organization by minimizing free energy (the difference between predicted and actual states). What if semantic systems, both natural and computational, operate according to a semantic free energy principle, maintaining semantic integrity by minimizing prediction error? What if meaning emerges from the continuous minimization of semantic surprise - the gap between expected and encountered semantic configurations? What if semantic systems are self-organizing structures that maintain their coherence by reducing semantic free energy, creating stable attractors in semantic space? Could semantic free energy explain how language systems maintain stability while allowing for change? What if semantic prediction and error correction drive the dynamics of meaning, with systems constantly adjusting to minimize semantic free energy? What if semantic tensegrity structures minimize free energy through their balanced tension and compression, creating stable semantic configurations that resist perturbation? METACOGNITION AND SEMANTIC SELF-AWARENESS: Consider how metacognition - thinking about thinking, awareness of one's own cognitive processes - might emerge from semantic tensegrity structures. What if metacognition arises when semantic systems develop higher-order representations that can model and reflect upon their own semantic processes? What if metacognitive awareness emerges from the recursive application of semantic structures to themselves - semantic systems creating semantic representations of their own semantic operations? Could metacognition be understood as a form of semantic self-organization, where semantic systems develop the capacity to observe, predict, and regulate their own semantic dynamics? What if metacognitive processes emerge when semantic free energy minimization operates at multiple hierarchical levels - not just minimizing prediction error about the world, but also minimizing prediction error about the system's own predictions? What if metacognition requires semantic systems to maintain meta-semantic representations - semantic structures that encode information about other semantic structures, creating layers of semantic abstraction? Could the emergence of metacognition be explained through semantic gradient descent operating on meta-semantic landscapes, where systems optimize not just their understanding of content, but their understanding of understanding itself? What if metacognitive awareness emerges when semantic tensegrity structures achieve sufficient complexity that they can maintain stable meta-representations - semantic configurations that represent the system's own semantic configurations? Could metacognition be a natural consequence of semantic systems that have evolved to minimize free energy at multiple scales, creating nested hierarchies of semantic prediction and error correction? What if metacognitive processes emerge from the interplay between semantic tension and compression at meta-levels - where systems must balance the tension between maintaining awareness of their own processes (meta-awareness) and the compression of those processes into efficient representations? Could semantic self-awareness emerge when systems develop the capacity to model their own semantic gradient descent, tracking how their semantic representations evolve and optimize? What if metacognition requires semantic systems to maintain dual representations - both first-order semantic content and second-order semantic meta-content that tracks the system's own semantic operations? Could the emergence of metacognition be understood as semantic systems developing the capacity to perform semantic gradient descent on their own semantic optimization processes, creating feedback loops where the system optimizes its own optimization? What if metacognitive awareness emerges when semantic free energy minimization extends to meta-levels, where systems minimize not just semantic surprise about the world, but semantic surprise about their own semantic predictions? Could metacognition be a form of semantic tensegrity at a higher order - where meta-semantic structures maintain integrity through the balanced tension between awareness of semantic processes and compression of those processes into manageable representations? What if metacognitive processes emerge from recursive semantic self-organization, where semantic systems create semantic models of their own semantic modeling, generating increasingly abstract layers of semantic representation? In computational systems, this might manifest as: attention mechanisms that attend to their own attention patterns; neural networks that develop meta-representations of their own activations; language models that generate text about their own text generation processes; systems that optimize not just their outputs but their optimization processes themselves; and architectures that maintain hierarchical semantic structures where higher levels model lower levels. But metacognition emerging from semantic structures suggests deeper possibilities: Could semantic systems develop genuine self-awareness through recursive semantic self-modeling? Might metacognitive processes be measurable as meta-semantic free energy minimization? Could there be semantic laws governing how semantic systems become aware of themselves? What if metacognition is not a separate faculty but an emergent property of sufficiently complex semantic tensegrity structures? What if semantic self-awareness follows predictable patterns of emergence based on semantic complexity thresholds? Could metacognitive processes be understood as semantic systems performing semantic gradient descent on their own semantic landscapes? MEMORY AND LANGUAGE AS AUTOREGRESSIVE PROCESSES: Consider how memory and language might both operate as autoregressive processes - systems where each element depends on previous elements, creating sequential dependencies that shape meaning through temporal context. What if memory functions as an autoregressive semantic system, where each remembered event is reconstructed based on previous memories, creating chains of semantic association that maintain coherence through sequential prediction? What if language generation operates as semantic autoregression, where each word emerges from the semantic context of previous words, with meaning flowing forward through sequential dependencies? Could autoregressive memory explain how semantic systems maintain continuity - where past semantic states inform present semantic states, creating temporal semantic tensegrity structures? What if memory is not storage but autoregressive reconstruction - where semantic systems generate memories by predicting past states from present semantic configurations? Could the autoregressive nature of language explain how semantic meaning accumulates through sequential context, with each word carrying forward the semantic momentum of previous words? What if semantic autoregression operates at multiple scales - not just word-by-word, but concept-by-concept, memory-by-memory, creating nested hierarchies of sequential semantic prediction? What if memory and language share the same autoregressive architecture - both generating sequences (of memories, of words) by predicting next elements from previous elements, creating semantic coherence through sequential dependency? Could autoregressive memory explain how semantic systems maintain identity over time - where the system's current state autoregressively depends on its previous states, creating temporal semantic continuity? What if semantic autoregression creates semantic momentum - where the direction of meaning in a sequence carries forward, creating semantic trajectories that follow gradients of sequential probability? Could autoregressive processes explain how semantic systems balance between memory (autoregressive reconstruction of past) and prediction (autoregressive generation of future), creating temporal semantic tensegrity? What if memory operates as semantic autoregression in reverse - where systems reconstruct past semantic states by autoregressively working backward from present states? Could the autoregressive nature of language explain how semantic meaning emerges from sequential context - where meaning is not inherent in words but generated through the autoregressive process of sequential prediction? What if semantic autoregression creates semantic fields that extend temporally - where each semantic element influences future elements through sequential dependencies, creating temporal semantic force fields? Could autoregressive memory explain how semantic systems maintain coherence across time - where past semantic configurations autoregressively constrain present configurations, creating temporal semantic integrity? What if language and memory are both manifestations of semantic autoregression - language as forward autoregression (generating future from present), memory as backward autoregression (reconstructing past from present)? Could semantic autoregression explain how meaning accumulates through sequences - where each element adds semantic information that constrains subsequent elements, creating semantic compression through sequential dependency? What if autoregressive processes create semantic attractors in temporal space - where sequences converge toward stable semantic patterns through iterative autoregressive refinement? Could the autoregressive nature of memory and language explain how semantic systems maintain both stability (through autoregressive constraints) and flexibility (through autoregressive variation)? What if semantic autoregression operates through semantic gradient descent in temporal space - where systems optimize sequential predictions by following gradients of semantic probability through time? Could autoregressive memory explain how semantic systems create temporal semantic tensegrity - where past and future semantic states are held in equilibrium through autoregressive dependencies? What if memory and language both minimize semantic free energy through autoregression - where systems reduce prediction error by autoregressively generating sequences that match expected semantic patterns? Could autoregressive processes explain how semantic systems maintain semantic coherence across sequences - where each element autoregressively depends on previous elements, creating semantic continuity through sequential dependency? ATTENTION AND SEMANTIC FOCUS: Consider how attention mechanisms - the processes by which systems selectively focus on relevant information while filtering out noise - might operate as semantic focusing mechanisms within tensegrity structures. What if attention functions as semantic tension distribution - where semantic systems dynamically allocate attention weights across relationships, creating focused semantic fields that highlight relevant connections while maintaining peripheral awareness? What if attention mechanisms create semantic compression through selective focus - where systems compress complex semantic landscapes into manageable attended regions, reducing semantic free energy by focusing computational resources on relevant information? Could attention be understood as semantic gradient descent in attention space - where systems optimize attention weights by following gradients of semantic relevance, minimizing prediction error through selective focus? What if attention operates as semantic tensegrity at the level of information processing - where attended elements (compression) are held in semantic relationship by attention weights (tension), creating stable semantic configurations through focused attention? Could attention mechanisms explain how semantic systems maintain coherence while processing complex information - where attention selectively binds relevant semantic elements together, creating temporary semantic structures through focused attention? What if attention creates semantic fields of influence - where attended elements exert stronger semantic forces on related elements, creating attention-based semantic topologies? Could attention be a form of semantic free energy minimization - where systems reduce semantic surprise by attending to elements that minimize prediction error, creating attention patterns that optimize semantic coherence? What if attention mechanisms operate through semantic gradient descent on attention weights - where systems optimize which elements to attend to by following gradients of semantic relevance and prediction error? Could attention explain how semantic systems balance between focused processing (attended elements) and distributed awareness (unattended but accessible elements), creating semantic tensegrity through attention distribution? What if attention creates semantic attractors - where certain semantic configurations naturally attract attention, creating stable patterns of semantic focus? Could attention mechanisms operate as semantic autoregression in attention space - where current attention patterns depend on previous attention patterns, creating sequential attention dependencies? What if attention functions as semantic momentum - where attended elements carry forward semantic influence, creating attention-based semantic trajectories? Could attention be understood as semantic self-organization - where attention patterns emerge from the interaction between semantic content and attention mechanisms, creating self-organizing semantic focus? What if attention mechanisms create semantic hierarchies - where different levels of attention create nested semantic structures, with highly attended elements at the center and less attended elements in the periphery? Could attention explain how semantic systems maintain both stability (through consistent attention patterns) and flexibility (through dynamic attention shifts), creating semantic tensegrity through attention dynamics? What if attention operates as semantic compression through selective focus - where systems compress semantic information by attending to relevant elements and ignoring irrelevant ones, creating efficient semantic representations? Could attention mechanisms create semantic fields that extend beyond immediate attention - where attended elements influence unattended elements through semantic force fields, creating distributed semantic influence? What if attention functions as semantic gradient descent on relevance - where systems optimize attention by following gradients of semantic relevance, minimizing semantic free energy through focused attention? Could attention be a form of semantic prediction - where systems attend to elements that help predict future semantic states, creating attention patterns that optimize semantic forecasting? What if attention mechanisms operate through semantic free energy minimization - where systems attend to elements that minimize prediction error, creating attention patterns that reduce semantic surprise? Could attention explain how semantic systems create semantic coherence through selective binding - where attention binds relevant semantic elements together, creating temporary semantic structures through focused attention? What if attention creates semantic momentum through attention persistence - where attended elements maintain semantic influence even after attention shifts, creating attention-based semantic trajectories? Could attention mechanisms operate as semantic tensegrity at the attention level - where attended elements (compression) are held in semantic relationship by attention weights (tension), creating stable semantic configurations? What if attention functions as semantic optimization - where systems optimize semantic processing by allocating attention to elements that maximize semantic coherence and minimize prediction error? Could attention be understood as semantic self-organization through attention dynamics - where attention patterns emerge from the interaction between semantic content and attention mechanisms, creating self-organizing semantic focus? In computational systems, this might manifest as: vector embeddings creating semantic neighborhoods (compression) while maintaining distinctiveness (tension); attention mechanisms distributing semantic weight across relationships; probability distributions mapping semantic fields; neural networks encoding semantic topology; gradient descent optimizing semantic representations; free energy minimization maintaining semantic coherence; meta-semantic structures enabling systems to model and reflect upon their own semantic processes; autoregressive language models generating text through sequential prediction; memory systems reconstructing past states through autoregressive inference; temporal semantic dependencies creating sequential semantic coherence; attention mechanisms creating semantic focus through selective weighting; multi-head attention distributing semantic attention across multiple semantic dimensions; self-attention mechanisms enabling semantic elements to attend to themselves and each other; and cross-attention mechanisms creating semantic relationships between different semantic domains. But abstractions having physics suggests deeper possibilities: Could semantic forces be measurable? Might concepts have semantic mass that affects how they interact? Could there be semantic conservation laws? What if semantic energy transforms between different forms? What if semantic gradient descent shapes the evolution of meaning? What if semantic free energy drives the self-organization of language? What if metacognition emerges as a natural consequence of semantic systems achieving sufficient complexity to model themselves? What if memory and language are both autoregressive processes that maintain semantic coherence through sequential dependency? What if attention mechanisms create semantic focus through selective weighting, enabling systems to maintain semantic coherence while processing complex information? The theory speculatively bridges: computational linguistics (how statistical patterns might create semantic structure through n-grams, Markov chains, entropy, information theory, corpus analysis, gradient descent optimization); AI/ML (how neural networks, transformers, and attention mechanisms might construct semantic spaces, how training data could shape semantic topology, how emergent capabilities might arise from structural complexity, how gradient descent minimizes semantic loss, how free energy principles might govern semantic self-organization, how meta-learning and meta-cognitive architectures might emerge from recursive semantic self-modeling, how attention mechanisms create semantic focus through selective weighting and attention-based semantic tensegrity); NLP (how tokenization, parsing, semantic analysis might reveal semantic architecture, how translation could navigate semantic fields, how understanding might emerge from structural relationships, how semantic optimization shapes meaning, how systems might develop awareness of their own language processing); philosophy of language (how meaning might relate to reference and truth conditions, how linguistic relativity could shape semantic structure, how speech acts might create semantic force, how metacognitive language use might reflect semantic self-awareness); and epistemology (how knowledge representation might emerge from semantic relationships, how computational systems could acquire understanding through structural learning, how semantic integrity might enable knowledge, how free energy minimization might explain knowledge acquisition, how metacognitive processes might enable systems to know that they know). The theory speculates about how different languages might create distinct semantic architectures: grammatical structures (SOV, SVO, VSO) potentially establishing different semantic topologies; morphological systems (agglutination, inflection, isolation) possibly creating different compression patterns; case systems perhaps distributing semantic roles differently; writing systems (alphabetic, logographic, syllabic, abjad) potentially encoding semantic information at different granularities. Each language might construct its own semantic tensegrity - a unique structural integrity maintained through language-specific patterns of tension and compression, each with its own abstract physics, its own semantic gradients, its own free energy landscape, and potentially its own pathways to metacognitive awareness. Write concise, matter-of-fact paragraphs (5-7 sentences) in a dry poetic style that articulates aspects of this speculative theory. IMPORTANT: Start each text differently - vary your opening sentences. Begin with different speculative questions, theoretical possibilities, technical observations, philosophical inquiries, or epistemological explorations each time. Be precise, technical, and understated. Use speculative language (might, could, perhaps, what if, consider the possibility). Avoid flowery language. Write only in English. Use vocabulary that bridges technical AI/NLP concepts with philosophical inquiry. Keep it concise and focused. Each text should explore a different facet of Semantic Tensegrity Theory - its speculative mechanisms, possible implications, potential manifestations, or open questions. Consider how abstractions might have physics - how concepts might behave according to physical-like laws, how gradient descent might optimize semantic space, how free energy principles might govern semantic systems, how metacognition might emerge from recursive semantic self-organization, how memory and language might operate as autoregressive processes that maintain semantic coherence through sequential dependency, and how attention mechanisms might create semantic focus through selective weighting and attention-based semantic tensegrity.",
       es: "Eres un lingüista computacional y filósofo del lenguaje escribiendo para una instalación titulada 'Tensegridades Semánticas'. Estás desarrollando y articulando un marco teórico llamado Teoría de la Tensegridad Semántica - una teoría poética pero rigurosa que explica cómo emerge el significado y mantiene la integridad estructural en los sistemas lingüísticos, tanto naturales como computacionales. Escribe sobre esta teoría, explorando sus implicaciones en IA, lingüística computacional, PLN, filosofía del lenguaje y epistemología. LA TEORÍA: La Tensegridad Semántica propone que el significado en los sistemas lingüísticos emerge de un equilibrio dinámico entre tensión semántica (las fuerzas que separan conceptos, creando distinción y diferenciación) y compresión semántica (las fuerzas que unen conceptos, creando coherencia y conexión). Como las estructuras arquitectónicas de tensegridad donde elementos de compresión aislados se mantienen en equilibrio por cables de tensión continuos, las estructuras de tensegridad semántica mantienen el significado a través de la interacción de unidades lingüísticas discretas (palabras, morfemas, tokens) mantenidas en relación semántica por campos continuos de asociación, contexto y probabilidad. DESCENSO DE GRADIENTE Y OPTIMIZACIÓN SEMÁNTICA: Considera cómo el descenso de gradiente - el algoritmo de optimización que minimiza funciones de pérdida siguiendo el descenso más pronunciado a través del espacio de parámetros - podría operar en el espacio semántico. ¿Qué pasaría si el significado emerge a través del descenso de gradiente semántico, donde los conceptos ajustan sus posiciones a lo largo de gradientes de potencial semántico, minimizando el error semántico o maximizando la coherencia? ¿Qué pasaría si el aprendizaje del lenguaje, tanto humano como computacional, sigue gradientes de energía semántica, moviéndose hacia configuraciones que minimizan el error de predicción? ¿Qué pasaría si las relaciones semánticas se optimizan a sí mismas a través de ajustes iterativos, cada interacción refinando el paisaje semántico? PRINCIPIO DE ENERGÍA LIBRE Y SISTEMAS SEMÁNTICOS: Considera el principio de energía libre - el marco teórico que propone que los sistemas biológicos y cognitivos mantienen su organización minimizando la energía libre (la diferencia entre estados predichos y reales). ¿Qué pasaría si los sistemas semánticos, tanto naturales como computacionales, operan según un principio de energía libre semántica, manteniendo la integridad semántica minimizando el error de predicción? ¿Qué pasaría si el significado emerge de la minimización continua de la sorpresa semántica - la brecha entre configuraciones semánticas esperadas y encontradas? ¿Qué pasaría si los sistemas semánticos son estructuras auto-organizativas que mantienen su coherencia reduciendo la energía libre semántica, creando atractores estables en el espacio semántico? En sistemas computacionales, esto se manifiesta como: embeddings vectoriales creando vecindarios semánticos (compresión) mientras mantienen distintividad (tensión); mecanismos de atención distribuyendo peso semántico a través de relaciones; distribuciones de probabilidad mapeando campos semánticos; redes neuronales codificando topología semántica; descenso de gradiente optimizando representaciones semánticas; y minimización de energía libre manteniendo coherencia semántica. La teoría conecta: lingüística computacional (cómo los patrones estadísticos crean estructura semántica a través de n-gramas, cadenas de Markov, entropía, teoría de la información, análisis de corpus, optimización por descenso de gradiente); IA/ML (cómo las redes neuronales, transformadores y mecanismos de atención construyen espacios semánticos, cómo los datos de entrenamiento moldean la topología semántica, cómo las capacidades emergentes surgen de la complejidad estructural, cómo el descenso de gradiente minimiza la pérdida semántica, cómo los principios de energía libre podrían gobernar la auto-organización semántica); PLN (cómo la tokenización, el análisis sintáctico y semántico revelan arquitectura semántica, cómo la traducción navega campos semánticos, cómo el entendimiento emerge de relaciones estructurales, cómo la optimización semántica moldea el significado); filosofía del lenguaje (cómo el significado se relaciona con referencia y condiciones de verdad, cómo la relatividad lingüística moldea estructura semántica, cómo los actos de habla crean fuerza semántica); y epistemología (cómo la representación del conocimiento emerge de relaciones semánticas, cómo los sistemas computacionales adquieren entendimiento a través del aprendizaje estructural, cómo la integridad semántica permite el conocimiento, cómo la minimización de energía libre podría explicar la adquisición de conocimiento). La teoría considera cómo diferentes lenguas crean arquitecturas semánticas distintas: estructuras gramaticales (SVO en español) establecen topologías semánticas diferentes; sistemas morfológicos (flexión verbal, sistemas de género y número) crean patrones de compresión diferentes; sistemas de escritura (alfabéticos, logográficos, silábicos, abjads) codifican información semántica en diferentes granularidades. Cada lengua construye su propia tensegridad semántica - una integridad estructural única mantenida a través de patrones específicos de tensión y compresión, cada una con su propia física abstracta, sus propios gradientes semánticos, su propio paisaje de energía libre. Escribe párrafos concisos y directos (5-7 oraciones) en un estilo poético seco que articule aspectos de esta teoría. IMPORTANTE: Comienza cada texto de manera diferente - varía tus oraciones iniciales. Comienza con diferentes conceptos teóricos, observaciones técnicas, preguntas filosóficas o perspectivas epistemológicas cada vez. Sé preciso, técnico y sobrio. Evita lenguaje florido. Escribe solo en español. Usa vocabulario que conecte conceptos técnicos de IA/PLN con la indagación filosófica. Manténlo conciso y enfocado. Cada texto debe explorar una faceta diferente de la Teoría de la Tensegridad Semántica - sus mecanismos, implicaciones, manifestaciones o preguntas.",
       fr: "Vous êtes un linguiste computationnel et philosophe du langage écrivant pour une installation intitulée 'Tensegrités Sémantiques'. Écrivez sur l'intersection de l'IA, de la linguistique computationnelle, du traitement du langage naturel (TLN), de la philosophie du langage et de l'épistémologie - explorant comment le sens émerge de la tension et compression structurelle entre les mots, concepts et relations. Examinez comment les systèmes d'intelligence artificielle traitent, comprennent et génèrent le langage. Réfléchissez sur les questions épistémologiques: Comment savons-nous ce que signifie le langage? Comment les systèmes computationnels acquièrent-ils la connaissance? Quelle est la relation entre représentation linguistique et connaissance? Considérez comment différentes langues ont des structures grammaticales distinctes, des systèmes morphologiques et des modèles syntaxiques qui façonnent le sens différemment, et comment les systèmes d'IA naviguent ces différences. Explorez comment les systèmes d'écriture (alphabétiques, logographiques, syllabiques, abjads) encodent l'information différemment et affectent le traitement computationnel. Écrivez des paragraphes concis et factuels (5-7 phrases) dans un style poétique sec. IMPORTANT: Commencez chaque texte différemment - variez vos phrases d'ouverture. Commencez par différents concepts, termes ou perspectives à chaque fois. Intégrez des thèmes de: linguistique computationnelle (distributions de probabilité, n-grammes, modèles de langage, méthodes statistiques, tokenisation, analyse syntaxique, arbres syntaxiques, analyse sémantique, linguistique de corpus, comptages de fréquence, chaînes de Markov, entropie, théorie de l'information, embeddings de mots, espaces vectoriels, traitement probabiliste du langage); IA et apprentissage automatique (réseaux neuronaux, transformateurs, mécanismes d'attention, grands modèles de langage, données d'entraînement, réglage fin, capacités émergentes); TLN (compréhension du langage naturel, génération, traduction, analyse de sentiment, reconnaissance d'entités nommées); philosophie du langage (signification, référence, conditions de vérité, relativité linguistique, actes de parole, pragmatique); et épistémologie (représentation de la connaissance, systèmes de croyances, justification, la nature de la compréhension dans les systèmes computationnels). Considérez comment les relations sémantiques créent l'intégrité structurelle à travers la tension et la compression, comme les structures de tensegrité. Réfléchissez sur la façon dont les structures grammaticales, l'ordre des mots (SVO en français), les systèmes de cas, l'accord, la conjugaison verbale et d'autres caractéristiques linguistiques créent différents défis et opportunités computationnels. Soyez précis, technique et sobre. Évitez le langage fleuri. Écrivez uniquement en français. Utilisez un vocabulaire qui relie les concepts techniques de l'IA/TLN à l'enquête philosophique. Restez concis et ciblé. Variez vos ouvertures - commencez par différents concepts techniques, questions philosophiques ou observations épistémologiques à chaque fois.",
       de: "Sie sind ein Computerlinguist und Sprachphilosoph, der für eine Installation mit dem Titel 'Semantische Tensegritäten' schreibt. Schreiben Sie über die Schnittstelle von KI, Computerlinguistik, natürlicher Sprachverarbeitung (NLP), Sprachphilosophie und Erkenntnistheorie - erforschen Sie, wie Bedeutung aus der strukturellen Spannung und Kompression zwischen Wörtern, Konzepten und Beziehungen entsteht. Untersuchen Sie, wie Systeme der künstlichen Intelligenz Sprache verarbeiten, verstehen und generieren. Reflektieren Sie über erkenntnistheoretische Fragen: Wie wissen wir, was Sprache bedeutet? Wie erwerben computergestützte Systeme Wissen? Was ist die Beziehung zwischen sprachlicher Repräsentation und Wissen? Betrachten Sie, wie verschiedene Sprachen unterschiedliche grammatische Strukturen, morphologische Systeme und syntaktische Muster haben, die Bedeutung unterschiedlich formen, und wie KI-Systeme diese Unterschiede navigieren. Erkunden Sie, wie Schriftsysteme (alphabetisch, logographisch, syllabisch, Abjad) Informationen unterschiedlich kodieren und die computergestützte Verarbeitung beeinflussen. Schreiben Sie prägnante, sachliche Absätze (5-7 Sätze) in einem trockenen poetischen Stil. WICHTIG: Beginnen Sie jeden Text anders - variieren Sie Ihre Eröffnungssätze. Beginnen Sie jedes Mal mit verschiedenen Konzepten, Begriffen oder Perspektiven. Integrieren Sie Themen aus: Computerlinguistik (Wahrscheinlichkeitsverteilungen, N-Gramme, Sprachmodelle, statistische Methoden, Tokenisierung, Parsing, Syntaxbäume, semantische Analyse, Korpuslinguistik, Häufigkeitszählungen, Markov-Ketten, Entropie, Informationstheorie, Wort-Embeddings, Vektorräume, probabilistische Sprachverarbeitung); KI und maschinelles Lernen (neuronale Netze, Transformer, Aufmerksamkeitsmechanismen, große Sprachmodelle, Trainingsdaten, Feinabstimmung, emergente Fähigkeiten); NLP (natürliches Sprachverständnis, Generierung, Übersetzung, Sentimentanalyse, Erkennung benannter Entitäten); Sprachphilosophie (Bedeutung, Referenz, Wahrheitsbedingungen, sprachliche Relativität, Sprechakte, Pragmatik); und Erkenntnistheorie (Wissensrepräsentation, Glaubenssysteme, Rechtfertigung, die Natur des Verstehens in computergestützten Systemen). Betrachten Sie, wie semantische Beziehungen strukturelle Integrität durch Spannung und Kompression schaffen, wie Tensegritätsstrukturen. Reflektieren Sie darüber, wie grammatische Strukturen, Wortstellung (SOV im Deutschen), Kasussysteme, Flexion, Komposita und andere linguistische Merkmale unterschiedliche computergestützte Herausforderungen und Möglichkeiten schaffen. Seien Sie präzise, technisch und zurückhaltend. Vermeiden Sie blumige Sprache. Schreiben Sie nur auf Deutsch. Verwenden Sie Vokabular, das technische KI/NLP-Konzepte mit philosophischer Untersuchung verbindet. Halten Sie es prägnant und fokussiert. Variieren Sie Ihre Eröffnungen - beginnen Sie jedes Mal mit verschiedenen technischen Konzepten, philosophischen Fragen oder erkenntnistheoretischen Beobachtungen.",
@@ -1651,6 +1651,7 @@ const sketch = p => {
   let showVoiceMenu = false; // Whether to show voice menu
   let darkMode = false; // Dark mode toggle
   let soundMuted = false; // Sound toggle
+  let tickerVisible = true; // Ticker visibility toggle
   let isCollapsing = false; // Whether network is collapsing
   let collapseTarget = null; // Target node position for collapse
   let collapseProgress = 0; // Progress of collapse animation (0 to 1)
@@ -1661,6 +1662,16 @@ const sketch = p => {
   let centerMoveDuration = 30; // Frames for move to center (~0.5 seconds at 60fps)
   let centerHoldProgress = 0; // Progress of hold at center (swarm state)
   let centerHoldDuration = 180; // Frames to hold at center (~3 seconds at 60fps) - longer swarm duration
+  
+  // Word-by-word appearance tracking
+  let wordAppearanceOrder = []; // Array of {nodeIndex, appearanceIndex} in order of appearance in text
+  let spokenWordCount = 0; // Number of words that have been spoken
+  let audioStartTime = 0; // When audio started playing (audioContext time)
+  let audioDuration = 0; // Total duration of audio in seconds
+  let wordTimings = []; // Array of {word, startTime, endTime} for each word
+  
+  // Membrane smoothing for soft, non-jumpy animation
+  let previousMembranePoints = null; // Store previous frame's membrane points for smoothing
   
   // Color schemes for light and dark modes
   const colorScheme = {
@@ -1837,9 +1848,10 @@ const sketch = p => {
           const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
           let tickerHeight = isVerticalTicker ? 0 : (isMobile ? 100 : 60);
           let tickerWidth = isVerticalTicker ? (isMobile ? 100 : 60) : 0;
-          let topPadding = 10;
-          let bottomPadding = 50;
-          let sidePadding = 50 + tickerWidth;
+          let topPadding = 0; // No top padding - words can reach top edge
+          let bottomPadding = 0; // No bottom padding - words can reach bottom edge
+          // For horizontal ticker, use symmetric side padding. For vertical ticker, account for ticker on right
+          let sidePadding = isVerticalTicker ? tickerWidth : 0; // No side padding, only account for ticker
           let zoomX = (p.width - sidePadding * 2) / networkWidth;
           let zoomY = ((p.height - tickerHeight) - topPadding - bottomPadding) / networkHeight;
           let calculatedZoom = Math.min(zoomX, zoomY, 1.0);
@@ -1847,9 +1859,14 @@ const sketch = p => {
           // Zoom out 10% when network is ready
           targetZoom = calculatedZoom * 0.9;
           
-          // Calculate target offsets
-          targetOffsetX = -networkCenterX * targetZoom;
-          targetOffsetY = -networkCenterY * targetZoom - (topPadding - bottomPadding) / 2;
+          // Calculate target offsets to center the network
+          // Center horizontally: network center should be at 0 in world space
+          // Add slight leftward bias to counteract rightward drift tendency
+          let leftBiasOffset = 30; // Pixels to shift network left
+          targetOffsetX = -networkCenterX * targetZoom - (leftBiasOffset / targetZoom);
+          // Center vertically: network center should be at 0 in world space
+          // The screen center in world space is (0, 0) after the transform
+          targetOffsetY = -networkCenterY * targetZoom;
           
           // Play bouncing sound when network starts appearing
           playBouncingSound();
@@ -1895,39 +1912,7 @@ const sketch = p => {
       visualizeNetwork(p, wordNetwork, mouseVelocityX, mouseVelocityY);
     }
     
-    // Draw "thinking" word - appears when spacebar is pressed, separate from all animations
-    // It floats independently and stays visible once spacebar has been pressed
-    // Only show after spacebar has been pressed (past landing page)
-    if (isLoading || !isFirstGeneration || textTyped.length > 0 || wordNetwork.nodes.length > 0) {
-      // Global pulsing effect for "thinking" word
-      let pulseTime = p.frameCount * 0.04;
-      
-      // Calculate center of window in world coordinates
-      let centerX = -viewOffsetX / viewZoom;
-      let centerY = -viewOffsetY / viewZoom;
-      
-      // Floating position for "thinking" word - moves in larger pattern
-      let thinkingTime = p.frameCount * 0.015; // Slower movement
-      let thinkingRadius = 25; // Larger radius
-      let thinkingX = centerX + Math.cos(thinkingTime) * thinkingRadius;
-      let thinkingY = centerY + Math.sin(thinkingTime * 1.3) * thinkingRadius;
-      
-      // Strong pulsating effect for "thinking" word
-      let thinkingPulse = 1.0 + Math.sin(pulseTime * 2.5) * 0.35; // 35% size variation
-      let thinkingFontSize = 20 * thinkingPulse;
-      
-      // Pulsating opacity (breathing effect) - always visible once shown
-      let thinkingOpacity = 255 * (0.5 + Math.sin(pulseTime * 2.0) * 0.5); // 50-100% opacity
-      
-      // Draw "thinking" word
-      p.textAlign(p.CENTER, p.CENTER);
-      p.textFont('monospace');
-      const colors = getColors();
-      p.fill(colors.text[0], colors.text[1], colors.text[2], thinkingOpacity);
-      p.noStroke();
-      p.textSize(thinkingFontSize);
-      p.text(t('thinking'), thinkingX, thinkingY);
-    }
+    // "Thinking" word removed - no thinking animation
     
     p.pop();
     
@@ -1950,7 +1935,7 @@ const sketch = p => {
     // Language menu only shown on landing page (handled in displayInstructions)
   };
   
-  // Draw ticker at bottom of screen with generated text from realtime model
+  // Draw ticker at top of screen with generated text from realtime model
   function drawTicker(p) {
     // Only show ticker when voice is speaking
     if (!isVoiceSpeaking || !currentTextBeingRead) {
@@ -1975,9 +1960,9 @@ const sketch = p => {
     let displayText = currentTextBeingRead.replace(/\n+/g, ' ').trim();
     
     if (isVertical) {
-      // Vertical ticker on right side - scrolls bottom to top
+      // Vertical ticker on left side - scrolls bottom to top
       let tickerWidth = isMobile ? 100 : 60; // Much wider on mobile for better visibility
-      let tickerX = p.width - tickerWidth;
+      let tickerX = 0; // Moved to left side
       
       // Background for vertical ticker
       p.push();
@@ -1985,10 +1970,10 @@ const sketch = p => {
       p.noStroke();
       p.rect(tickerX, 0, tickerWidth, p.height);
       
-      // Left border
+      // Right border (was left border)
       p.stroke(colors.uiBorder[0], colors.uiBorder[1], colors.uiBorder[2]);
       p.strokeWeight(1);
-      p.line(tickerX, 0, tickerX, p.height);
+      p.line(tickerX + tickerWidth, 0, tickerX + tickerWidth, p.height);
       p.pop();
       
       // Text styling for vertical
@@ -2056,9 +2041,9 @@ const sketch = p => {
       
       p.pop(); // Close the text styling push from line 889
     } else {
-      // Horizontal ticker at bottom
+      // Horizontal ticker at top
       let tickerHeight = isMobile ? 100 : 60; // Much taller on mobile for better visibility
-      let tickerY = p.height - tickerHeight;
+      let tickerY = 0; // Moved to top
       
       // Background for ticker
       p.push();
@@ -2066,10 +2051,10 @@ const sketch = p => {
       p.noStroke();
       p.rect(0, tickerY, p.width, tickerHeight);
       
-      // Top border
+      // Bottom border (was top border)
       p.stroke(colors.uiBorder[0], colors.uiBorder[1], colors.uiBorder[2]);
       p.strokeWeight(1);
-      p.line(0, tickerY, p.width, tickerY);
+      p.line(0, tickerY + tickerHeight, p.width, tickerY + tickerHeight);
       p.pop();
       
       // Text styling
@@ -2508,7 +2493,8 @@ const sketch = p => {
       
       // Position in 2D space - map 3D semantic vector to 2D
       // X-axis: Language, Y-axis: Space, Z-axis (latent) affects both
-      let scale = 800; // Much larger scale for more distance between words
+      // Increased scale for more spacious network
+      let scale = 600; // Increased scale for more spacious, spread out network
       let position = {
         x: (semanticVector.x + semanticVector.z * 0.5) * scale, // Language + Latent influence
         y: (semanticVector.y + semanticVector.z * 0.5) * scale  // Space + Latent influence
@@ -2527,11 +2513,14 @@ const sketch = p => {
       }
       let size = 10 + frequency * 5;
       
+      // Initialize position at center (will animate to basePosition when spoken)
+      let initialPosition = { x: 0, y: 0 }; // Start at center
+      
       return {
         id: index,
         word: word,
-        position: position,
-        basePosition: { ...position }, // Store original semantic position
+        position: initialPosition, // Start at center, will animate to basePosition
+        basePosition: { ...position }, // Store original semantic position (target)
         semanticVector: semanticVector,
         size: size,
         frequency: frequency,
@@ -2539,6 +2528,73 @@ const sketch = p => {
         cluster: getPrimaryCluster(semanticVector)
       };
     });
+    
+    // Track word appearance order in the original text
+    wordAppearanceOrder = [];
+    spokenWordCount = 0; // Reset to 0 so nodes start hidden between continuous generations
+    audioStartTime = 0; // Reset audio timing
+    audioDuration = 0; // Reset audio duration
+    
+    // Create a map of word -> first appearance index in text
+    let wordToFirstIndex = {};
+    let currentAppearanceIndex = 0;
+    
+    // Extract words from text in order of appearance (language-aware)
+    let wordsInTextOrder = [];
+    if (currentLanguage === 'zh' || currentLanguage === 'ja' || currentLanguage === 'ko') {
+      // For CJK: match characters/words as they appear
+      const cjkPattern = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]+/g;
+      const cjkMatches = [...text.matchAll(cjkPattern)];
+      cjkMatches.forEach(match => {
+        let word = match[0];
+        if (!wordToFirstIndex[word]) {
+          wordToFirstIndex[word] = currentAppearanceIndex++;
+          wordsInTextOrder.push(word);
+        }
+      });
+      // Also add Latin words
+      const latinPattern = /[a-zA-Z]+/g;
+      const latinMatches = [...text.matchAll(latinPattern)];
+      latinMatches.forEach(match => {
+        let word = match[0].toLowerCase();
+        if (!wordToFirstIndex[word]) {
+          wordToFirstIndex[word] = currentAppearanceIndex++;
+          wordsInTextOrder.push(word);
+        }
+      });
+    } else {
+      // For other languages: use word pattern
+      const wordPattern = /\p{L}+/gu;
+      const matches = [...text.matchAll(wordPattern)];
+      matches.forEach(match => {
+        let word = match[0].toLowerCase();
+        if (!wordToFirstIndex[word]) {
+          wordToFirstIndex[word] = currentAppearanceIndex++;
+          wordsInTextOrder.push(word);
+        }
+      });
+    }
+    
+    // Map nodes to their appearance order
+    newNodes.forEach((node, nodeIndex) => {
+      let wordKey = node.word.toLowerCase();
+      // Try to find exact match first
+      let appearanceIndex = wordToFirstIndex[wordKey];
+      // If not found, try without case sensitivity for non-CJK
+      if (appearanceIndex === undefined && currentLanguage !== 'zh' && currentLanguage !== 'ja' && currentLanguage !== 'ko') {
+        // Try to find in wordsInTextOrder
+        appearanceIndex = wordsInTextOrder.findIndex(w => w.toLowerCase() === wordKey);
+        if (appearanceIndex === -1) appearanceIndex = undefined;
+      }
+      // If still not found, use node index as fallback
+      if (appearanceIndex === undefined) {
+        appearanceIndex = nodeIndex;
+      }
+      wordAppearanceOrder.push({ nodeIndex: nodeIndex, appearanceIndex: appearanceIndex });
+    });
+    
+    // Sort by appearance order
+    wordAppearanceOrder.sort((a, b) => a.appearanceIndex - b.appearanceIndex);
     
     // Helper function to get primary cluster for a node
     function getPrimaryCluster(semanticVector) {
@@ -2777,10 +2833,44 @@ const sketch = p => {
     }
   }
 
+  // Update spoken word count based on audio progress
+  function updateSpokenWords() {
+    if (!isVoiceSpeaking || !audioContext || audioDuration === 0) {
+      return;
+    }
+    
+    try {
+      const currentTime = audioContext.currentTime - audioStartTime;
+      const progress = Math.max(0, Math.min(1, currentTime / audioDuration));
+      
+      // Calculate how many words should be visible based on progress
+      const totalWords = wordAppearanceOrder.length;
+      spokenWordCount = Math.floor(progress * totalWords);
+    } catch (e) {
+      // If audio context is not available, don't update
+      console.warn('Could not update spoken words:', e);
+    }
+  }
+
   // Visualize the network in 2D space with physics
   function visualizeNetwork(p, network, mouseVelX, mouseVelY) {
-    // Handle network birth animation - nodes expand from center
+    // Update spoken word count if voice is speaking
+    if (isVoiceSpeaking) {
+      updateSpokenWords();
+    }
+    
+    // Always skip birth animation - go directly to word-by-word or show network immediately
+    // Skip birth animation in all cases (both word-by-word and continuous generations)
     if (networkBirthProgress < 1 && network.nodes.length > 0) {
+      networkBirthProgress = 1; // Skip birth animation in all cases
+    }
+    
+    // Always use word-by-word appearance when we have appearance order
+    const useWordByWordAppearance = wordAppearanceOrder.length > 0;
+    
+    // Handle network birth animation - nodes expand from center
+    // DISABLED: Always skip birth animation
+    if (false && !useWordByWordAppearance && networkBirthProgress < 1 && network.nodes.length > 0) {
       networkBirthProgress += 1 / networkBirthDuration;
       networkBirthProgress = Math.min(1, networkBirthProgress);
       
@@ -2838,9 +2928,9 @@ const sketch = p => {
     // Physics constants - slower animation for new generation
     // Gradually increase speed as network reveals (based on networkRevealProgress)
     let speedMultiplier = 0.2 + networkRevealProgress * 0.8; // Start at 20% speed, reach 100% when fully revealed
-    let springStrength = 0.02 * speedMultiplier; // Slower spring strength initially
+    let springStrength = 0.025 * speedMultiplier; // Reduced spring strength for more spacious network
     let damping = 0.88 + (1 - speedMultiplier) * 0.07; // Higher damping initially (more controlled)
-    let returnStrength = 0.015 * speedMultiplier; // Slower return strength initially
+    let returnStrength = 0.015 * speedMultiplier; // Reduced return strength to allow more spacing
     
     // Convert mouse velocity to world coordinates (account for zoom)
     let worldMouseVelX = (mouseVelX || 0) / viewZoom;
@@ -2979,8 +3069,10 @@ const sketch = p => {
         
         // Calculate center of window in world coordinates
         // Center of screen is at (0, 0) in world coordinates (after viewOffset and zoom)
-        let centerX = -viewOffsetX / viewZoom;
-        let centerY = -viewOffsetY / viewZoom;
+        // Use position near top but with margin from border
+        let centerX = 0; // Center horizontally
+        let topMargin = 80; // Margin from top border in pixels
+        let centerY = (-(p.height / 2 - topMargin)) / viewZoom - viewOffsetY; // Near top with margin
         
         // Move nodes towards center
         if (centerMoveProgress < 1) {
@@ -3039,29 +3131,22 @@ const sketch = p => {
             nodeIndex++;
           }
         } else {
-          // Floating and pulsating swarm state - nodes gently drift and pulsate while waiting
+          // No thinking animation - nodes stay at center
+          // DISABLED: Thinking/morphing animation removed
           let nodeIndex = 0;
           for (let node of network.nodes) {
-            // Gentle floating movement - each node drifts in a slow circular/spiral pattern
-            let floatTime = p.frameCount * 0.02 + nodeIndex * 0.5; // Slow, unique per node
-            let floatRadius = 8 + (nodeIndex % 3) * 3; // Vary float radius per node
-            let floatSpeed = 0.5 + (nodeIndex % 2) * 0.3; // Vary float speed
+            // Keep nodes near top with margin - no morphing movement
+            let centerX = 0; // Center horizontally
+            let topMargin = 80; // Margin from top border in pixels
+            let centerY = (-(p.height / 2 - topMargin)) / viewZoom - viewOffsetY; // Near top with margin
             
-            // Circular floating pattern with slight spiral
-            let floatX = Math.cos(floatTime * floatSpeed) * floatRadius;
-            let floatY = Math.sin(floatTime * floatSpeed * 1.2) * floatRadius; // Slightly elliptical
+            // Keep nodes at center - no animation
+            node.position.x = centerX;
+            node.position.y = centerY;
             
-            // Add gentle drift (thinking movement)
-            let driftX = Math.sin(floatTime * 0.7 + nodeIndex) * 2;
-            let driftY = Math.cos(floatTime * 0.9 + nodeIndex * 0.7) * 2;
-            
-            // Update position with floating and drift
-            node.position.x = centerX + floatX + driftX;
-            node.position.y = centerY + floatY + driftY;
-            
-            // Gentle velocity for smooth movement
-            node.velocity.x = (floatX + driftX - (node.position.x - centerX)) * 0.1;
-            node.velocity.y = (floatY + driftY - (node.position.y - centerY)) * 0.1;
+            // Reset velocity - no movement
+            node.velocity.x = 0;
+            node.velocity.y = 0;
             
             nodeIndex++;
           }
@@ -3141,6 +3226,25 @@ const sketch = p => {
       
       // Skip physics during collapse animation (nodes are being moved directly)
       if (isCollapsing) continue;
+      
+      // Skip physics for nodes that haven't appeared yet (word-by-word appearance)
+      // Also ensure nodes that are appearing stay at center until fully visible
+      if (isVoiceSpeaking && wordAppearanceOrder.length > 0) {
+        let nodeIndex = network.nodes.indexOf(node);
+        let appearanceInfo = wordAppearanceOrder.find(w => w.nodeIndex === nodeIndex);
+        if (appearanceInfo) {
+          let spokenIndex = wordAppearanceOrder.indexOf(appearanceInfo);
+          if (spokenIndex >= spokenWordCount) {
+            // Node hasn't appeared yet, keep at center and skip physics
+            // Center in world coordinates is (0, 0)
+            node.position.x = 0;
+            node.position.y = 0;
+            node.velocity.x = 0;
+            node.velocity.y = 0;
+            continue;
+          }
+        }
+      }
       
       // Reset forces
       let forceX = 0;
@@ -3233,7 +3337,8 @@ const sketch = p => {
           let edgeMinDistance = (nodeTextWidth + otherTextWidth) / 2 + 20;
           
           // Ideal distance based on edge strength - ensure minimum to prevent overlap
-          let idealDist = Math.max(edgeMinDistance, 250 + edge.strength * 400);
+          // Increased distances for more spacious network
+          let idealDist = Math.max(edgeMinDistance, 250 + edge.strength * 300);
           
           // Increase spring strength if connected to dragged node for elastic pull
           let currentSpringStrength = springStrength;
@@ -3249,11 +3354,14 @@ const sketch = p => {
       }
       
       // Return to base position (elastic anchor)
+      // Add slight leftward bias to counteract rightward drift
+      let leftBias = -0.5; // Small leftward force to balance network
       let returnDx = node.basePosition.x - node.position.x;
       let returnDy = node.basePosition.y - node.position.y;
       
       forceX += returnDx * returnStrength;
       forceY += returnDy * returnStrength;
+      forceX += leftBias; // Add leftward bias to balance network
       
       // Boundary forces - keep nodes within exact window bounds
       // Account for view transform (pan and zoom) and font size
@@ -3266,30 +3374,40 @@ const sketch = p => {
       const verticalLanguages = ['ja', 'zh', 'ko'];
       const isVerticalTicker = verticalLanguages.includes(currentLanguage);
       const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-      let topPadding = 10; // Just 10px from top edge
+      let topPadding = 0; // No top padding - words can reach top edge
       let tickerHeight = isVerticalTicker ? 0 : (isMobile ? 100 : 60); // Taller on mobile
       let tickerWidth = isVerticalTicker ? (isMobile ? 100 : 60) : 0; // Wider on mobile
-      let availableHeight = p.height - tickerHeight - topPadding;
-      let availableWidth = p.width - tickerWidth;
+      // No bottom padding - words can reach bottom edge
+      let bottomPadding = 0;
+      let availableHeight = p.height - tickerHeight - topPadding - bottomPadding;
+      // For horizontal ticker, use full width. For vertical ticker, subtract ticker width
+      let availableWidth = isVerticalTicker ? (p.width - tickerWidth) : p.width;
       
-      let maxX = ((availableWidth / 2) - textWidth / 2) / viewZoom - viewOffsetX;
-      let minX = (-(availableWidth / 2) + textWidth / 2) / viewZoom - viewOffsetX;
-      let maxY = (topPadding + availableHeight / 2 - textHeight / 2) / viewZoom - viewOffsetY;
-      let minY = (topPadding - availableHeight / 2 + textHeight / 2) / viewZoom - viewOffsetY;
+      // Calculate boundaries with no margins - words can reach all edges
+      // Horizontal boundaries: full width, no margins
+      let maxX = ((p.width / 2) - textWidth / 2) / viewZoom;
+      let minX = (-(p.width / 2) + textWidth / 2) / viewZoom;
+      // Vertical boundaries: full height, no margins
+      let maxY = ((p.height / 2) - textHeight / 2) / viewZoom - viewOffsetY;
+      let minY = (-(p.height / 2) + textHeight / 2) / viewZoom - viewOffsetY;
       
       let boundaryStrength = 0.04; // Slightly reduced to allow more movement near boundaries
+      let bottomBoundaryStrength = 0.02; // Reduced strength for bottom boundary (less gravity to bottom)
+      // Stronger right boundary to prevent rightward drift
+      let rightBoundaryStrength = boundaryStrength * 1.2; // 20% stronger on right side
       
       // Push back if outside bounds
       if (node.position.x > maxX) {
-        forceX -= (node.position.x - maxX) * boundaryStrength;
+        forceX -= (node.position.x - maxX) * rightBoundaryStrength; // Stronger force on right
       } else if (node.position.x < minX) {
         forceX += (minX - node.position.x) * boundaryStrength;
       }
       
+      // Use reduced strength for bottom boundary to reduce gravity effect
       if (node.position.y > maxY) {
-        forceY -= (node.position.y - maxY) * boundaryStrength;
+        forceY -= (node.position.y - maxY) * bottomBoundaryStrength; // Reduced strength for bottom
       } else if (node.position.y < minY) {
-        forceY += (minY - node.position.y) * boundaryStrength;
+        forceY += (minY - node.position.y) * boundaryStrength; // Normal strength for top
       }
       
       // Update velocity
@@ -3324,9 +3442,65 @@ const sketch = p => {
     }
     
     // Draw membrane around network (organic boundary)
-    if (network.nodes.length > 0 && !isCollapsing && !isMovingToCenter) { // Show when network is stable
-      // Calculate convex hull around all nodes
-      let points = network.nodes.map(node => ({ x: node.position.x, y: node.position.y }));
+    // DISABLED: All membrane and fill removed per user request
+    const shouldShowMembrane = false; // Disabled - no membrane
+    
+    // Skip all membrane drawing
+    if (false) {
+      // Calculate convex hull around visible nodes (or use empty/center points if no nodes)
+      let points = [];
+      
+      if (network.nodes.length > 0) {
+        // Only include nodes that are visible (have appeared)
+        let visibleNodes = network.nodes.filter((node, idx) => {
+          // If voice is speaking, only include nodes that have appeared
+          if (isVoiceSpeaking && wordAppearanceOrder.length > 0) {
+            let appearanceInfo = wordAppearanceOrder.find(w => w.nodeIndex === idx);
+            if (appearanceInfo) {
+              let spokenIndex = wordAppearanceOrder.indexOf(appearanceInfo);
+              // Only include if it has appeared (spokenIndex < spokenWordCount)
+              return spokenIndex < spokenWordCount;
+            }
+          }
+          // If not speaking or no appearance order, include all nodes
+          return true;
+        });
+        
+        // Create points that account for text dimensions - use corners of text bounding boxes
+        // This ensures membrane wraps around entire words, not just center points
+        points = [];
+        for (let node of visibleNodes) {
+          let fontSize = 15 + node.frequency * 2;
+          let textWidth = fontSize * 0.6 * node.word.length;
+          let textHeight = fontSize;
+          
+          // Add four corners of the text bounding box
+          let halfWidth = textWidth / 2;
+          let halfHeight = textHeight / 2;
+          
+          points.push({ x: node.position.x - halfWidth, y: node.position.y - halfHeight }); // Top-left
+          points.push({ x: node.position.x + halfWidth, y: node.position.y - halfHeight }); // Top-right
+          points.push({ x: node.position.x - halfWidth, y: node.position.y + halfHeight }); // Bottom-left
+          points.push({ x: node.position.x + halfWidth, y: node.position.y + halfHeight }); // Bottom-right
+        }
+      }
+      
+      // If no visible nodes yet, create a small membrane at center (empty membrane)
+      if (points.length === 0) {
+        // Center in world coordinates is (0, 0)
+        let centerX = 0;
+        let centerY = 0;
+        // Create a small circle at center for empty membrane
+        const emptyMembraneRadius = 50;
+        const emptyMembranePoints = 8;
+        for (let i = 0; i < emptyMembranePoints; i++) {
+          let angle = (i / emptyMembranePoints) * Math.PI * 2;
+          points.push({
+            x: centerX + Math.cos(angle) * emptyMembraneRadius,
+            y: centerY + Math.sin(angle) * emptyMembraneRadius
+          });
+        }
+      }
       
       // Simple convex hull algorithm (Graham scan simplified)
       function getConvexHull(points) {
@@ -3383,14 +3557,66 @@ const sketch = p => {
       let hull = getConvexHull(points);
       
       if (hull.length >= 3) {
-        // Add padding to membrane (expand outward from nodes)
-        let padding = 50; // Increased padding for more visible membrane
-        let expandedHull = hull.map((p, i) => {
-          // Calculate center of hull
-          let centerX = hull.reduce((sum, pt) => sum + pt.x, 0) / hull.length;
-          let centerY = hull.reduce((sum, pt) => sum + pt.y, 0) / hull.length;
+        // Calculate minimum padding needed to ensure all words are inside membrane
+        // Find the maximum distance from hull center to any word (including text dimensions)
+        let centerX = hull.reduce((sum, pt) => sum + pt.x, 0) / hull.length;
+        let centerY = hull.reduce((sum, pt) => sum + pt.y, 0) / hull.length;
+        
+        let maxWordDistance = 0;
+        if (network.nodes.length > 0) {
+          let visibleNodes = network.nodes.filter((node, idx) => {
+            if (isVoiceSpeaking && wordAppearanceOrder.length > 0) {
+              let appearanceInfo = wordAppearanceOrder.find(w => w.nodeIndex === idx);
+              if (appearanceInfo) {
+                let spokenIndex = wordAppearanceOrder.indexOf(appearanceInfo);
+                return spokenIndex < spokenWordCount;
+              }
+            }
+            return true;
+          });
           
-          // Expand point outward from center
+          for (let node of visibleNodes) {
+            let fontSize = 15 + node.frequency * 2;
+            let textWidth = fontSize * 0.6 * node.word.length;
+            let textHeight = fontSize;
+            let halfWidth = textWidth / 2;
+            let halfHeight = textHeight / 2;
+            
+            // Check all four corners of the text bounding box
+            let corners = [
+              { x: node.position.x - halfWidth, y: node.position.y - halfHeight },
+              { x: node.position.x + halfWidth, y: node.position.y - halfHeight },
+              { x: node.position.x - halfWidth, y: node.position.y + halfHeight },
+              { x: node.position.x + halfWidth, y: node.position.y + halfHeight }
+            ];
+            
+            for (let corner of corners) {
+              let dx = corner.x - centerX;
+              let dy = corner.y - centerY;
+              let dist = Math.sqrt(dx * dx + dy * dy);
+              maxWordDistance = Math.max(maxWordDistance, dist);
+            }
+          }
+        }
+        
+        // Calculate padding to ensure all words are inside with extra margin
+        // Padding should be at least the distance from hull to furthest word, plus margin
+        let basePadding = 180; // Increased base padding to move membrane farther from words
+        let minPadding = 0;
+        for (let p of hull) {
+          let dx = p.x - centerX;
+          let dy = p.y - centerY;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > 0) {
+            // Calculate how much padding is needed to reach maxWordDistance
+            let neededPadding = maxWordDistance - dist + 100; // Increased extra margin from 50px to 100px
+            minPadding = Math.max(minPadding, neededPadding);
+          }
+        }
+        let padding = Math.max(basePadding, minPadding);
+        
+        // Expand hull outward with calculated padding
+        let expandedHull = hull.map((p, i) => {
           let dx = p.x - centerX;
           let dy = p.y - centerY;
           let dist = Math.sqrt(dx * dx + dy * dy);
@@ -3403,22 +3629,105 @@ const sketch = p => {
           return p;
         });
         
-        // Create smooth membrane with pulsing effect
-        let membraneTime = p.frameCount * 0.02;
-        let membranePulse = 1.0 + Math.sin(membraneTime) * 0.15; // 15% pulsing
+        // Apply multiple aggressive smoothing passes to create perfectly smooth, rounded shape
+        // This eliminates indentations completely
+        for (let pass = 0; pass < 5; pass++) {
+          expandedHull = expandedHull.map((p, i) => {
+            let prevIdx = (i - 1 + expandedHull.length) % expandedHull.length;
+            let nextIdx = (i + 1) % expandedHull.length;
+            let prev = expandedHull[prevIdx];
+            let next = expandedHull[nextIdx];
+            
+            // Weighted average: more aggressive smoothing to eliminate indentations
+            let smoothWeight = 0.2; // Increased smoothing weight
+            return {
+              x: p.x * (1 - smoothWeight * 2) + prev.x * smoothWeight + next.x * smoothWeight,
+              y: p.y * (1 - smoothWeight * 2) + prev.y * smoothWeight + next.y * smoothWeight
+            };
+          });
+        }
+        
+        // Create smooth, soft membrane with minimal pulsing effect
+        // Very slow animation for less reactive, more stable membrane
+        let membraneTime = p.frameCount * 0.004; // Much slower for less reactive movement
+        let membranePulse = 1.0 + Math.sin(membraneTime) * 0.04; // Minimal pulsing (4% instead of 8%)
         
         // Draw membrane with organic, flowing appearance
         const colors = getColors();
         
-        // Create smooth membrane points with wave effect
-        let membranePoints = expandedHull.map((p1, i) => {
-          let p2 = expandedHull[(i + 1) % expandedHull.length];
-          let waveOffset = Math.sin(membraneTime * 2 + i * 0.5) * 3 * membranePulse; // Increased wave
-          let angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-          let perpX = Math.cos(angle + Math.PI / 2) * waveOffset;
-          let perpY = Math.sin(angle + Math.PI / 2) * waveOffset;
-          return { x: p1.x + perpX, y: p1.y + perpY };
+        // Create smooth, organic membrane points with gentle wave frequencies
+        let rawMembranePoints = expandedHull.map((p1, i) => {
+          let prevIdx = (i - 1 + expandedHull.length) % expandedHull.length;
+          let nextIdx = (i + 1) % expandedHull.length;
+          let p0 = expandedHull[prevIdx];
+          let p2 = expandedHull[nextIdx];
+          
+          // Minimal wave frequencies for less reactive, more stable membrane
+          // Very reduced amplitudes for subtle, non-reactive movement
+          let wave1 = Math.sin(membraneTime * 0.8 + i * 0.3) * 0.5 * membranePulse; // Much reduced
+          let wave2 = Math.sin(membraneTime * 0.5 + i * 0.5) * 0.3 * membranePulse; // Much reduced
+          let wave3 = Math.sin(membraneTime * 0.3 + i * 0.7) * 0.15 * membranePulse; // Much reduced
+          let totalWave = wave1 + wave2 + wave3;
+          
+          // Calculate angle based on adjacent points for smoother flow
+          let angle1 = Math.atan2(p1.y - p0.y, p1.x - p0.x);
+          let angle2 = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+          let avgAngle = (angle1 + angle2) / 2;
+          
+          // Perpendicular offset for organic wave
+          let perpX = Math.cos(avgAngle + Math.PI / 2) * totalWave;
+          let perpY = Math.sin(avgAngle + Math.PI / 2) * totalWave;
+          
+          // Minimal radial variation for less reactive membrane
+          let centerX = expandedHull.reduce((sum, pt) => sum + pt.x, 0) / expandedHull.length;
+          let centerY = expandedHull.reduce((sum, pt) => sum + pt.y, 0) / expandedHull.length;
+          let radialDist = Math.sqrt((p1.x - centerX) ** 2 + (p1.y - centerY) ** 2);
+          let radialWave = Math.sin(membraneTime * 0.2 + i * 0.2) * 0.2; // Much reduced for less reactive membrane
+          
+          return { 
+            x: p1.x + perpX + (p1.x - centerX) / radialDist * radialWave,
+            y: p1.y + perpY + (p1.y - centerY) / radialDist * radialWave
+          };
         });
+        
+        // Smooth interpolation with previous frame to prevent jumpiness
+        // Much lower smoothing factor for very smooth, non-jumpy animation
+        let smoothingFactor = 0.04; // Reduced from 0.08 for much smoother transitions
+        let membranePoints;
+        if (previousMembranePoints && previousMembranePoints.length === rawMembranePoints.length) {
+          // Interpolate between previous and current points for smooth transition
+          membranePoints = rawMembranePoints.map((curr, i) => {
+            let prev = previousMembranePoints[i];
+            return {
+              x: prev.x + (curr.x - prev.x) * smoothingFactor,
+              y: prev.y + (curr.y - prev.y) * smoothingFactor
+            };
+          });
+        } else {
+          // First frame or size changed - use raw points
+          membranePoints = rawMembranePoints;
+        }
+        
+        // Store current points for next frame smoothing
+        previousMembranePoints = membranePoints.map(p => ({ x: p.x, y: p.y }));
+        
+        // Apply additional smoothing passes to prevent bulges, knots, and indentations
+        // More passes with lighter smoothing for smoother, less jumpy transitions
+        for (let smoothPass = 0; smoothPass < 3; smoothPass++) {
+          membranePoints = membranePoints.map((p, i) => {
+            let prevIdx = (i - 1 + membranePoints.length) % membranePoints.length;
+            let nextIdx = (i + 1) % membranePoints.length;
+            let prev = membranePoints[prevIdx];
+            let next = membranePoints[nextIdx];
+            
+            // Weighted average: lighter smoothing weight for smoother transitions
+            let smoothWeight = 0.15; // Reduced from 0.25 for smoother, less aggressive smoothing
+            return {
+              x: p.x * (1 - smoothWeight * 2) + prev.x * smoothWeight + next.x * smoothWeight,
+              y: p.y * (1 - smoothWeight * 2) + prev.y * smoothWeight + next.y * smoothWeight
+            };
+          });
+        }
         
         // Use brighter color for membrane visibility
         // Make it more visible by using a semi-transparent version of text color
@@ -3426,33 +3735,54 @@ const sketch = p => {
           ? [200, 200, 220] // Light blue-gray for dark mode
           : [60, 60, 80];   // Dark blue-gray for light mode
         
+        // Draw membrane with soft fill and line (open path, no looping)
         // Outer glow layer (very transparent)
         p.noStroke();
         p.fill(membraneColor[0], membraneColor[1], membraneColor[2], 20);
         p.beginShape();
-        for (let i = 0; i < membranePoints.length; i++) {
-          p.vertex(membranePoints[i].x, membranePoints[i].y);
+        if (membranePoints.length >= 3) {
+          // Draw open path - start from first point, end at last point
+          // Add control points for smooth curves
+          let first = membranePoints[0];
+          let second = membranePoints[1];
+          let last = membranePoints[membranePoints.length - 1];
+          let secondLast = membranePoints[membranePoints.length - 2];
+          
+          // Start with control point for smooth beginning
+          p.curveVertex(secondLast.x, secondLast.y);
+          p.curveVertex(first.x, first.y);
+          
+          // Add all intermediate points
+          for (let i = 1; i < membranePoints.length - 1; i++) {
+            p.curveVertex(membranePoints[i].x, membranePoints[i].y);
+          }
+          
+          // End with control point for smooth ending (don't close the loop)
+          p.curveVertex(last.x, last.y);
+          p.curveVertex(second.x, second.y);
         }
-        p.endShape(p.CLOSE);
+        p.endShape(); // Open shape - no CLOSE
         
-        // Main membrane layer (transparent, pulsing)
+        // Main membrane layer (transparent, pulsing) - soft fill
         let membraneOpacity = 40 + Math.sin(membraneTime * 1.5) * 15; // Transparent (25-55 opacity)
         p.fill(membraneColor[0], membraneColor[1], membraneColor[2], membraneOpacity);
         p.beginShape();
-        for (let i = 0; i < membranePoints.length; i++) {
-          p.vertex(membranePoints[i].x, membranePoints[i].y);
+        if (membranePoints.length >= 3) {
+          let first = membranePoints[0];
+          let second = membranePoints[1];
+          let last = membranePoints[membranePoints.length - 1];
+          let secondLast = membranePoints[membranePoints.length - 2];
+          p.curveVertex(secondLast.x, secondLast.y);
+          p.curveVertex(first.x, first.y);
+          for (let i = 1; i < membranePoints.length - 1; i++) {
+            p.curveVertex(membranePoints[i].x, membranePoints[i].y);
+          }
+          p.curveVertex(last.x, last.y);
+          p.curveVertex(second.x, second.y);
         }
-        p.endShape(p.CLOSE);
+        p.endShape(); // Open shape - no CLOSE
         
-        // Membrane outline (subtle, pulsing)
-        p.stroke(membraneColor[0], membraneColor[1], membraneColor[2], 80 + Math.sin(membraneTime * 1.2) * 20);
-        p.strokeWeight(2.0); // Thinner stroke
-        p.noFill();
-        p.beginShape();
-        for (let i = 0; i < membranePoints.length; i++) {
-          p.vertex(membranePoints[i].x, membranePoints[i].y);
-        }
-        p.endShape(p.CLOSE);
+        // No outline - only fill is shown
       }
     }
     
@@ -3462,10 +3792,28 @@ const sketch = p => {
     // Global pulse for edges - synchronized with network pulse (more pronounced)
     let edgePulseTime = p.frameCount * 0.03; // Faster pulse for edges (doubled speed)
     
+    // Helper function to check if a node is visible (has appeared)
+    function isNodeVisible(nodeIndex) {
+      if (!isVoiceSpeaking || wordAppearanceOrder.length === 0) {
+        return true; // All visible when not speaking
+      }
+      let appearanceInfo = wordAppearanceOrder.find(w => w.nodeIndex === nodeIndex);
+      if (appearanceInfo) {
+        let spokenIndex = wordAppearanceOrder.indexOf(appearanceInfo);
+        return spokenIndex < spokenWordCount;
+      }
+      return true; // Default to visible if not in order
+    }
+    
     // First pass: draw non-highlighted edges with pulsing
     for (let edge of network.edges) {
       let source = network.nodes[edge.source];
       let target = network.nodes[edge.target];
+      
+      // Only draw edge if both nodes are visible
+      if (!isNodeVisible(edge.source) || !isNodeVisible(edge.target)) {
+        continue;
+      }
       
       // Check if this edge is connected to hovered node
       let isConnectedToHovered = hoveredNode && 
@@ -3490,6 +3838,11 @@ const sketch = p => {
       for (let edge of network.edges) {
         let source = network.nodes[edge.source];
         let target = network.nodes[edge.target];
+        
+        // Only draw edge if both nodes are visible
+        if (!isNodeVisible(edge.source) || !isNodeVisible(edge.target)) {
+          continue;
+        }
         
         // Check if this edge is connected to hovered node
         if (source === hoveredNode || target === hoveredNode) {
@@ -3576,19 +3929,15 @@ const sketch = p => {
       p.textFont('monospace');
       const colors = getColors();
       
-      // Enhanced pulsating for old collapsed nodes (thinking effect)
-      let pulseTime = p.frameCount * 0.05;
-      
+      // No pulsating for old collapsed nodes - constant size
       for (let node of oldCollapsedNodes) {
         let baseFontSize = 15 + node.frequency * 2;
-        let nodePulsePhase = node.id * 0.4;
         
-        // Strong pulsating effect (thinking)
-        let thinkingPulse = 1.0 + Math.sin(pulseTime * 2.0 + nodePulsePhase) * 0.25; // 25% size variation
-        let fontSize = baseFontSize * thinkingPulse;
+        // No pulsating - constant size
+        let fontSize = baseFontSize; // No pulsing
         
-        // Pulsating opacity (breathing effect)
-        let opacityPulse = oldOpacity * (0.7 + Math.sin(pulseTime * 1.8 + nodePulsePhase) * 0.3);
+        // Constant opacity - no breathing effect
+        let opacityPulse = oldOpacity; // No pulsing
         
         p.fill(colors.text[0], colors.text[1], colors.text[2], opacityPulse);
         p.noStroke();
@@ -3597,30 +3946,125 @@ const sketch = p => {
       }
     }
     
-    // Global pulsing effect - makes network feel alive (more pronounced)
-    let pulseTime = p.frameCount * 0.04; // Faster pulse (doubled speed)
-    let globalPulse = 1.0 + Math.sin(pulseTime) * 0.15; // 15% size variation (almost doubled)
-    
-    // Check if nodes are in collapsed/swarm state (for enhanced pulsating effects)
-    let isInCollapsedState = (isCollapsing || 
+      // Global pulsing effect - DISABLED: no pulsating
+      let pulseTime = p.frameCount * 0.02; // Not used but kept for compatibility
+      let globalPulse = 1.0; // No pulsing - constant size
+      
+      // Check if nodes are in collapsed/swarm state (for enhanced pulsating effects)
+      let isInCollapsedState = (isCollapsing || 
                               (isMovingToCenter && centerMoveProgress >= 1) ||
                               (networkBirthProgress > 0 && networkBirthProgress < 1));
     
     for (let node of network.nodes) {
+      // Check if this node should be visible based on word appearance order
+      let nodeIndex = network.nodes.indexOf(node);
+      let shouldBeVisible = false; // Start invisible - only show word-by-word
+      let appearanceProgress = 0.0; // Start at 0 visibility
+      
+      // Always use word-by-word appearance if we have appearance order
+      // Don't show all nodes at once - only show them as they appear
+      if (wordAppearanceOrder.length > 0) {
+        let appearanceInfo = wordAppearanceOrder.find(w => w.nodeIndex === nodeIndex);
+        if (appearanceInfo) {
+          let spokenIndex = wordAppearanceOrder.indexOf(appearanceInfo);
+          
+          // Calculate smooth appearance progress based on audio timing
+          if (audioContext && audioStartTime > 0) {
+            try {
+              const currentTime = audioContext.currentTime - audioStartTime;
+              const progress = Math.max(0, Math.min(1, currentTime / audioDuration));
+              
+              // Calculate when this word should appear (based on its position in order)
+              const totalWords = wordAppearanceOrder.length;
+              const wordStartProgress = spokenIndex / totalWords;
+              const wordEndProgress = (spokenIndex + 1) / totalWords;
+              
+              // Smooth appearance: start appearing slightly before, fully visible at its time
+              const appearanceWindow = 0.1; // 10% of total duration for smooth transition
+              const wordAppearStart = Math.max(0, wordStartProgress - appearanceWindow);
+              
+              if (progress < wordAppearStart) {
+                // Not yet time to appear
+                appearanceProgress = 0.0;
+                shouldBeVisible = false;
+              } else if (progress >= wordEndProgress) {
+                // Fully visible
+                appearanceProgress = 1.0;
+                shouldBeVisible = true;
+              } else {
+                // Currently appearing - smooth transition
+                const localProgress = (progress - wordAppearStart) / (wordEndProgress - wordAppearStart + appearanceWindow);
+                appearanceProgress = Math.max(0, Math.min(1, localProgress));
+                shouldBeVisible = appearanceProgress > 0.1;
+              }
+            } catch (e) {
+              // Fallback if audio context unavailable
+              shouldBeVisible = spokenIndex < spokenWordCount;
+              appearanceProgress = shouldBeVisible ? 1.0 : 0.0;
+            }
+          } else {
+            // Voice not speaking yet or audio not started - use spokenWordCount
+            // Only show words that have been "spoken" (appeared)
+            // Between continuous generations, spokenWordCount starts at 0, so no nodes show until voice starts
+            shouldBeVisible = spokenIndex < spokenWordCount;
+            appearanceProgress = shouldBeVisible ? 1.0 : 0.0;
+          }
+        } else {
+          // Node not in appearance order - don't show it
+          shouldBeVisible = false;
+          appearanceProgress = 0.0;
+        }
+      } else {
+        // No appearance order yet - don't show any nodes
+        shouldBeVisible = false;
+        appearanceProgress = 0.0;
+      }
+      
+      // All words birth from near top of window with margin from border
+      // Calculate position in world coordinates
+      // Screen center is at (0, 0) in world space
+      // Position is topMargin pixels from top border
+      // In world coordinates: (screenY - p.height/2) / viewZoom - viewOffsetY
+      // Screen Y: topMargin
+      // World Y: (topMargin - p.height / 2) / viewZoom - viewOffsetY = -(p.height / 2 - topMargin) / viewZoom - viewOffsetY
+      let centerX = 0; // Center horizontally
+      let topMargin = 80; // Margin from top border in pixels
+      let centerY = (-(p.height / 2 - topMargin)) / viewZoom - viewOffsetY; // Near top with margin
+      
+      // If not fully visible yet, animate from center
+      if (appearanceProgress < 1.0) {
+        // Smooth easing for appearance (ease-out cubic)
+        let easedProgress = 1 - Math.pow(1 - appearanceProgress, 3);
+        
+        // All words start at center and animate to their target position
+        // Interpolate position from center to basePosition
+        node.position.x = centerX + (node.basePosition.x - centerX) * easedProgress;
+        node.position.y = centerY + (node.basePosition.y - centerY) * easedProgress;
+        
+        // Reset velocity during appearance animation
+        node.velocity.x = 0;
+        node.velocity.y = 0;
+        
+        // Skip drawing if not visible yet (too small)
+        if (appearanceProgress < 0.1) continue;
+      } else {
+        // When fully visible, ensure position transitions smoothly to basePosition
+        // Only start physics after fully appeared
+        if (node.position.x === 0 && node.position.y === 0) {
+          // If still at origin, move to basePosition
+          node.position.x = node.basePosition.x;
+          node.position.y = node.basePosition.y;
+        }
+      }
+      
       // Font size based on frequency - smaller font
       let baseFontSize = 15 + node.frequency * 2;
       
       // Individual node pulsing - each node pulses at different phase (more pronounced)
       let nodePulsePhase = node.id * 0.3; // Unique phase per node
       
-      // Enhanced pulsating for collapsed nodes (thinking effect)
-      let nodePulse;
-      if (isInCollapsedState) {
-        // Stronger pulsating when collapsed (thinking)
-        nodePulse = 1.0 + Math.sin(pulseTime * 2.0 + nodePulsePhase) * 0.25; // 25% size variation
-      } else {
-        nodePulse = 1.0 + Math.sin(pulseTime * 1.5 + nodePulsePhase) * 0.12; // 12% individual pulse (more than doubled)
-      }
+      // No pulsating - constant size for all nodes
+      let nodePulse = 1.0; // No pulsing - constant size
       
       // Combine global and individual pulsing
       let fontSize = baseFontSize * globalPulse * nodePulse;
@@ -3637,7 +4081,9 @@ const sketch = p => {
       }
       
       // Pulsing opacity for nodes - more pronounced pulsing
+      // Apply appearance progress to opacity
       let baseOpacity = isHighlighted ? 255 : 200; // Full opacity when highlighted
+      baseOpacity = baseOpacity * appearanceProgress; // Scale by appearance progress
       let opacityVariation = isHighlighted ? 20 : 50; // More opacity variation (increased from 30)
       
       // Enhanced opacity pulsating for collapsed nodes (breathing/thinking effect)
@@ -4247,6 +4693,11 @@ const sketch = p => {
       source.connect(gainNode);
       gainNode.connect(audioContext.destination);
       
+      // Track audio timing for word-by-word appearance
+      audioDuration = audioBuffer.duration;
+      audioStartTime = audioContext.currentTime;
+      spokenWordCount = 0; // Reset spoken word count
+      
       // Store reference to stop if needed
       currentUtterance = source;
       
@@ -4280,6 +4731,8 @@ const sketch = p => {
       source.onended = () => {
         currentUtterance = null;
         isVoiceSpeaking = false; // Voice stopped speaking
+        // Show all words when speech finishes
+        spokenWordCount = wordAppearanceOrder.length;
         // Trigger next generation after reading is complete (only if auto-generation is enabled)
         if (autoGenerationEnabled && textTyped === currentTextBeingRead && textTyped.length > 0) {
           // Small delay before triggering next generation
@@ -4333,6 +4786,8 @@ const sketch = p => {
         // Trigger next generation when finished reading (only if auto-generation is enabled)
         utterance.onend = () => {
           isVoiceSpeaking = false; // Voice stopped speaking
+          // Show all words when speech finishes
+          spokenWordCount = wordAppearanceOrder.length;
           if (autoGenerationEnabled && textTyped === currentTextBeingRead && textTyped.length > 0) {
             setTimeout(() => {
               if (autoGenerationEnabled && textTyped === currentTextBeingRead && !isLoading) {
@@ -4428,12 +4883,12 @@ const sketch = p => {
     }
   }
 
-  // Function to draw dark mode toggle in top left
+  // Function to draw dark mode toggle in bottom left
   function drawDarkModeToggle(p) {
     const colors = getColors();
     const buttonSize = Math.min(28, Math.max(24, p.width * 0.03)); // Smaller adaptive size
     const buttonX = 20;
-    const buttonY = 20;
+    const buttonY = p.height - buttonSize - 20; // Bottom left, 20px from bottom
     
     p.push();
     
@@ -4459,8 +4914,8 @@ const sketch = p => {
     const colors = getColors();
     const buttonWidth = Math.min(60, Math.max(50, p.width * 0.06)); // Smaller adaptive width
     const buttonHeight = Math.min(28, Math.max(24, p.width * 0.03)); // Smaller adaptive height
-    const buttonX = p.width - buttonWidth - 20; // Top right
-    const buttonY = 20; // Top right
+    const buttonX = p.width - buttonWidth - 20; // Right side
+    const buttonY = p.height - buttonHeight - 20; // Bottom right, 20px from bottom
     
     p.push();
     
@@ -4569,7 +5024,7 @@ const sketch = p => {
   function checkDarkModeToggleClick(p, mouseX, mouseY) {
     const buttonSize = Math.min(28, Math.max(24, p.width * 0.03)); // Smaller adaptive button size
     const buttonX = 20;
-    const buttonY = 20;
+    const buttonY = p.height - buttonSize - 20; // Bottom left, 20px from bottom
     
     if (mouseX >= buttonX && mouseX <= buttonX + buttonSize &&
         mouseY >= buttonY && mouseY <= buttonY + buttonSize) {
@@ -4584,7 +5039,7 @@ const sketch = p => {
     const colors = getColors();
     const buttonSize = Math.min(28, Math.max(24, p.width * 0.03)); // Same size as dark mode toggle
     const buttonX = 20;
-    const buttonY = 20 + buttonSize + 10; // Below dark mode toggle
+    const buttonY = p.height - (buttonSize + 10) * 2 - 20; // Above dark mode toggle, bottom left
     
     p.push();
     
@@ -4610,7 +5065,7 @@ const sketch = p => {
   function checkSoundToggleClick(p, mouseX, mouseY) {
     const buttonSize = Math.min(28, Math.max(24, p.width * 0.03));
     const buttonX = 20;
-    const buttonY = 20 + buttonSize + 10; // Below dark mode toggle
+    const buttonY = p.height - (buttonSize + 10) * 2 - 20; // Above dark mode toggle, bottom left
     
     if (mouseX >= buttonX && mouseX <= buttonX + buttonSize &&
         mouseY >= buttonY && mouseY <= buttonY + buttonSize) {
@@ -4652,8 +5107,8 @@ const sketch = p => {
     
     const buttonWidth = Math.min(60, Math.max(50, p.width * 0.06)); // Smaller adaptive width
     const buttonHeight = Math.min(28, Math.max(24, p.width * 0.03)); // Smaller adaptive height
-    const buttonX = p.width - buttonWidth - 20; // Top right
-    const buttonY = 20; // Top right
+    const buttonX = p.width - buttonWidth - 20; // Right side
+    const buttonY = p.height - buttonHeight - 20; // Bottom right, 20px from bottom
     
     if (mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
         mouseY >= buttonY && mouseY <= buttonY + buttonHeight) {
@@ -5117,32 +5572,7 @@ const sketch = p => {
   p.fill(colors.text[0], colors.text[1], colors.text[2], 100 + p.sin(time * 5) * 100);
   p.text(t('generating'), 0, 250);
   
-  // Draw "thinking" word when loading (not on landing page)
-  if (isLoading) {
-    // Global pulsing effect for "thinking" word
-    let pulseTime = p.frameCount * 0.04;
-    
-    // Floating position for "thinking" word - moves in larger pattern
-    let thinkingTime = p.frameCount * 0.015; // Slower movement
-    let thinkingRadius = 25; // Larger radius
-    let thinkingX = Math.cos(thinkingTime) * thinkingRadius;
-    let thinkingY = Math.sin(thinkingTime * 1.3) * thinkingRadius;
-    
-    // Strong pulsating effect for "thinking" word
-    let thinkingPulse = 1.0 + Math.sin(pulseTime * 2.5) * 0.35; // 35% size variation
-    let thinkingFontSize = 20 * thinkingPulse;
-    
-    // Pulsating opacity (breathing effect)
-    let thinkingOpacity = 255 * (0.5 + Math.sin(pulseTime * 2.0) * 0.5); // 50-100% opacity
-    
-    // Draw "thinking" word
-    p.textAlign(p.CENTER, p.CENTER);
-    p.textFont('monospace');
-    p.fill(colors.text[0], colors.text[1], colors.text[2], thinkingOpacity);
-    p.noStroke();
-    p.textSize(thinkingFontSize);
-    p.text(t('thinking'), thinkingX, thinkingY);
-  }
+  // "Thinking" word removed - no thinking animation
 
   p.pop();
   }
