@@ -1,6 +1,6 @@
 # Semantic Tensegrities
 
-**An Speculative Theory of Synthetic Meaning**
+**A Speculative Theory of Synthetic Meaning**
 
 A generative installation exploring computational linguistics, semantic relationships, and the concept of semantic tensegrity - how meaning emerges from the structural tension and compression between words, concepts, and relationships.
 
