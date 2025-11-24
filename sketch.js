@@ -217,7 +217,7 @@ const sketch = p => {
   const translations = {
     en: {
       title: 'SEMANTIC TENSEGRITIES',
-      subtitle: 'An Speculative Theory of Synthetic Meaning',
+      subtitle: 'A Speculative Theory of Synthetic Meaning',
       pressSpacebar: 'Press SPACEBAR to start',
       autoGeneration: 'Generation continues automatically',
       autoRead: 'Text is read automatically when generated',
