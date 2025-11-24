@@ -50,11 +50,13 @@ The installation generates texts about computational linguistics, probability di
 - **Dynamic Word Network**: Words are visualized as nodes connected by semantic relationships
 - **Word-by-Word Appearance**: Words appear one by one from the top of the canvas, synchronized with the spoken audio
 - **Synchronized Animation**: Words birth from the origin point (near top) as they are spoken, creating a visual-audio synchronization
+- **Sequential Text Flow**: Black curved line connects words in the order they appear in the generated text, showing the sequential flow through the network
+- **Closed Shape Fill**: When the sequential line forms a closed loop, the enclosed area is filled with soft gray
 - **Blue Edge Connections**: Simple blue edges connect semantically related words
 - **Interactive Exploration**: Hover over nodes to see relationships, click and drag to explore the network
 - **Semantic Clustering**: Words are positioned based on their semantic relationships (language, space, latent dimensions)
 - **Ensured Connectivity**: All nodes are guaranteed to be connected in the network visualization
-- **Physics Simulation**: Organic movement with spring forces, repulsion, and boundary constraints
+- **Physics Simulation**: Organic, slower movement with spring forces, repulsion, and boundary constraints
 - **Spacious Layout**: Network maintains generous spacing between words for clarity
 - **Balanced Positioning**: Network is balanced to prevent rightward drift, with slight leftward bias
 

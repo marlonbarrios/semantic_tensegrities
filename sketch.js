@@ -2928,9 +2928,9 @@ const sketch = p => {
     // Physics constants - slower animation for new generation
     // Gradually increase speed as network reveals (based on networkRevealProgress)
     let speedMultiplier = 0.2 + networkRevealProgress * 0.8; // Start at 20% speed, reach 100% when fully revealed
-    let springStrength = 0.025 * speedMultiplier; // Reduced spring strength for more spacious network
-    let damping = 0.88 + (1 - speedMultiplier) * 0.07; // Higher damping initially (more controlled)
-    let returnStrength = 0.015 * speedMultiplier; // Reduced return strength to allow more spacing
+    let springStrength = 0.015 * speedMultiplier; // Reduced spring strength for slower movement (was 0.025)
+    let damping = 0.92 + (1 - speedMultiplier) * 0.05; // Higher damping for slower movement (was 0.88-0.95, now 0.92-0.97)
+    let returnStrength = 0.01 * speedMultiplier; // Reduced return strength for slower movement (was 0.015)
     
     // Convert mouse velocity to world coordinates (account for zoom)
     let worldMouseVelX = (mouseVelX || 0) / viewZoom;
@@ -3252,8 +3252,8 @@ const sketch = p => {
       
       // Active floating movement - slower for new generation
       // Use sine waves with different phases per node for organic movement
-      let floatSpeed = 0.008 * speedMultiplier; // Slower floating speed initially
-      let floatAmplitude = 1.0 * speedMultiplier; // Smaller amplitude initially
+      let floatSpeed = 0.005 * speedMultiplier; // Slower floating speed (was 0.008)
+      let floatAmplitude = 0.6 * speedMultiplier; // Smaller amplitude for slower movement (was 1.0)
       let time = p.frameCount * floatSpeed;
       
       // Each node has unique phase based on its ID
@@ -3288,7 +3288,7 @@ const sketch = p => {
       // Collision avoidance - prevent word overlap
       // Calculate minimum distance based on font sizes
       let nodeFontSize = 15 + node.frequency * 2;
-      let collisionStrength = 0.1; // Increased strength for more active collisions
+      let collisionStrength = 0.06; // Reduced strength for slower movement (was 0.1)
       
       for (let otherNode of network.nodes) {
         if (otherNode.id === node.id) continue; // Skip self
@@ -3875,6 +3875,69 @@ const sketch = p => {
           p.line(source.position.x, source.position.y, target.position.x, target.position.y);
         }
       }
+    }
+    
+    // Draw sequential text flow line - black curved line connecting words in order of appearance
+    // This line shows the sequence of words as they appear in the generated text
+    if (wordAppearanceOrder.length > 1) {
+      p.push();
+      
+      // Collect visible sequential points
+      let visiblePoints = [];
+      for (let i = 0; i < wordAppearanceOrder.length; i++) {
+        let wordInfo = wordAppearanceOrder[i];
+        if (isNodeVisible(wordInfo.nodeIndex)) {
+          let node = network.nodes[wordInfo.nodeIndex];
+          visiblePoints.push({ x: node.position.x, y: node.position.y });
+        }
+      }
+      
+      // Draw curved line through all visible points
+      if (visiblePoints.length > 2) {
+        // Check if the curve forms a closed shape (first and last points are close)
+        let firstPoint = visiblePoints[0];
+        let lastPoint = visiblePoints[visiblePoints.length - 1];
+        let distanceToClose = Math.sqrt(
+          Math.pow(lastPoint.x - firstPoint.x, 2) + 
+          Math.pow(lastPoint.y - firstPoint.y, 2)
+        );
+        let isClosed = distanceToClose < 50; // Consider closed if within 50 pixels
+        
+        // Draw fill first if closed
+        if (isClosed) {
+          p.fill(200, 200, 200, 40); // Soft gray with low opacity
+          p.noStroke();
+          p.beginShape();
+          for (let i = 0; i < visiblePoints.length; i++) {
+            let point = visiblePoints[i];
+            // For the first and last points, we need to add them twice for curve control
+            if (i === 0 || i === visiblePoints.length - 1) {
+              p.curveVertex(point.x, point.y); // Add control point
+            }
+            p.curveVertex(point.x, point.y); // Add actual point
+          }
+          // Close the shape by connecting back to first point
+          p.curveVertex(firstPoint.x, firstPoint.y); // Close the curve
+          p.endShape(p.CLOSE);
+        }
+        
+        // Draw the black stroke on top - thickest line in the system
+        p.stroke(0, 0, 0); // Black color
+        p.strokeWeight(6.0); // Thickest line in the system
+        p.noFill();
+        p.beginShape();
+        for (let i = 0; i < visiblePoints.length; i++) {
+          let point = visiblePoints[i];
+          // For the first and last points, we need to add them twice for curve control
+          // For intermediate points, add them once
+          if (i === 0 || i === visiblePoints.length - 1) {
+            p.curveVertex(point.x, point.y); // Add control point
+          }
+          p.curveVertex(point.x, point.y); // Add actual point
+        }
+        p.endShape();
+      }
+      p.pop();
     }
     
     // Draw nodes as words - 2D rendering
