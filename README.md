@@ -4,7 +4,7 @@
 
 ![Network Visualization - Sequential Flow](public/st2.png)
 
-A generative installation exploring computational linguistics, semantic relationships, and the concept of semantic tensegrity - how meaning emerges from the structural tension and compression between words, concepts, and relationships.
+A generative installation inspired by concepts of computational linguistics, semantic relationships, and the concept of semantic tensegrity as a speculative theory of meaning that reflects the physics of abstraction - how meaning emerges from the structural tension and compression between words, concepts, and relationships.
 
 Powered by OpenAI Realtime model (GPT-4o) and OpenAI TTS, designed in p5.js.
 
@@ -249,3 +249,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+**Repository:** [https://github.com/marlonbarrios/semantic_tensegrities](https://github.com/marlonbarrios/semantic_tensegrities)

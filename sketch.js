@@ -4218,6 +4218,11 @@ const sketch = p => {
       return; // Don't process other clicks if credits were clicked
     }
     
+    // Check if repository link was clicked (only on home page)
+    if (textTyped.length === 0 && checkRepoClick(p, p.mouseX, p.mouseY)) {
+      return; // Don't process other clicks if repo link was clicked
+    }
+    
     // Mobile: tap anywhere on landing page to start
     if (textTyped.length === 0 && !isLoading) {
       const isMobile = p.width < 768 || ('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -4351,7 +4356,8 @@ const sketch = p => {
         checkSoundToggleClick(p, p.mouseX, p.mouseY) ||
         checkLanguageMenuClick(p, p.mouseX, p.mouseY) ||
         checkVoiceMenuClick(p, p.mouseX, p.mouseY) ||
-        checkCreditsClick(p, p.mouseX, p.mouseY)) {
+        checkCreditsClick(p, p.mouseX, p.mouseY) ||
+        checkRepoClick(p, p.mouseX, p.mouseY)) {
       return false; // Button was clicked, let UI handle it
     }
     
@@ -5421,7 +5427,7 @@ const sketch = p => {
     // So the actual screen position is (p.width/2, p.height/2 + creditsY)
     const baseFontSize = Math.min(32, p.width / 20);
     const creditsFontSize = Math.max(8, baseFontSize * 0.25);
-    const creditsYRelative = p.height / 2 - 30; // Relative to center
+    const creditsYRelative = p.height / 2 - 50; // Relative to center (matches displayInstructions)
     const creditsText = 'Concept and development by Marlon Barrios Solano';
     
     // Estimate text width
@@ -5440,6 +5446,47 @@ const sketch = p => {
         mouseY <= creditsYScreen + textHeight / 2 + 5) {
       // Open link in new tab
       window.open('https://marlonbarrios.github.io/', '_blank');
+      return true;
+    }
+    return false;
+  }
+  
+  // Function to check if repository link is clicked
+  function checkRepoClick(p, mouseX, mouseY) {
+    // Only check if on home page
+    if (textTyped.length > 0) {
+      return false;
+    }
+    
+    // Calculate repo text position (on same line as powered by)
+    const baseFontSize = Math.min(32, p.width / 20);
+    const creditsFontSize = Math.max(8, baseFontSize * 0.25);
+    const creditsYRelative = p.height / 2 - 50; // Relative to center
+    const poweredByYRelative = creditsYRelative + creditsFontSize + 4;
+    const repoText = 'Repository';
+    const poweredByText = 'Powered by OpenAI Realtime model';
+    const separator = ' | ';
+    
+    // Calculate text widths
+    p.textFont('monospace', creditsFontSize);
+    const poweredByWidth = p.textWidth(poweredByText);
+    const separatorWidth = p.textWidth(separator);
+    const repoTextWidth = p.textWidth(repoText);
+    const combinedWidth = poweredByWidth + separatorWidth + repoTextWidth;
+    
+    // Calculate repository link position
+    const repoXStart = p.width / 2 - combinedWidth / 2 + poweredByWidth + separatorWidth;
+    const repoXEnd = repoXStart + repoTextWidth;
+    const repoYScreen = p.height / 2 + poweredByYRelative;
+    const textHeight = creditsFontSize;
+    
+    // Check if click is within repo text bounds
+    if (mouseX >= repoXStart - 5 && 
+        mouseX <= repoXEnd + 5 &&
+        mouseY >= repoYScreen - textHeight / 2 - 5 && 
+        mouseY <= repoYScreen + textHeight / 2 + 5) {
+      // Open link in new tab
+      window.open('https://github.com/marlonbarrios/semantic_tensegrities', '_blank');
       return true;
     }
     return false;
@@ -5516,7 +5563,7 @@ const sketch = p => {
     const creditsText = 'Concept and development by Marlon Barrios Solano';
     
     // Check if mouse is hovering over credits (for visual feedback)
-    const creditsY = p.height / 2 - 30;
+    const creditsY = p.height / 2 - 50;
     const textWidth = p.textWidth(creditsText);
     const textHeight = creditsFontSize;
     const creditsX = 0; // Already translated to center
@@ -5543,11 +5590,55 @@ const sketch = p => {
     p.line(-textWidth / 2, creditsY + 3, textWidth / 2, creditsY + 3);
     p.noStroke();
     
-    // Powered by OpenAI Realtime model
+    // Powered by OpenAI Realtime model and Repository link (on same line)
     const poweredByText = 'Powered by OpenAI Realtime model';
-    const poweredByY = creditsY + creditsFontSize + 8;
+    const repoText = 'Repository';
+    const separator = ' | ';
+    const poweredByY = creditsY + creditsFontSize + 4;
+    
+    // Calculate positions for combined text
+    p.textFont('monospace', creditsFontSize);
+    const poweredByWidth = p.textWidth(poweredByText);
+    const separatorWidth = p.textWidth(separator);
+    const repoTextWidth = p.textWidth(repoText);
+    const combinedWidth = poweredByWidth + separatorWidth + repoTextWidth;
+    
+    // Draw "Powered by" text
     p.fill(colors.textQuaternary[0], colors.textQuaternary[1], colors.textQuaternary[2], colors.textQuaternary[3] || 70);
-    p.text(poweredByText, 0, poweredByY);
+    p.text(poweredByText, -combinedWidth / 2 + poweredByWidth / 2, poweredByY);
+    
+    // Draw separator
+    p.text(separator, -combinedWidth / 2 + poweredByWidth + separatorWidth / 2, poweredByY);
+    
+    // Check if hovering over repository link
+    const repoXStart = -combinedWidth / 2 + poweredByWidth + separatorWidth;
+    const repoXEnd = repoXStart + repoTextWidth;
+    const repoXCenter = repoXStart + repoTextWidth / 2;
+    const repoMouseXLocal = p.mouseX - p.width / 2;
+    const repoMouseYLocal = p.mouseY - p.height / 2;
+    const isHoveringRepo = repoMouseXLocal >= repoXStart - 5 && 
+                           repoMouseXLocal <= repoXEnd + 5 &&
+                           repoMouseYLocal >= poweredByY - creditsFontSize / 2 - 5 && 
+                           repoMouseYLocal <= poweredByY + creditsFontSize / 2 + 5;
+    
+    // Draw repository link with hover effect
+    if (isHoveringRepo) {
+      p.fill(colors.textQuaternary[0], colors.textQuaternary[1], colors.textQuaternary[2], 150);
+      p.cursor('pointer');
+    } else {
+      p.fill(colors.textQuaternary[0], colors.textQuaternary[1], colors.textQuaternary[2], 100);
+    }
+    p.text(repoText, repoXCenter, poweredByY);
+    
+    // Draw underline for repository link
+    if (isHoveringRepo) {
+      p.stroke(colors.textQuaternary[0], colors.textQuaternary[1], colors.textQuaternary[2], 150);
+    } else {
+      p.stroke(colors.textQuaternary[0], colors.textQuaternary[1], colors.textQuaternary[2], 80);
+    }
+    p.strokeWeight(0.5);
+    p.line(repoXStart, poweredByY + 3, repoXEnd, poweredByY + 3);
+    p.noStroke();
     
     p.pop();
     
