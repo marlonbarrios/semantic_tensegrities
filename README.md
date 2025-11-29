@@ -2,6 +2,8 @@
 
 **A Speculative Theory of Synthetic Meaning**
 
+![Network Visualization - Sequential Flow](public/st2.png)
+
 A generative installation exploring computational linguistics, semantic relationships, and the concept of semantic tensegrity - how meaning emerges from the structural tension and compression between words, concepts, and relationships.
 
 Powered by OpenAI Realtime model (GPT-4o) and OpenAI TTS, designed in p5.js.
@@ -62,7 +64,7 @@ The installation generates texts that explore speculative theories about computa
 - **Spacious Layout**: Network maintains generous spacing between words for clarity
 - **Balanced Positioning**: Network is balanced to prevent rightward drift, with slight leftward bias
 
-![Network Visualization - Sequential Flow](public/st2.png)
+
 
 ![Network Visualization - Semantic Relationships](public/st2.5.png)
 
