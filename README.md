@@ -16,9 +16,11 @@ The live application is hosted on Vercel and ready to use. Simply visit the link
 
 ## Concept
 
-**Semantic Tensegrities** is an interactive installation that visualizes language as a network of semantic relationships. The work explores how meaning emerges from the structural tension and compression between words, concepts, and relationships - similar to how tensegrity structures maintain integrity through balanced forces.
+**Semantic Tensegrities** is an interactive installation that visualizes language as a network of semantic relationships. The work is fundamentally **speculative** - it explores how meaning *might* emerge from the structural tension and compression between words, concepts, and relationships - similar to how tensegrity structures maintain integrity through balanced forces. This is not a definitive theory but rather a speculative framework that invites contemplation on the nature of meaning in computational and natural language systems.
 
-The installation generates texts about computational linguistics, probability distributions, language models, semantic analysis, gradient descent, free energy principles, metacognition, autoregressive processes, and attention mechanisms. These texts are then visualized as dynamic networks where words become nodes connected by semantic relationships, with words appearing one by one from the top of the canvas, synchronized with the spoken audio, creating a living visualization of meaning.
+The installation generates texts that explore speculative theories about computational linguistics, probability distributions, language models, semantic analysis, gradient descent, free energy principles, metacognition, autoregressive processes, and attention mechanisms. These speculative texts are then visualized as dynamic networks where words become nodes connected by semantic relationships, with words appearing one by one from the top of the canvas, synchronized with the spoken audio, creating a living visualization of speculative meaning. The work creates attention on the visualization of the vectors of the text - the vectorial representation of words and their semantic relationships - and the network of relationships, visualizing an emergent spatial structure where meaning takes form through the interplay of sequential prediction (the thick black line tracing word order) and semantic weights (the blue edges connecting related concepts), revealing how language might organize itself in spatial dimensions.
+
+![Semantic Tensegrities Installation](public/st1.png)
 
 ## Features
 
@@ -60,6 +62,10 @@ The installation generates texts about computational linguistics, probability di
 - **Spacious Layout**: Network maintains generous spacing between words for clarity
 - **Balanced Positioning**: Network is balanced to prevent rightward drift, with slight leftward bias
 
+![Network Visualization - Sequential Flow](public/st2.png)
+
+![Network Visualization - Semantic Relationships](public/st2.5.png)
+
 ### Audio Experience
 - **OpenAI Text-to-Speech**: Generated texts are read aloud using OpenAI's TTS API with natural-sounding voices (tts-1-hd model)
 - **Voice Selection**: Dropdown menu to select from available OpenAI TTS voices (alloy, echo, fable, onyx, nova, shimmer)
@@ -97,6 +103,10 @@ The installation generates texts about computational linguistics, probability di
 - **Home Button**: Click the home button (bottom right, when network is visible) to return to landing page and stop all generation/sound
 - **Dark/Light Mode**: Toggle between color schemes using the button in the bottom left
 - **Ticker Toggle**: Button to show/hide the ticker display
+
+![Visual Elements - Dark Mode](public/st3.png)
+
+![Visual Elements - Light Mode](public/st4.png)
 
 ## Setup
 
