@@ -130,16 +130,32 @@ npm install
 ```
 
 3. Set your OpenAI API key:
-   - Create a `.env` file in the root directory
+   - Create a `.env` file in the root directory (or copy `.env.example` to `.env`)
    - Add your OpenAI API key: `VITE_OPENAI_KEY=your_api_key_here`
-   - Or set it directly in `sketch.js` (for local development only)
+   - Get your API key from: https://platform.openai.com/api-keys
 
-4. Start the development server:
-```bash
-npm run dev
-```
+4. Start the development servers:
+   
+   **Option 1: Run both servers together (recommended)**
+   ```bash
+   npm run dev:all
+   ```
+   
+   **Option 2: Run servers separately**
+   
+   In one terminal, start the proxy server:
+   ```bash
+   npm run server
+   ```
+   
+   In another terminal, start the Vite dev server:
+   ```bash
+   npm run dev
+   ```
 
 5. Open your browser to `http://localhost:5173/`
+
+**Note:** The proxy server (running on port 3001) is required to avoid CORS issues when calling the OpenAI API from the browser. Make sure both servers are running before using the application.
 
 ## How to Use
 

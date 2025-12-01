@@ -1,13 +1,12 @@
 import './style.css';
-import OpenAI from 'openai';
+// OpenAI import removed - using proxy server instead to avoid CORS issues
 
 // P_3_1_2_01 - Typewriter Visual Composition
 // Adapted from Generative Gestaltung
 // Integrated with GPT-4 AI text generation
 
-const openAIKey = import.meta.env.VITE_OPENAI_KEY;
-
-let openai;
+// API key is now used by the proxy server (server.js)
+// const openAIKey = import.meta.env.VITE_OPENAI_KEY;
 let isLoading = false;
 let loadingStartTime = 0; // Track when loading started
 const MAX_LOADING_TIME = 60000; // 60 seconds max loading time
@@ -4708,7 +4707,7 @@ const sketch = p => {
 
   // Function to read text using OpenAI TTS API (triggers next generation when finished)
   async function readText(text) {
-    if (!openai) return;
+    // No need to check openai client - we use proxy now
     
     // Prevent multiple voices from playing simultaneously
     // Stop any current speech first and wait a moment for cleanup
@@ -4731,15 +4730,25 @@ const sketch = p => {
       // Set current text being read
       currentTextBeingRead = text;
       
-      // Generate speech using OpenAI TTS (HD model for better quality, matching Realtime API voice)
-      const mp3 = await openai.audio.speech.create({
-        model: "tts-1-hd", // Use OpenAI TTS HD model for better quality (matches Realtime API quality)
-        voice: currentVoice, // Use selected voice
-        input: cleanText,
+      // Generate speech using OpenAI TTS via proxy (HD model for better quality, matching Realtime API voice)
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "tts-1-hd",
+          voice: currentVoice,
+          input: cleanText,
+        })
       });
       
+      if (!response.ok) {
+        throw new Error(`TTS API error: ${response.status} ${response.statusText}`);
+      }
+      
       // Get audio buffer
-      const buffer = await mp3.arrayBuffer();
+      const buffer = await response.arrayBuffer();
       
       // Play audio using Web Audio API
       if (!audioContext) {
@@ -4885,16 +4894,28 @@ const sketch = p => {
         setTimeout(() => reject(new Error('API call timeout after 30 seconds')), 30000);
       });
       
-      const apiPromise = openai.chat.completions.create({
-        model: "gpt-4o", // Using latest realtime/fast model
-        temperature: 1.0,
-        messages: [
-          { 
-            "role": "system", 
-            "content": getSystemPrompt()
-          },
-          { "role": "user", "content": prompt }
-        ]
+      // Use proxy endpoint to avoid CORS issues
+      const apiPromise = fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "gpt-4o",
+          temperature: 1.0,
+          messages: [
+            { 
+              "role": "system", 
+              "content": getSystemPrompt()
+            },
+            { "role": "user", "content": prompt }
+          ]
+        })
+      }).then(res => {
+        if (!res.ok) {
+          throw new Error(`API error: ${res.status} ${res.statusText}`);
+        }
+        return res.json();
       });
       
       const completion = await Promise.race([apiPromise, timeoutPromise]);
@@ -5733,11 +5754,9 @@ const sketch = p => {
 };
 
 function onReady() {
-  openai = new OpenAI({
-    apiKey: openAIKey,
-    dangerouslyAllowBrowser: true
-  });
-
+  // OpenAI client no longer needed - we use proxy server instead
+  // openai initialization removed to avoid CORS issues
+  
   const mainElt = document.querySelector('main');
   new p5(sketch, mainElt);
 }
