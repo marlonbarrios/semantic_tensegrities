@@ -157,6 +157,27 @@ npm install
 
 **Note:** The proxy server (running on port 3001) is required to avoid CORS issues when calling the OpenAI API from the browser. Make sure both servers are running before using the application.
 
+### Vercel Deployment
+
+For production deployment on Vercel:
+
+1. **Set Environment Variable in Vercel:**
+   - Go to your Vercel project settings
+   - Navigate to "Environment Variables"
+   - Add `VITE_OPENAI_KEY` with your OpenAI API key value
+   - Make sure it's available for Production, Preview, and Development environments
+
+2. **Deploy:**
+   - Vercel automatically detects the `api/` directory and treats files in it as serverless functions
+   - The API routes (`/api/chat` and `/api/tts`) will be available as serverless functions
+   - No additional configuration needed - Vercel handles it automatically
+
+3. **Verify:**
+   - After deployment, check that the environment variable is set correctly
+   - The API endpoints should work without CORS issues
+
+**Note:** The `server.js` file is only for local development. On Vercel, the `api/` directory functions are used instead.
+
 ## How to Use
 
 ### Getting Started
